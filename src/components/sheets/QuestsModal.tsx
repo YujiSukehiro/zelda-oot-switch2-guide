@@ -3,6 +3,7 @@ import {
   Check,
   Clock,
   Droplets,
+  Lock,
   MapPin,
   Pause,
   Play,
@@ -11,7 +12,12 @@ import {
   Sparkles,
   Sword,
 } from 'lucide-react';
-import { REGION_BY_ID, SONGS_AND_QUESTS } from '../../data';
+import {
+  REGION_BY_ID,
+  REQUIREMENT_BY_ID,
+  SONGS_AND_QUESTS,
+  THREADS_OF_TIME_SECRETS,
+} from '../../data';
 import type { PlayerProgressState } from '../../types/zelda';
 import { SheetDialog } from './NoteBadge';
 import './sheets.css';
@@ -25,7 +31,7 @@ export interface QuestsModalProps {
   onSelectRegion: (regionId: string) => void;
 }
 
-type QuestViewTab = 'all' | 'biggoron' | 'masks';
+type QuestViewTab = 'all' | 'threads' | 'biggoron' | 'masks';
 
 const TIMER_PRESETS: ReadonlyArray<{ label: string; durationSec: number; stepHint: string }> = [
   { label: '4:00', durationSec: 240, stepHint: 'Step 4: Odd Mushroom' },
@@ -86,6 +92,10 @@ export function QuestsModal({
     setIsRunning(autoStart);
   };
 
+  const threadsCompletedCount = THREADS_OF_TIME_SECRETS.filter(
+    (quest) => state.completedSecretIds[quest.id],
+  ).length;
+
   const biggoronCompletedCount = SONGS_AND_QUESTS.biggoronSwordQuest.filter(
     (step) => state.completedSecretIds[`biggoron-step-${step.step}`],
   ).length;
@@ -98,10 +108,11 @@ export function QuestsModal({
   const zoraThawed = effectiveRequirements.has('zora-thawed');
   const biggoronSwordClaimed = Boolean(state.completedSecretIds['eq-biggoron-sword']);
 
+  const showThreads = activeTab === 'all' || activeTab === 'threads';
   const showBiggoron = activeTab === 'all' || activeTab === 'biggoron';
   const showMasks = activeTab === 'all' || activeTab === 'masks';
 
-  const tabOrder: readonly QuestViewTab[] = ['all', 'biggoron', 'masks'];
+  const tabOrder: readonly QuestViewTab[] = ['all', 'threads', 'biggoron', 'masks'];
 
   return (
     <SheetDialog
@@ -112,14 +123,16 @@ export function QuestsModal({
       title={
         <>
           <ScrollText size={19} aria-hidden="true" />
-          <span>Quest Chains Tracker — Biggoron’s Sword &amp; Happy Mask Shop</span>
+          <span>
+            Quest Chains Tracker — Threads of Time, Biggoron’s Sword &amp; Happy Mask Shop
+          </span>
         </>
       }
-      subtitle={`Biggoron Trade: ${biggoronCompletedCount}/12 Steps · Happy Mask Sequence: ${masksCompletedCount}/4 Deliveries`}
+      subtitle={`Threads of Time: ${threadsCompletedCount}/${THREADS_OF_TIME_SECRETS.length} · Biggoron Trade: ${biggoronCompletedCount}/12 Steps · Happy Mask: ${masksCompletedCount}/4`}
     >
       {/* Accessible Tab Switcher (ArrowLeft / ArrowRight keyboard support) */}
       <div
-        className="zelda-tablist"
+        className="zelda-tablist zelda-tablist--underline"
         role="tablist"
         aria-label="Quest chain sections"
         onKeyDown={(e) => {
@@ -136,7 +149,7 @@ export function QuestsModal({
         <button
           type="button"
           role="tab"
-          className="zelda-tab"
+          className="zelda-tab zelda-tab--underline"
           aria-selected={activeTab === 'all'}
           data-testid="quests-tab-all"
           onClick={() => setActiveTab('all')}
@@ -146,7 +159,17 @@ export function QuestsModal({
         <button
           type="button"
           role="tab"
-          className="zelda-tab"
+          className="zelda-tab zelda-tab--underline"
+          aria-selected={activeTab === 'threads'}
+          data-testid="quests-tab-threads"
+          onClick={() => setActiveTab('threads')}
+        >
+          Threads of Time ({threadsCompletedCount}/{THREADS_OF_TIME_SECRETS.length})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          className="zelda-tab zelda-tab--underline"
           aria-selected={activeTab === 'biggoron'}
           data-testid="quests-tab-biggoron"
           onClick={() => setActiveTab('biggoron')}
@@ -156,7 +179,7 @@ export function QuestsModal({
         <button
           type="button"
           role="tab"
-          className="zelda-tab"
+          className="zelda-tab zelda-tab--underline"
           aria-selected={activeTab === 'masks'}
           data-testid="quests-tab-masks"
           onClick={() => setActiveTab('masks')}
@@ -164,6 +187,155 @@ export function QuestsModal({
           Happy Mask Shop ({masksCompletedCount}/4)
         </button>
       </div>
+
+      {/* ====================================================================
+          SECTION 0: Threads of Time (6 Switch 2 Character Quests)
+         ==================================================================== */}
+      {showThreads ? (
+        <section
+          aria-label="Threads of Time (6 Switch 2 Character Quests)"
+          data-testid="threads-of-time-section"
+          style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}
+          >
+            <h3 style={{ margin: 0, fontSize: 'var(--text-base)', color: 'var(--color-triforce)' }}>
+              <Sparkles
+                size={16}
+                style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }}
+                aria-hidden="true"
+              />
+              Threads of Time (6 Switch 2 Character Quests) ({threadsCompletedCount}/
+              {THREADS_OF_TIME_SECRETS.length})
+            </h3>
+            <span className="zelda-badge zelda-badge--new">
+              All 6 Complete → Fierce Deity Tunic Cosmetic
+            </span>
+          </div>
+
+          <div className="zelda-callout zelda-callout--switch2" data-testid="threads-intro-callout">
+            <div className="zelda-callout__title">
+              <Sparkles size={15} aria-hidden="true" />
+              <span>Switch 2 Remake Exclusive: Sheik’s Cross-Era Sage Epilogues</span>
+            </div>
+            <p style={{ margin: 0 }}>
+              Initiated at the ruined <strong>Market Fountain</strong> as Adult Link, each Thread of
+              Time pairs your Adult Sage progress with Master Sword time-travel to heal unfinished
+              bonds across Malon, Darunia, Ruto, Nabooru, Impa, and Saria. Each quest counts
+              individually toward 100% completion!
+            </p>
+          </div>
+
+          <div className="zelda-quest-list">
+            {THREADS_OF_TIME_SECRETS.map((quest, index) => {
+              const isDone = Boolean(state.completedSecretIds[quest.id]);
+              const regionName = REGION_BY_ID[quest.regionId]?.name ?? quest.regionId;
+              const missingReqs = quest.requiredIds.filter(
+                (reqId) => !effectiveRequirements.has(reqId),
+              );
+              const isReady = missingReqs.length === 0;
+
+              return (
+                <div
+                  key={quest.id}
+                  className={`zelda-quest-step ${isDone ? 'zelda-quest-step--done' : ''}`.trim()}
+                  data-testid={`quest-step-${quest.id}`}
+                >
+                  <div className="zelda-sheet-card__top">
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <span className="zelda-badge zelda-badge--new">
+                        Thread {index + 1}/{THREADS_OF_TIME_SECRETS.length}
+                      </span>
+                      <strong style={{ fontSize: 'var(--text-sm)' }}>{quest.title}</strong>
+                      {isDone ? (
+                        <span className="zelda-badge zelda-badge--rupee">Completed</span>
+                      ) : isReady ? (
+                        <span className="zelda-badge zelda-badge--rupee">Ready Now</span>
+                      ) : (
+                        <span className="zelda-badge zelda-badge--updated">
+                          <Lock size={11} aria-hidden="true" />
+                          <span>{missingReqs.length} Missing</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={isDone}
+                      className="zelda-check-btn"
+                      data-testid={`quest-check-${quest.id}`}
+                      onClick={() => onToggleSecret(quest.id)}
+                    >
+                      <Check size={13} aria-hidden="true" />
+                      <span>{isDone ? 'Done' : 'Check Quest'}</span>
+                    </button>
+                  </div>
+
+                  {/* Live Requirement Pills */}
+                  <div className="zelda-card-badges" aria-label="Quest requirements">
+                    {quest.requiredIds.map((reqId) => {
+                      const reqLabel = REQUIREMENT_BY_ID[reqId]?.name ?? reqId;
+                      const owned = effectiveRequirements.has(reqId);
+                      return (
+                        <span
+                          key={reqId}
+                          className={`zelda-badge ${
+                            owned ? 'zelda-badge--rupee' : 'zelda-badge--timer'
+                          }`}
+                        >
+                          {owned ? '✓' : '•'} {reqLabel}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {quest.crossEraSteps ? (
+                    <div className="zelda-thread-era-steps">
+                      <p className="zelda-sheet-card__desc">{quest.crossEraSteps.step1}</p>
+                      <p className="zelda-sheet-card__desc">{quest.crossEraSteps.step2}</p>
+                    </div>
+                  ) : (
+                    <p className="zelda-sheet-card__desc">{quest.howToGet}</p>
+                  )}
+
+                  <div className="zelda-sheet-card__footer">
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                      Region: {regionName}
+                    </span>
+                    <button
+                      type="button"
+                      className="zelda-link-btn"
+                      data-testid={`quest-jump-${quest.id}`}
+                      onClick={() => {
+                        onSelectRegion(quest.regionId);
+                        onClose();
+                      }}
+                    >
+                      <MapPin size={13} aria-hidden="true" />
+                      <span>Jump to {regionName}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {/* ====================================================================
           SECTION 1: 12-Step Biggoron's Sword Trading Sequence

@@ -150,13 +150,14 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
       {
         id: 'sacred-forest-meadow-phase-2',
-        title: 'Adult Link — Minuet of Forest & Night Hedge Wall',
+        title: 'Adult Link — Minuet of Forest, Night Wall & Saria’s Thread of Time',
         era: 'adult',
         steps: [
           'Sprint past the charging spear Moblins (and stun the giant club Moblin on the temple approach with the Hookshot) to trigger Sheik’s cutscene and learn the Minuet of Forest (L -> X -> Y -> A -> Y -> A).',
           'At night (play Sun’s Song if needed), stand atop the ladder platform overlooking the hedge maze and Hookshot Gold Skulltula #7 high on the eastern stone wall.',
+          'After clearing the Forest Temple with the Fairy Bow and unlocking Time Travel via Prelude of Light, play Saria’s Song on the quiet tree stump outside the Forest Temple to complete Threads of Time: Saria’s Eternal Forest.',
         ],
-        secretIds: ['song-minuet', 'gs-007'],
+        secretIds: ['song-minuet', 'gs-007', 'sw2-thread-saria'],
       },
     ],
     proTips: [
@@ -279,13 +280,14 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
       {
         id: 'lon-lon-ranch-phase-3',
-        title: 'Adult Link — Rescuing Epona From Ingo',
+        title: 'Adult Link — Rescuing Epona & Malon’s Ranch Song Thread',
         era: 'adult',
         steps: [
           'Arrive with at least 60 Rupees: pay Ingo 10 Rupees to enter the corral, play Epona’s Song immediately to mount Epona instead of the slow horse, and speak to Ingo from horseback to wager 50 Rupees.',
           'Hug the inside fence rail, space your carrots (never burn the final carrot unless sprinting the finish line), beat Ingo in two consecutive races, and jump the locked front gate to claim Epona permanently!',
+          'Once you unlock Time Travel via Prelude of Light, speak with Malon beside the corral fence with Epona freed to perform a duet of Epona’s Song and stamp Threads of Time: Malon’s Ranch Song COMPLETE.',
         ],
-        secretIds: ['eq-epona'],
+        secretIds: ['eq-epona', 'sw2-thread-malon'],
       },
     ],
     proTips: [
@@ -314,7 +316,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         title: 'Child Link — New 5th Bottle, Minigames & Song of Time',
         era: 'child',
         steps: [
-          'Open the Threads of Time journal (- button, then Y for Tapestry view) to track your six major side-quest chains.',
+          'Open the Threads of Time journal (- button, then Y for Tapestry view) anytime to track your six character-focused side-quest arcs across Hyrule.',
           'IMMEDIATE STOP: Enter the Market Potion Shop (east side), speak to the panicked shopkeeper, scoop up the escaped Golden Bug skittering across the floor with his loaner bottle, and keep Empty Bottle #1 + a free Red Potion!',
           'Step into the Guardhouse ("Lots O\' Pots" right inside the drawbridge) and roll into the corner crate for Gold Skulltula #14 (smash the pots too for easy early Rupees).',
           'Play the daytime Shooting Gallery (20 Rupees; use Switch 2 gyro aiming!) and hit 10/10 targets for the Biggest Bullet Bag (50); then at night, lead Richard the white dog from behind the Bazaar stall to the illuminated Back Alley house for Heart Piece #2.',
@@ -322,7 +324,6 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Return to the Castle Town moat after clearing all 3 Child Dungeons, dive for the Ocarina of Time to learn the Song of Time (A -> L -> R -> A -> L -> R), and open the Door of Time in the Temple of Time.',
         ],
         secretIds: [
-          'sw2-threads-of-time',
           'bottle-01',
           'gs-014',
           'cap-seeds-50',
@@ -492,6 +493,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Once you earn the Fairy Bow, score 10/10 at the completed Kakariko Shooting Gallery (20 Rupees; gyro aiming makes the final fast Rupee easy) for the Bigger Quiver (40).',
           'Start the Biggoron’s Sword quest: talk to Anju for the Pocket Egg (#1) -> play Sun’s Song to hatch the Pocket Cucco and wake Talon in the lower house (#2) -> show Anju for Cojiro (#3) -> after waking Grog in Lost Woods, rush through the Potion Shop back door before the 4:00 timer expires to hand Granny the Odd Mushroom for the Odd Poultice (#5).',
           'Re-enter Kakariko after clearing the Forest, Fire, and Water Temples to watch the Bongo Bongo cutscene and learn the Nocturne of Shadow (Y -> A -> A -> L -> Y -> A -> R) from Sheik.',
+          'After earning the Hover Boots and awakening Impa in the Shadow Temple (with the Lens of Truth and Time Travel unlocked), enter Impa’s House and inspect her Sheikah chronicle with the Lens of Truth to complete Threads of Time: Impa’s Sheikah Legacy.',
         ],
         secretIds: [
           'song-storms',
@@ -503,6 +505,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'biggoron-step-3',
           'biggoron-step-5',
           'song-nocturne',
+          'sw2-thread-impa',
         ],
       },
       {
@@ -680,13 +683,14 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
       {
         id: 'goron-city-phase-2',
-        title: 'Adult Link — Free Goron Tunic & Suspended Rope Platform',
+        title: 'Adult Link — Free Goron Tunic, Rope Platform & Darunia’s Heirloom',
         era: 'adult',
         steps: [
           'Time a Bomb (or Bow shot) to stop young Link the Goron rolling around 2F, talk to him twice to receive the heat-proof Goron Tunic for free, and pull the statue inside Darunia’s 1F room to unlock the Death Mountain Crater shortcut.',
           'Walk across the 4F rope bridges onto the central suspended stone platform and Hookshot Gold Skulltula #31 on the back of the stone arch (day or night).',
+          'After clearing the Fire Temple with the Megaton Hammer, return to Darunia’s 1F chamber and speak with young Link the Goron to inspect Darunia’s Sworn-Brother Heirloom and complete Threads of Time: Darunia’s Goron Heirloom.',
         ],
-        secretIds: ['eq-goron-tunic', 'gs-031'],
+        secretIds: ['eq-goron-tunic', 'gs-031', 'sw2-thread-darunia'],
       },
     ],
     proTips: [
@@ -830,14 +834,14 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
       {
         id: 'zoras-domain-phase-2',
-        title: 'Adult Link — Zora Tunic, Waterfall Skulltula & Thawed Eyeball Frog',
+        title: 'Adult Link — Zora Tunic, Waterfall Skulltula, Ruto’s Thread & Eyeball Frog',
         era: 'adult',
         steps: [
           'Bring Bottled Blue Fire from the Ice Cavern and pour it onto frozen King Zora in the throne room to receive a free Zora Tunic.',
           'At night, stand beside the frozen (or post-Water Temple thawed!) waterfall crest, look left, and Hookshot Gold Skulltula #38.',
-          'After beating the Water Temple (which thaws the entire Domain in Switch 2!), hand Biggoron’s Prescription to King Zora for the Eyeball Frog (#9)—then immediately dive straight down into the newly thawed Lake Hylia underwater shortcut to reach the Lakeside Lab in 25 seconds!',
+          'After beating the Water Temple (which thaws the entire Domain in Switch 2!), celebrate with King Zora and the restored Zora court to complete Threads of Time: Ruto & the Unfrozen Domain, then hand Biggoron’s Prescription to King Zora for the Eyeball Frog (#9) and dive straight down into the reopened Lake Hylia underwater shortcut!',
         ],
-        secretIds: ['eq-zora-tunic', 'gs-038', 'biggoron-step-9'],
+        secretIds: ['eq-zora-tunic', 'gs-038', 'sw2-thread-ruto', 'biggoron-step-9'],
       },
     ],
     proTips: [
@@ -1027,14 +1031,15 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
       {
         id: 'gerudo-fortress-phase-2',
-        title: 'Adult Link — Horseback Archery Range & Target Pole Token',
+        title: 'Adult Link — Horseback Archery, Target Pole Token & Nabooru’s Accord',
         era: 'adult',
         steps: [
           'Ride Epona east to the Horseback Archery Range (20 Rupees per round; daylight only): use Switch 2 gyro aiming to hit pots and bullseyes for 1,000+ points to claim Heart Piece #35.',
           'Play a second Horseback Archery round and score 1,500+ points (draw your next arrow while turning around at the end post to rapid-fire the central bullseye!) to win the Biggest Quiver (50).',
           'Return to the Archery Range at night on foot and Hookshot the back of the northernmost wooden target pole for Gold Skulltula #52.',
+          'Once you hold both the Gerudo Membership Card and the Mirror Shield after awakening Nabooru in the Spirit Temple, speak with Nabooru’s lieutenant overlooking the repaired canyon bridge to complete Threads of Time: Nabooru’s Desert Accord.',
         ],
-        secretIds: ['hp-35', 'cap-quiver-50', 'gs-052'],
+        secretIds: ['hp-35', 'cap-quiver-50', 'gs-052', 'sw2-thread-nabooru'],
       },
     ],
     proTips: [

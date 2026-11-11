@@ -126,6 +126,30 @@ quests.biggoronSwordQuest.forEach((x) => checkRecord({ ...x, id: `biggoron-step-
 quests.cowsAndKeyGrottos.forEach((x) => checkRecord(x, 'CowOrGrotto'));
 quests.switch2Exclusives.forEach((x) => checkRecord(x, 'Switch2Exclusive'));
 
+const expectedThreadIds = [
+  'sw2-thread-malon',
+  'sw2-thread-darunia',
+  'sw2-thread-ruto',
+  'sw2-thread-nabooru',
+  'sw2-thread-impa',
+  'sw2-thread-saria',
+];
+const threadEntries = quests.switch2Exclusives.filter((x) => x.id.startsWith('sw2-thread-'));
+assert(
+  threadEntries.length === exp.threadsOfTimeQuests,
+  `Expected ${exp.threadsOfTimeQuests} Threads of Time quests, got ${threadEntries.length}`
+);
+for (const tid of expectedThreadIds) {
+  assert(
+    seenItemIds.has(tid),
+    `Missing canonical Threads of Time quest ID: ${tid}`
+  );
+}
+assert(
+  !seenItemIds.has('sw2-threads-of-time'),
+  'Legacy lumped sw2-threads-of-time entry must be replaced by the 6 individual sw2-thread-* quests'
+);
+
 const ganonsCastleCount =
   upgrades.gearAndEquipment.filter((x) => x.regionId === 'ganons-castle').length +
   upgrades.ganonTrials.filter((x) => x.regionId === 'ganons-castle').length;

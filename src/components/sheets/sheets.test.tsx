@@ -11,6 +11,7 @@ import {
   toggleRequirementOwned,
 } from '../../lib/gating';
 import { exportProgressJson } from '../../lib/storage';
+import { HallOfFallenFoesModal } from './HallOfFallenFoesModal';
 import {
   BackupModal,
   LoadoutDock,
@@ -21,6 +22,7 @@ import {
   TopCommandBar,
   UnlockToast,
 } from './index';
+import { ReferenceGuideModal } from './ReferenceGuideModal';
 
 afterEach(() => {
   cleanup();
@@ -334,7 +336,7 @@ describe('SearchModal', () => {
     );
 
     expect(screen.getByTestId('search-modal')).toHaveTextContent(
-      'Search across all 271 collectibles & milestones, 34 regions & dungeons, and 69 progression items',
+      'Search across all 276 collectibles & milestones, 34 regions & dungeons, and 69 progression items',
     );
 
     const searchInput = screen.getByTestId('global-search-input');
@@ -420,5 +422,184 @@ describe('BackupModal', () => {
 
     fireEvent.click(screen.getByTestId('backup-reset-confirm-btn'));
     expect(onResetProgress).toHaveBeenCalledTimes(1);
+  });
+});
+
+
+describe('Phase 2 Sheets: Threads of Time, Hall of Fallen Foes & Field Reference Guide', () => {
+  it('exposes Hall of Fallen Foes (X/84) and Field Guide in TopCommandBar and Pierre shortcut in OcarinaModal', () => {
+    const state = createDefaultProgressState();
+    state.completedFoeStatueIds = { 'foe-01': true, 'foe-02': true, 'foe-75': true };
+    const progress = computeGlobalProgress(state);
+    const onOpenSheet = vi.fn();
+
+    render(
+      <TopCommandBar
+        state={state}
+        globalProgress={progress}
+        activeSheet={null}
+        onOpenSheet={onOpenSheet}
+        onToggleTheme={vi.fn()}
+      />,
+    );
+
+    const foesBtn = screen.getByTestId('open-foes-btn');
+    expect(foesBtn).toHaveTextContent('Hall of Fallen Foes (3/84)');
+    fireEvent.click(foesBtn);
+    expect(onOpenSheet).toHaveBeenCalledWith('foes');
+
+    const refBtn = screen.getByTestId('open-reference-btn');
+    expect(refBtn).toHaveTextContent(/Field Guide/i);
+    fireEvent.click(refBtn);
+    expect(onOpenSheet).toHaveBeenCalledWith('reference');
+
+    cleanup();
+
+    const onOpenPierre = vi.fn();
+    render(
+      <OcarinaModal
+        isOpen={true}
+        onClose={vi.fn()}
+        state={state}
+        effectiveRequirements={deriveEffectiveRequirements(state)}
+        onToggleRequirement={vi.fn()}
+        onSaveScarecrowNotes={vi.fn()}
+        onSelectRegion={vi.fn()}
+        onOpenPierreDirectory={onOpenPierre}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('open-pierre-directory-btn'));
+    expect(onOpenPierre).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders all 6 checkable Threads of Time character quests in QuestsModal with zero raw ID leaks', () => {
+    const state = createDefaultProgressState();
+    state.completedSecretIds['sw2-thread-malon'] = true;
+    const effective = deriveEffectiveRequirements(state);
+    const onToggleSecret = vi.fn();
+    const onSelectRegion = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <QuestsModal
+        isOpen={true}
+        onClose={onClose}
+        state={state}
+        effectiveRequirements={effective}
+        onToggleSecret={onToggleSecret}
+        onSelectRegion={onSelectRegion}
+      />,
+    );
+
+    const threadsSection = screen.getByTestId('threads-of-time-section');
+    expect(threadsSection).toHaveTextContent('Threads of Time (6 Switch 2 Character Quests) (1/6)');
+    expect(threadsSection.textContent).not.toMatch(/\((?:hp|gs|sw2)-|\*\*/);
+
+    fireEvent.click(screen.getByTestId('quest-check-sw2-thread-saria'));
+    expect(onToggleSecret).toHaveBeenCalledWith('sw2-thread-saria');
+
+    fireEvent.click(screen.getByTestId('quest-jump-sw2-thread-nabooru'));
+    expect(onSelectRegion).toHaveBeenCalledWith('gerudo-fortress');
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders HallOfFallenFoesModal with 84 statues, Wing & Rare filters, Check All Non-Rare, and Boss Rush medals', () => {
+    const completedFoes: Record<string, boolean> = { 'foe-01': true };
+    const medals: Record<string, 'none' | 'bronze' | 'silver' | 'gold' | 'master'> = {};
+    const onToggleFoeStatue = vi.fn((id: string, val?: boolean) => {
+      completedFoes[id] = val ?? !completedFoes[id];
+    });
+    const onSetBossRushMedal = vi.fn((id: string, medal: 'none' | 'bronze' | 'silver' | 'gold' | 'master') => {
+      medals[id] = medal;
+    });
+    const onSelectRegion = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <HallOfFallenFoesModal
+        isOpen={true}
+        onClose={onClose}
+        completedFoeStatueIds={completedFoes}
+        bossRushMedals={medals}
+        onToggleFoeStatue={onToggleFoeStatue}
+        onSetBossRushMedal={onSetBossRushMedal}
+        onSelectRegion={onSelectRegion}
+      />,
+    );
+
+    const dialog = screen.getByTestId('hall-of-fallen-foes-modal');
+    expect(dialog.textContent).not.toMatch(/\((?:hp|gs|gf)-\d+|\*\*/);
+    expect(screen.getByTestId('foes-progress-counter')).toHaveTextContent('1 / 84 Statues');
+
+    // Filter to Rare / Easy to Miss stragglers
+    fireEvent.click(screen.getByTestId('foes-rare-only-checkbox'));
+    expect(screen.getByTestId('foes-statue-grid')).toHaveTextContent('Peahat Larva');
+    expect(screen.getByTestId('foes-statue-grid')).not.toHaveTextContent('Withered Deku Baba');
+    fireEvent.click(screen.getByTestId('foes-rare-only-checkbox'));
+
+    // Wing filter: Bosses (10)
+    fireEvent.click(screen.getByTestId('foes-wing-boss'));
+    expect(screen.getByTestId('foes-statue-grid')).toHaveTextContent('Queen Gohma');
+    expect(screen.getByTestId('foes-statue-grid')).toHaveTextContent('Ganon');
+
+    // 1-click Check All Non-Rare
+    fireEvent.click(screen.getByTestId('check-all-non-rare-foes-btn'));
+    expect(onToggleFoeStatue).toHaveBeenCalled();
+
+    // Jump to spawn region
+    fireEvent.click(screen.getByTestId('foe-jump-foe-75'));
+    expect(onSelectRegion).toHaveBeenCalledWith('deku-tree');
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    // Switch to Boss Rush Medal Tracker tab
+    fireEvent.click(screen.getByTestId('foes-tab-boss-rush'));
+    expect(screen.getByTestId('boss-rush-panel')).toHaveTextContent(
+      /Master All-Bosses \+ Dark Link Gauntlet/i,
+    );
+    fireEvent.click(screen.getByTestId('boss-rush-medal-gauntlet-master-master'));
+    expect(onSetBossRushMedal).toHaveBeenCalledWith('gauntlet-master', 'master');
+  });
+
+  it('renders ReferenceGuideModal across all 4 tabs (Pierre, Grottos & Echo Gem, Fishing & Loach, Smart Rupees)', () => {
+    const onSelectRegion = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <ReferenceGuideModal
+        isOpen={true}
+        onClose={onClose}
+        onSelectRegion={onSelectRegion}
+        initialTab="pierre"
+      />,
+    );
+
+    const dialog = screen.getByTestId('reference-guide-modal');
+    expect(dialog.textContent).not.toMatch(/\((?:hp|gs|gf)-\d+|\*\*/);
+
+    // Tab 1: Pierre Scarecrow Spots
+    expect(screen.getByTestId('ref-panel-pierre')).toHaveTextContent(
+      /Lakeside Laboratory Rooftop Watchtower/i,
+    );
+    fireEvent.click(screen.getByTestId('pierre-jump-pierre-fire-temple-boulder-maze'));
+    expect(onSelectRegion).toHaveBeenCalledWith('fire-temple');
+
+    // Tab 2: Hidden Grottos & Echo Gem
+    fireEvent.click(screen.getByTestId('ref-tab-grottos'));
+    expect(screen.getByTestId('echo-gem-callout')).toHaveTextContent(/20 Gold Skulltulas/i);
+    fireEvent.click(screen.getByTestId('grotto-method-megaton-hammer'));
+    expect(screen.getByTestId('grottos-card-grid')).toHaveTextContent(/150 Rupees Total/i);
+
+    // Tab 3: Lake Hylia Fishing & Hylian Loach
+    fireEvent.click(screen.getByTestId('ref-tab-fishing'));
+    expect(screen.getByTestId('sinking-lure-section')).toHaveTextContent(/Spot 4/i);
+    expect(screen.getByTestId('hylian-loach-guide')).toHaveTextContent(/30 to 35 lbs/i);
+
+    // Tab 4: Smart Rupee & Free-Gear Cheat Sheet
+    fireEvent.click(screen.getByTestId('ref-tab-gear'));
+    expect(screen.getByTestId('free-gear-table')).toHaveTextContent(/Hylian Shield/i);
+    expect(screen.getByTestId('free-gear-table')).toHaveTextContent(/FREE in Kakariko Graveyard/i);
+    expect(screen.getByTestId('mandatory-budgets-grid')).toHaveTextContent(/1,175 Rupees/i);
+    expect(screen.getByTestId('mandatory-budgets-grid')).toHaveTextContent(/550 Rupees/i);
   });
 });

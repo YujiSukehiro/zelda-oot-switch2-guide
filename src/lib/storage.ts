@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { REGION_BY_ID, REQUIREMENT_BY_ID, ROUTE_STEP_BY_ID, SECRET_BY_ID } from '../data';
+import {
+  BOSS_RUSH_GAUNTLET_BY_ID,
+  FOE_STATUE_BY_ID,
+  REGION_BY_ID,
+  REQUIREMENT_BY_ID,
+  ROUTE_STEP_BY_ID,
+  SECRET_BY_ID,
+  THREADS_OF_TIME_QUEST_IDS,
+} from '../data';
 import type {
+  BossRushMedal,
   EraFilter,
   LastSessionSnapshot,
   MapLayerMode,
@@ -29,7 +38,22 @@ const VALID_ERAS = new Set<EraFilter>(['all', 'child', 'adult']);
 const VALID_THEMES = new Set<ThemeMode>(['dark', 'parchment']);
 const VALID_VIEWS = new Set<WorkspaceViewMode>(['map', 'route', 'area']);
 const VALID_MAP_LAYERS = new Set<MapLayerMode>(['illustrated', 'schematic']);
-const VALID_SHEETS = new Set(['ocarina', 'quests', 'diff', 'search', 'backup']);
+const VALID_SHEETS = new Set([
+  'ocarina',
+  'quests',
+  'diff',
+  'search',
+  'backup',
+  'foes',
+  'reference',
+]);
+const VALID_BOSS_RUSH_MEDALS = new Set<BossRushMedal>([
+  'none',
+  'bronze',
+  'silver',
+  'gold',
+  'master',
+]);
 
 /**
  * Synchronizes the cross-listed 50-Skulltula Piece of Heart (`hp-10` <-> `skr-50`)
@@ -92,6 +116,37 @@ function sanitizeLastSession(value: unknown): LastSessionSnapshot | null {
   };
 }
 
+function sanitizeFoeStatueMap(value: unknown): Record<string, boolean> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+  const cleaned: Record<string, boolean> = {};
+  for (const [key, flag] of Object.entries(value as Record<string, unknown>)) {
+    if (flag === true && FOE_STATUE_BY_ID[key]) {
+      cleaned[key] = true;
+    }
+  }
+  return cleaned;
+}
+
+function sanitizeBossRushMedals(value: unknown): Record<string, BossRushMedal> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+  const cleaned: Record<string, BossRushMedal> = {};
+  for (const [key, medal] of Object.entries(value as Record<string, unknown>)) {
+    if (
+      BOSS_RUSH_GAUNTLET_BY_ID[key] &&
+      typeof medal === 'string' &&
+      VALID_BOSS_RUSH_MEDALS.has(medal as BossRushMedal) &&
+      medal !== 'none'
+    ) {
+      cleaned[key] = medal as BossRushMedal;
+    }
+  }
+  return cleaned;
+}
+
 /**
  * Validates and normalizes an untrusted object into a canonical `PlayerProgressState`.
  */
@@ -109,10 +164,19 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
       ? (candidate.state as Record<string, unknown>)
       : candidate;
 
-  const completedSecretIds = syncCrossListedSecrets(
-    sanitizeBooleanMap(source.completedSecretIds),
-  );
+  const rawSecrets = sanitizeBooleanMap(source.completedSecretIds);
+  // Migrate legacy Phase 1 lumped `sw2-threads-of-time` to all 6 individual `sw2-thread-*` quests
+  if (rawSecrets['sw2-threads-of-time'] === true) {
+    delete rawSecrets['sw2-threads-of-time'];
+    for (const threadId of THREADS_OF_TIME_QUEST_IDS) {
+      rawSecrets[threadId] = true;
+    }
+  }
+
+  const completedSecretIds = syncCrossListedSecrets(rawSecrets);
   const completedRouteStepIds = sanitizeBooleanMap(source.completedRouteStepIds);
+  const completedFoeStatueIds = sanitizeFoeStatueMap(source.completedFoeStatueIds);
+  const bossRushMedals = sanitizeBossRushMedals(source.bossRushMedals);
 
   let ownedRequirementIds: Record<string, boolean>;
   if (
@@ -182,6 +246,12 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
 
   if (Object.keys(completedRouteStepIds).length > 0) {
     next.completedRouteStepIds = completedRouteStepIds;
+  }
+  if (Object.keys(completedFoeStatueIds).length > 0) {
+    next.completedFoeStatueIds = completedFoeStatueIds;
+  }
+  if (Object.keys(bossRushMedals).length > 0) {
+    next.bossRushMedals = bossRushMedals;
   }
   if (activeRouteChapterId) {
     next.activeRouteChapterId = activeRouteChapterId;
@@ -314,6 +384,8 @@ function hasAnyStoredProgress(state: PlayerProgressState): boolean {
   return (
     Object.keys(state.completedSecretIds).length > 0 ||
     Object.keys(state.completedRouteStepIds ?? {}).length > 0 ||
+    Object.keys(state.completedFoeStatueIds ?? {}).length > 0 ||
+    Object.keys(state.bossRushMedals ?? {}).length > 0 ||
     Boolean(state.bookmarkedRouteStepId) ||
     state.customScarecrowNotes.length > 0
   );
@@ -739,6 +811,71 @@ export function usePlayerProgress() {
     setState((prev) => ({ ...prev, theme }));
   }, []);
 
+  const toggleFoeStatue = useCallback((statueId: string, completed?: boolean) => {
+    const statueMeta = FOE_STATUE_BY_ID[statueId];
+    if (!statueMeta) return;
+    setState((prev) => {
+      const existing = prev.completedFoeStatueIds ?? {};
+      const shouldComplete = completed ?? !Boolean(existing[statueId]);
+      const nextStatues = { ...existing };
+      if (shouldComplete) {
+        nextStatues[statueId] = true;
+      } else {
+        delete nextStatues[statueId];
+      }
+      const next: PlayerProgressState = {
+        ...prev,
+        lastSession: {
+          updatedAt: new Date().toISOString(),
+          lastActionLabel: `${shouldComplete ? 'Logged Foe Statue' : 'Unchecked Foe Statue'}: ${statueMeta.name}`,
+          regionId: statueMeta.primaryRegionId,
+          chapterId: prev.activeRouteChapterId ?? null,
+          stepId: prev.bookmarkedRouteStepId ?? null,
+        },
+      };
+      if (Object.keys(nextStatues).length > 0) {
+        next.completedFoeStatueIds = nextStatues;
+      } else {
+        delete next.completedFoeStatueIds;
+      }
+      return next;
+    });
+  }, []);
+
+  const setBossRushMedal = useCallback((gauntletId: string, medal: BossRushMedal) => {
+    const gauntletMeta = BOSS_RUSH_GAUNTLET_BY_ID[gauntletId];
+    if (!gauntletMeta || !VALID_BOSS_RUSH_MEDALS.has(medal)) return;
+    setState((prev) => {
+      const existing = prev.bossRushMedals ?? {};
+      const nextMedals = { ...existing };
+      if (medal === 'none') {
+        delete nextMedals[gauntletId];
+      } else {
+        nextMedals[gauntletId] = medal;
+      }
+      const medalLabel =
+        medal === 'none'
+          ? 'Cleared Medal'
+          : `${medal.charAt(0).toUpperCase()}${medal.slice(1)} Medal`;
+      const next: PlayerProgressState = {
+        ...prev,
+        lastSession: {
+          updatedAt: new Date().toISOString(),
+          lastActionLabel: `Boss Rush (${gauntletMeta.title}): ${medalLabel}`,
+          regionId: 'hall-of-fallen-foes',
+          chapterId: prev.activeRouteChapterId ?? null,
+          stepId: prev.bookmarkedRouteStepId ?? null,
+        },
+      };
+      if (Object.keys(nextMedals).length > 0) {
+        next.bossRushMedals = nextMedals;
+      } else {
+        delete next.bossRushMedals;
+      }
+      return next;
+    });
+  }, []);
+
   const importProgress = useCallback((jsonText: string): PlayerProgressState => {
     const imported = parseImportedProgressJson(jsonText);
     setState(imported);
@@ -775,6 +912,8 @@ export function usePlayerProgress() {
     setLoadoutMode,
     setScarecrowNotes,
     setTheme,
+    toggleFoeStatue,
+    setBossRushMedal,
     importProgress,
     exportProgress,
     resetAllProgress,

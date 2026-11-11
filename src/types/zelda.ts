@@ -121,6 +121,7 @@ export interface GameMetadata {
     happyMaskTrades: number;
     biggoronTradeSteps: number;
     hallOfFallenFoesStatues: number;
+    threadsOfTimeQuests?: number;
     bigPoesTotal: number;
     bigPoeBottlePoints: number;
   };
@@ -419,6 +420,8 @@ export interface PlayerProgressState {
   mapLayerMode?: MapLayerMode;
   lastSession?: LastSessionSnapshot | null;
   hasCompletedOnboarding?: boolean;
+  completedFoeStatueIds?: Record<string, boolean>;
+  bossRushMedals?: Record<string, BossRushMedal>;
 }
 
 export type WorkspaceViewMode = 'map' | 'route' | 'area';
@@ -637,7 +640,131 @@ export interface StoryPreset {
   ownedRequirementIds: string[];
 }
 
-export type CompanionSheetId = 'ocarina' | 'quests' | 'diff' | 'search' | 'backup';
+export type CompanionSheetId =
+  | 'ocarina'
+  | 'quests'
+  | 'diff'
+  | 'search'
+  | 'backup'
+  | 'foes'
+  | 'reference';
+
+export type FoeGalleryWing =
+  | 'overworld'
+  | 'child-dungeon'
+  | 'adult-temple'
+  | 'mini-boss'
+  | 'boss';
+
+export type BossRushMedal = 'none' | 'bronze' | 'silver' | 'gold' | 'master';
+
+export interface FoeStatueEntry {
+  id: string;
+  number: number;
+  name: string;
+  wing: FoeGalleryWing;
+  era: 'child' | 'adult' | 'both';
+  primaryRegionId: string;
+  otherLocations?: string[];
+  weakness: string;
+  howToLog: string;
+  isRareOrMissable: boolean;
+  rareTip?: string;
+}
+
+export interface BossRushGauntlet {
+  id: string;
+  title: string;
+  subtitle: string;
+  unlockCondition: string;
+  arenaLoadout: string;
+  lineup: string[];
+  targetTimes: {
+    bronze: string;
+    silver: string;
+    gold: string;
+    master: string;
+  };
+  strategyTip: string;
+}
+
+export type ScarecrowHookshotTier = 'Hookshot' | 'Longshot';
+
+export interface ScarecrowSpotEntry {
+  id: string;
+  title: string;
+  regionId: string;
+  zoneKind: 'overworld' | 'dungeon';
+  era: 'adult' | 'both';
+  hookshotTier: ScarecrowHookshotTier;
+  reward: string;
+  whereToStand: string;
+}
+
+export type GrottoOpenMethod =
+  | 'Bombs'
+  | 'Song of Storms'
+  | 'Megaton Hammer'
+  | 'Open Grass/Dive';
+
+export interface HiddenGrottoEntry {
+  id: string;
+  title: string;
+  regionId: string;
+  era: 'child' | 'adult' | 'both' | 'cross-era';
+  openMethod: GrottoOpenMethod;
+  rewardSummary: string;
+  locationAndSteps: string;
+  isSwitch2Changed?: boolean;
+}
+
+export interface SinkingLureSpot {
+  id: string;
+  title: string;
+  landmark: string;
+  howToSpot: string;
+}
+
+export interface FishingPrizeTier {
+  era: 'child' | 'adult';
+  label: string;
+  targetWeight: string;
+  entryFeeRupees: number;
+  reward: string;
+  bestCastSpot: string;
+}
+
+export interface FishingGuideData {
+  prizes: FishingPrizeTier[];
+  sinkingLureUnlock: string;
+  sinkingLureSpots: SinkingLureSpot[];
+  loachGuide: {
+    weightRange: string;
+    spawnConditions: string;
+    visualCue: string;
+    reward: string;
+    switch2GyroTips: string[];
+  };
+}
+
+export interface ShopVsFreeGearEntry {
+  id: string;
+  item: string;
+  shopPriceLabel: string;
+  freeOrSmartAlternative: string;
+  howToClaimFree: string;
+  regionId: string;
+  savingsNote: string;
+}
+
+export interface MandatoryRupeeBudgetEntry {
+  id: string;
+  title: string;
+  totalRupees: number;
+  regionId: string;
+  breakdown: string;
+  smartTip: string;
+}
 
 export interface UrlHashState {
   view?: WorkspaceViewMode;
