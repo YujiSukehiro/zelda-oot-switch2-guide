@@ -1,23 +1,28 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  BookOpen,
   CheckCircle2,
   ChevronDown,
   Coins,
+  Compass,
   Heart,
   Hourglass,
   Layers,
+  ListChecks,
   Lock,
   Moon,
   Music,
   Shield,
   Skull,
   Sparkles,
+  Swords,
   Wrench,
   X,
 } from 'lucide-react';
-import { ATTACHED_DUNGEONS_BY_REGION, REGION_BY_ID } from '../../data';
+import { ATTACHED_DUNGEONS_BY_REGION, REGION_BY_ID, SECRET_BY_ID } from '../../data';
 import { categorizeRegionSecrets, computeRegionSummary } from '../../lib/gating';
 import type {
+  AreaWalkthroughGuide,
   BlockerCategoryKind,
   DrawerGroupMode,
   PlayerProgressState,
@@ -34,11 +39,13 @@ export interface RegionDrawerProps {
   state: PlayerProgressState;
   effectiveRequirements: Set<string>;
   regionSummaries: Record<string, RegionProgressSummary>;
+  areaGuide?: AreaWalkthroughGuide;
   onClose: () => void;
   onSelectRegion: (regionId: string) => void;
   onToggleSecret: (secretId: string, completed?: boolean) => void;
   onToggleRequirement?: (requirementId: string, owned?: boolean) => void;
   onOpenSongbook?: (songId?: string) => void;
+  onOpenOptimalRouteForRegion?: (regionId: string) => void;
 }
 
 const MOBILE_MEDIA_QUERY = '(max-width: 899px)';
@@ -117,12 +124,15 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
   state,
   effectiveRequirements,
   regionSummaries,
+  areaGuide,
   onClose,
   onSelectRegion,
   onToggleSecret,
   onToggleRequirement,
   onOpenSongbook,
+  onOpenOptimalRouteForRegion,
 }) => {
+  const [activeDossierTab, setActiveDossierTab] = useState<'checklist' | 'guide'>('checklist');
   const [groupMode, setGroupMode] = useState<DrawerGroupMode>('blocker');
   const [activePopoverReqId, setActivePopoverReqId] = useState<string | null>(null);
 
@@ -131,6 +141,7 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
   const bodyScrollRef = useRef<HTMLDivElement | null>(null);
   const lastPillTriggerRef = useRef<HTMLButtonElement | null>(null);
   const subtabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const modeTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const isUnmountingDialogRef = useRef<boolean>(false);
 
   const region = regionId ? REGION_BY_ID[regionId] : undefined;
@@ -470,101 +481,213 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
           )}
         </section>
 
-        {/* 1-Click Grouping Mode Switcher */}
-        <div className="dossier-grouping-bar">
-          <span className="grouping-bar-label">
-            <Layers size={13} aria-hidden="true" />
-            Group Secrets:
-          </span>
-          <div
-            data-testid="group-mode-switcher"
-            role="group"
-            aria-label="Secret grouping mode"
-            className="dossier-group-switcher"
+        {/* Primary Dossier Mode Tabs: Checklist & Locks vs. In-Depth Area Guide (modern-web-guidance: tabs) */}
+        <div
+          role="tablist"
+          aria-label="Region dossier view"
+          data-testid="dossier-mode-tabs"
+          className="dossier-mode-tablist"
+        >
+          <button
+            ref={(el) => {
+              modeTabRefs.current[0] = el;
+            }}
+            id="dossier-tab-checklist"
+            type="button"
+            role="tab"
+            data-testid="dossier-tab-checklist"
+            aria-selected={activeDossierTab === 'checklist'}
+            tabIndex={activeDossierTab === 'checklist' ? 0 : -1}
+            className="dossier-mode-tab"
+            onClick={() => setActiveDossierTab('checklist')}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' || e.key === 'End') {
+                e.preventDefault();
+                setActiveDossierTab('guide');
+                modeTabRefs.current[1]?.focus();
+              }
+            }}
           >
-            <button
-              type="button"
-              data-testid="group-mode-blocker"
-              aria-pressed={groupMode === 'blocker'}
-              className={`group-mode-pill ${groupMode === 'blocker' ? 'is-active' : ''}`}
-              onClick={() => setGroupMode('blocker')}
-            >
-              By Requirement Gate
-            </button>
-            <button
-              type="button"
-              data-testid="group-mode-tier"
-              aria-pressed={groupMode === 'tier'}
-              className={`group-mode-pill ${groupMode === 'tier' ? 'is-active' : ''}`}
-              onClick={() => setGroupMode('tier')}
-            >
-              Canonical Tiers (0–5)
-            </button>
-            <button
-              type="button"
-              data-testid="group-mode-type"
-              aria-pressed={groupMode === 'type'}
-              className={`group-mode-pill ${groupMode === 'type' ? 'is-active' : ''}`}
-              onClick={() => setGroupMode('type')}
-            >
-              Collectible Type
-            </button>
-          </div>
+            <ListChecks size={14} aria-hidden="true" />
+            <span>
+              Secrets &amp; Locks ({summary.completedCount}/{summary.totalCount})
+            </span>
+          </button>
+
+          <button
+            ref={(el) => {
+              modeTabRefs.current[1] = el;
+            }}
+            id="dossier-tab-guide"
+            type="button"
+            role="tab"
+            data-testid="dossier-tab-guide"
+            aria-selected={activeDossierTab === 'guide'}
+            tabIndex={activeDossierTab === 'guide' ? 0 : -1}
+            className="dossier-mode-tab"
+            onClick={() => setActiveDossierTab('guide')}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft' || e.key === 'Home') {
+                e.preventDefault();
+                setActiveDossierTab('checklist');
+                modeTabRefs.current[0]?.focus();
+              }
+            }}
+          >
+            <BookOpen size={14} aria-hidden="true" />
+            <span>In-Depth Area Guide</span>
+          </button>
         </div>
 
-        {/* Mode 1 (Default): By Requirement Gate ('blocker') */}
-        {groupMode === 'blocker' && (
-          <div className="dossier-sections-stack">
-            <section
-              data-testid="section-ready-now"
-              aria-label="Secrets ready to grab right now"
-              className="dossier-ready-section"
-            >
-              <div className="section-banner-header is-ready">
-                <span className="status-dot is-ready" aria-hidden="true" />
-                <h3>Ready Right Now ({categorized.readyNow.length})</h3>
+        {/* Tab Panel 1: Categorized Secrets & Locks Checklist */}
+        <div
+          role="tabpanel"
+          aria-labelledby="dossier-tab-checklist"
+          hidden={activeDossierTab !== 'checklist'}
+        >
+          <div className="dossier-tabpanel-inner">
+            {/* 1-Click Grouping Mode Switcher */}
+            <div className="dossier-grouping-bar">
+              <span className="grouping-bar-label">
+                <Layers size={13} aria-hidden="true" />
+                Group Secrets:
+              </span>
+              <div
+                data-testid="group-mode-switcher"
+                role="group"
+                aria-label="Secret grouping mode"
+                className="dossier-group-switcher"
+              >
+                <button
+                  type="button"
+                  data-testid="group-mode-blocker"
+                  aria-pressed={groupMode === 'blocker'}
+                  className={`group-mode-pill ${groupMode === 'blocker' ? 'is-active' : ''}`}
+                  onClick={() => setGroupMode('blocker')}
+                >
+                  By Requirement Gate
+                </button>
+                <button
+                  type="button"
+                  data-testid="group-mode-tier"
+                  aria-pressed={groupMode === 'tier'}
+                  className={`group-mode-pill ${groupMode === 'tier' ? 'is-active' : ''}`}
+                  onClick={() => setGroupMode('tier')}
+                >
+                  Canonical Tiers (0–5)
+                </button>
+                <button
+                  type="button"
+                  data-testid="group-mode-type"
+                  aria-pressed={groupMode === 'type'}
+                  className={`group-mode-pill ${groupMode === 'type' ? 'is-active' : ''}`}
+                  onClick={() => setGroupMode('type')}
+                >
+                  Collectible Type
+                </button>
               </div>
+            </div>
 
-              {categorized.readyNow.length > 0 ? (
-                renderSecretList(categorized.readyNow)
-              ) : (
-                <p className="dossier-empty-hint">
-                  {categorized.allEvaluated.length === 0
-                    ? 'No collectibles match your active filter in this area.'
-                    : categorized.lockedBuckets.length === 0 &&
-                        categorized.completed.length > 0
-                      ? 'All secrets in this region are completed!'
-                      : 'No remaining secrets are ready with your current loadout — inspect the specific requirement gates below or toggle gear in your Loadout.'}
-                </p>
-              )}
-            </section>
+            {/* Mode 1 (Default): By Requirement Gate ('blocker') */}
+            {groupMode === 'blocker' && (
+              <div className="dossier-sections-stack">
+                <section
+                  data-testid="section-ready-now"
+                  aria-label="Secrets ready to grab right now"
+                  className="dossier-ready-section"
+                >
+                  <div className="section-banner-header is-ready">
+                    <span className="status-dot is-ready" aria-hidden="true" />
+                    <h3>Ready Right Now ({categorized.readyNow.length})</h3>
+                  </div>
 
-            <section
-              data-testid="section-locked-buckets"
-              aria-label="Secrets locked behind specific requirements"
-              className="dossier-locked-section"
-            >
-              <div className="section-banner-header is-locked">
-                <Lock size={14} aria-hidden="true" />
-                <h3>Locked Behind Specific Requirements ({lockedSecretsCount})</h3>
+                  {categorized.readyNow.length > 0 ? (
+                    renderSecretList(categorized.readyNow)
+                  ) : (
+                    <p className="dossier-empty-hint">
+                      {categorized.allEvaluated.length === 0
+                        ? 'No collectibles match your active filter in this area.'
+                        : categorized.lockedBuckets.length === 0 &&
+                            categorized.completed.length > 0
+                          ? 'All secrets in this region are completed!'
+                          : 'No remaining secrets are ready with your current loadout — inspect the specific requirement gates below or toggle gear in your Loadout.'}
+                    </p>
+                  )}
+                </section>
+
+                <section
+                  data-testid="section-locked-buckets"
+                  aria-label="Secrets locked behind specific requirements"
+                  className="dossier-locked-section"
+                >
+                  <div className="section-banner-header is-locked">
+                    <Lock size={14} aria-hidden="true" />
+                    <h3>Locked Behind Specific Requirements ({lockedSecretsCount})</h3>
+                  </div>
+
+                  {categorized.lockedBuckets.length > 0 ? (
+                    <div className="dossier-buckets-stack">
+                      {categorized.lockedBuckets.map((bucket) => (
+                        <details
+                          key={bucket.key}
+                          open
+                          data-testid={`locked-bucket-${bucket.key}`}
+                          className={`dossier-disclosure locked-bucket cat-${bucket.category}`}
+                        >
+                          <summary className="dossier-disclosure-summary">
+                            <span className="disclosure-summary-left">
+                              <span className="disclosure-cat-icon">
+                                {renderBlockerIcon(bucket.category)}
+                              </span>
+                              <span className="disclosure-title">{bucket.label}</span>
+                              <span className="disclosure-count">({bucket.items.length})</span>
+                            </span>
+                            <ChevronDown
+                              size={16}
+                              className="disclosure-chevron"
+                              aria-hidden="true"
+                            />
+                          </summary>
+                          <div className="dossier-disclosure-content">
+                            {renderSecretList(bucket.items)}
+                          </div>
+                        </details>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="dossier-empty-hint">
+                      Nothing locked — your current loadout satisfies every remaining secret here!
+                    </p>
+                  )}
+                </section>
               </div>
+            )}
 
-              {categorized.lockedBuckets.length > 0 ? (
-                <div className="dossier-buckets-stack">
-                  {categorized.lockedBuckets.map((bucket) => (
+            {/* Mode 2: Canonical Progression Tiers (0–5) */}
+            {groupMode === 'tier' && (
+              <section
+                data-testid="section-tier-groups"
+                aria-label="Secrets grouped by canonical progression tiers"
+                className="dossier-buckets-stack"
+              >
+                {categorized.tierGroups
+                  .filter((tg) => tg.items.length > 0)
+                  .map((tierGroup) => (
                     <details
-                      key={bucket.key}
+                      key={tierGroup.key}
                       open
-                      data-testid={`locked-bucket-${bucket.key}`}
-                      className={`dossier-disclosure locked-bucket cat-${bucket.category}`}
+                      data-testid={`tier-bucket-${tierGroup.key}`}
+                      className="dossier-disclosure tier-bucket"
                     >
                       <summary className="dossier-disclosure-summary">
                         <span className="disclosure-summary-left">
-                          <span className="disclosure-cat-icon">
-                            {renderBlockerIcon(bucket.category)}
-                          </span>
-                          <span className="disclosure-title">{bucket.label}</span>
-                          <span className="disclosure-count">({bucket.items.length})</span>
+                          <span
+                            className="tier-color-dot"
+                            style={{ backgroundColor: tierGroup.tier.badgeColor }}
+                            aria-hidden="true"
+                          />
+                          <span className="disclosure-title">{tierGroup.label}</span>
+                          <span className="disclosure-count">({tierGroup.items.length})</span>
                         </span>
                         <ChevronDown
                           size={16}
@@ -573,124 +696,218 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
                         />
                       </summary>
                       <div className="dossier-disclosure-content">
-                        {renderSecretList(bucket.items)}
+                        <p className="tier-bucket-desc">{tierGroup.tier.description}</p>
+                        {renderSecretList(tierGroup.items)}
                       </div>
                     </details>
                   ))}
-                </div>
-              ) : (
-                <p className="dossier-empty-hint">
-                  Nothing locked — your current loadout satisfies every remaining secret here!
-                </p>
-              )}
-            </section>
+              </section>
+            )}
+
+            {/* Mode 3: Collectible Type */}
+            {groupMode === 'type' && (
+              <section
+                data-testid="section-type-groups"
+                aria-label="Secrets grouped by collectible type"
+                className="dossier-buckets-stack"
+              >
+                {categorized.typeGroups
+                  .filter((tg) => tg.items.length > 0)
+                  .map((typeGroup) => (
+                    <details
+                      key={typeGroup.key}
+                      open
+                      data-testid={`type-bucket-${typeGroup.key}`}
+                      className="dossier-disclosure type-bucket"
+                    >
+                      <summary className="dossier-disclosure-summary">
+                        <span className="disclosure-summary-left">
+                          <span className="disclosure-title">{typeGroup.label}</span>
+                          <span className="disclosure-count">({typeGroup.items.length})</span>
+                        </span>
+                        <ChevronDown
+                          size={16}
+                          className="disclosure-chevron"
+                          aria-hidden="true"
+                        />
+                      </summary>
+                      <div className="dossier-disclosure-content">
+                        {renderSecretList(typeGroup.items)}
+                      </div>
+                    </details>
+                  ))}
+              </section>
+            )}
+
+            {/* Collapsible Completed Section at Bottom */}
+            <details
+              data-testid="section-completed"
+              className="dossier-disclosure completed-bucket"
+            >
+              <summary className="dossier-disclosure-summary">
+                <span className="disclosure-summary-left">
+                  <CheckCircle2
+                    size={15}
+                    className="completed-summary-icon"
+                    aria-hidden="true"
+                  />
+                  <span className="disclosure-title">
+                    Completed ({categorized.completed.length})
+                  </span>
+                </span>
+                <ChevronDown size={16} className="disclosure-chevron" aria-hidden="true" />
+              </summary>
+              <div className="dossier-disclosure-content">
+                {categorized.completed.length > 0 ? (
+                  renderSecretList(categorized.completed)
+                ) : (
+                  <p className="dossier-empty-hint">
+                    No secrets checked off in {region.name} yet.
+                  </p>
+                )}
+              </div>
+            </details>
           </div>
-        )}
+        </div>
 
-        {/* Mode 2: Canonical Progression Tiers (0–5) */}
-        {groupMode === 'tier' && (
-          <section
-            data-testid="section-tier-groups"
-            aria-label="Secrets grouped by canonical progression tiers"
-            className="dossier-buckets-stack"
-          >
-            {categorized.tierGroups
-              .filter((tg) => tg.items.length > 0)
-              .map((tierGroup) => (
-                <details
-                  key={tierGroup.key}
-                  open
-                  data-testid={`tier-bucket-${tierGroup.key}`}
-                  className="dossier-disclosure tier-bucket"
-                >
-                  <summary className="dossier-disclosure-summary">
-                    <span className="disclosure-summary-left">
-                      <span
-                        className="tier-color-dot"
-                        style={{ backgroundColor: tierGroup.tier.badgeColor }}
-                        aria-hidden="true"
-                      />
-                      <span className="disclosure-title">{tierGroup.label}</span>
-                      <span className="disclosure-count">({tierGroup.items.length})</span>
-                    </span>
-                    <ChevronDown
-                      size={16}
-                      className="disclosure-chevron"
-                      aria-hidden="true"
-                    />
-                  </summary>
-                  <div className="dossier-disclosure-content">
-                    <p className="tier-bucket-desc">{tierGroup.tier.description}</p>
-                    {renderSecretList(tierGroup.items)}
-                  </div>
-                </details>
-              ))}
-          </section>
-        )}
-
-        {/* Mode 3: Collectible Type */}
-        {groupMode === 'type' && (
-          <section
-            data-testid="section-type-groups"
-            aria-label="Secrets grouped by collectible type"
-            className="dossier-buckets-stack"
-          >
-            {categorized.typeGroups
-              .filter((tg) => tg.items.length > 0)
-              .map((typeGroup) => (
-                <details
-                  key={typeGroup.key}
-                  open
-                  data-testid={`type-bucket-${typeGroup.key}`}
-                  className="dossier-disclosure type-bucket"
-                >
-                  <summary className="dossier-disclosure-summary">
-                    <span className="disclosure-summary-left">
-                      <span className="disclosure-title">{typeGroup.label}</span>
-                      <span className="disclosure-count">({typeGroup.items.length})</span>
-                    </span>
-                    <ChevronDown
-                      size={16}
-                      className="disclosure-chevron"
-                      aria-hidden="true"
-                    />
-                  </summary>
-                  <div className="dossier-disclosure-content">
-                    {renderSecretList(typeGroup.items)}
-                  </div>
-                </details>
-              ))}
-          </section>
-        )}
-
-        {/* Collapsible Completed Section at Bottom */}
-        <details
-          data-testid="section-completed"
-          className="dossier-disclosure completed-bucket"
+        {/* Tab Panel 2: In-Depth Area & Dungeon Walkthrough Guide */}
+        <div
+          role="tabpanel"
+          aria-labelledby="dossier-tab-guide"
+          data-testid="dossier-guide-panel"
+          hidden={activeDossierTab !== 'guide'}
         >
-          <summary className="dossier-disclosure-summary">
-            <span className="disclosure-summary-left">
-              <CheckCircle2
-                size={15}
-                className="completed-summary-icon"
-                aria-hidden="true"
-              />
-              <span className="disclosure-title">
-                Completed ({categorized.completed.length})
-              </span>
-            </span>
-            <ChevronDown size={16} className="disclosure-chevron" aria-hidden="true" />
-          </summary>
-          <div className="dossier-disclosure-content">
-            {categorized.completed.length > 0 ? (
-              renderSecretList(categorized.completed)
+          <div className="dossier-guide-stack">
+            {areaGuide ? (
+              <>
+                <div className="area-guide-banner">
+                  <p className="area-guide-tagline">{areaGuide.tagline}</p>
+                  <div className="area-guide-visit-order">
+                    <Compass size={13} aria-hidden="true" />
+                    <span>
+                      <strong>Optimal Timing:</strong> {areaGuide.recommendedVisitOrder}
+                    </span>
+                  </div>
+                  {onOpenOptimalRouteForRegion && (
+                    <button
+                      type="button"
+                      className="area-guide-route-jump-btn"
+                      data-testid="dossier-jump-to-route-btn"
+                      onClick={() => onOpenOptimalRouteForRegion(region.id)}
+                    >
+                      <Compass size={13} aria-hidden="true" />
+                      <span>Open {region.name} in Horizontal Optimal Route</span>
+                    </button>
+                  )}
+                </div>
+
+                {areaGuide.entrancesAndShortcuts.length > 0 && (
+                  <section className="area-guide-card">
+                    <h3 className="area-guide-card__title">Entrances, Warps &amp; Shortcuts</h3>
+                    <ul className="area-guide-bullets">
+                      {areaGuide.entrancesAndShortcuts.map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {areaGuide.phases.map((phase) => {
+                  const phaseSecrets = phase.secretIds
+                    .map((id) => SECRET_BY_ID[id])
+                    .filter((s): s is NonNullable<typeof s> => Boolean(s));
+                  const doneInPhase = phaseSecrets.filter(
+                    (s) => state.completedSecretIds[s.id],
+                  ).length;
+
+                  return (
+                    <section
+                      key={phase.id}
+                      className="area-guide-card"
+                      data-testid={`area-guide-phase-${phase.id}`}
+                    >
+                      <div className="area-guide-phase-head">
+                        <h3 className="area-guide-card__title">{phase.title}</h3>
+                        <span className={`secret-badge badge-era era-${phase.era}`}>
+                          {phase.era === 'child'
+                            ? 'Child Link'
+                            : phase.era === 'adult'
+                              ? 'Adult Link'
+                              : 'Both Eras'}
+                        </span>
+                      </div>
+
+                      <ol className="area-guide-steps">
+                        {phase.steps.map((stepText, idx) => (
+                          <li key={idx}>{stepText}</li>
+                        ))}
+                      </ol>
+
+                      {phaseSecrets.length > 0 && (
+                        <div className="area-guide-phase-secrets">
+                          <div className="area-guide-phase-secrets__label">
+                            Check Off as You Go ({doneInPhase}/{phaseSecrets.length})
+                          </div>
+                          <ul className="area-guide-secret-checks">
+                            {phaseSecrets.map((sec) => {
+                              const checked = Boolean(state.completedSecretIds[sec.id]);
+                              return (
+                                <li
+                                  key={sec.id}
+                                  className={`area-guide-secret-row${checked ? ' is-checked' : ''}`}
+                                >
+                                  <label>
+                                    <input
+                                      type="checkbox"
+                                      data-testid={`guide-secret-check-${sec.id}`}
+                                      checked={checked}
+                                      onChange={(e) => onToggleSecret(sec.id, e.target.checked)}
+                                    />
+                                    <span>{sec.title}</span>
+                                  </label>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </section>
+                  );
+                })}
+
+                {areaGuide.bossStrategy && (
+                  <section className="area-guide-card area-guide-boss-card">
+                    <div className="area-guide-phase-head">
+                      <h3 className="area-guide-card__title">
+                        <Swords size={15} aria-hidden="true" />
+                        <span>Boss Strategy: {areaGuide.bossStrategy.bossName}</span>
+                      </h3>
+                    </div>
+                    <p className="area-guide-boss-weakness">
+                      <strong>Weakness:</strong> {areaGuide.bossStrategy.weakness}
+                    </p>
+                    <p className="area-guide-boss-text">{areaGuide.bossStrategy.strategy}</p>
+                  </section>
+                )}
+
+                {areaGuide.proTips.length > 0 && (
+                  <section className="area-guide-card">
+                    <h3 className="area-guide-card__title">Switch 2 &amp; Optimization Pro Tips</h3>
+                    <ul className="area-guide-bullets">
+                      {areaGuide.proTips.map((tip, i) => (
+                        <li key={i}>{tip}</li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </>
             ) : (
               <p className="dossier-empty-hint">
-                No secrets checked off in {region.name} yet.
+                Select Secrets &amp; Locks above to view and check off collectibles in {region.name}.
               </p>
             )}
           </div>
-        </details>
+        </div>
       </div>
 
       {/* Requirement How-To-Get & Switch 2 Notes Popover (rendered inside active container so top-layer <dialog> never marks it inert) */}

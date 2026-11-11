@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { REGION_BY_ID, REQUIREMENT_BY_ID } from '../data';
+import { REGION_BY_ID, REQUIREMENT_BY_ID, SECRET_BY_ID } from '../data';
 import type {
   EraFilter,
+  LastSessionSnapshot,
+  MapLayerMode,
   PlayerProgressState,
   ThemeMode,
   UnlockDelta,
   UrlHashState,
+  WorkspaceViewMode,
 } from '../types/zelda';
 import {
   applyStoryPreset,
@@ -17,9 +20,14 @@ import {
 } from './gating';
 
 export const STORAGE_KEY = 'zelda-oot-sw2-progress-v1';
+const IDB_NAME = 'zelda-oot-sw2-idb';
+const IDB_STORE = 'kv';
+const IDB_KEY = 'progress-v1';
 
 const VALID_ERAS = new Set<EraFilter>(['all', 'child', 'adult']);
 const VALID_THEMES = new Set<ThemeMode>(['dark', 'parchment']);
+const VALID_VIEWS = new Set<WorkspaceViewMode>(['map', 'route']);
+const VALID_MAP_LAYERS = new Set<MapLayerMode>(['illustrated', 'schematic']);
 const VALID_SHEETS = new Set(['ocarina', 'quests', 'diff', 'search', 'backup']);
 
 function sanitizeBooleanMap(value: unknown): Record<string, boolean> {
@@ -33,6 +41,24 @@ function sanitizeBooleanMap(value: unknown): Record<string, boolean> {
     }
   }
   return cleaned;
+}
+
+function sanitizeLastSession(value: unknown): LastSessionSnapshot | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  const raw = value as Record<string, unknown>;
+  if (typeof raw.updatedAt !== 'string' || typeof raw.lastActionLabel !== 'string') {
+    return null;
+  }
+  return {
+    updatedAt: raw.updatedAt.slice(0, 64),
+    lastActionLabel: raw.lastActionLabel.slice(0, 160),
+    regionId:
+      typeof raw.regionId === 'string' && REGION_BY_ID[raw.regionId] ? raw.regionId : null,
+    chapterId: typeof raw.chapterId === 'string' ? raw.chapterId.slice(0, 48) : null,
+    stepId: typeof raw.stepId === 'string' ? raw.stepId.slice(0, 64) : null,
+  };
 }
 
 /**
@@ -53,6 +79,7 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
       : candidate;
 
   const completedSecretIds = sanitizeBooleanMap(source.completedSecretIds);
+  const completedRouteStepIds = sanitizeBooleanMap(source.completedRouteStepIds);
 
   let ownedRequirementIds: Record<string, boolean>;
   if (
@@ -87,7 +114,25 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
     ? (source.theme as ThemeMode)
     : 'dark';
 
-  return {
+  const activeRouteChapterId =
+    typeof source.activeRouteChapterId === 'string' && source.activeRouteChapterId.length > 0
+      ? source.activeRouteChapterId.slice(0, 48)
+      : undefined;
+
+  const bookmarkedRouteStepId =
+    typeof source.bookmarkedRouteStepId === 'string' && source.bookmarkedRouteStepId.length > 0
+      ? source.bookmarkedRouteStepId.slice(0, 64)
+      : null;
+
+  const mapLayerMode: MapLayerMode | undefined = VALID_MAP_LAYERS.has(
+    source.mapLayerMode as MapLayerMode,
+  )
+    ? (source.mapLayerMode as MapLayerMode)
+    : undefined;
+
+  const lastSession = sanitizeLastSession(source.lastSession);
+
+  const next: PlayerProgressState = {
     version: 1,
     completedSecretIds,
     ownedRequirementIds,
@@ -97,6 +142,24 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
     customScarecrowNotes,
     theme,
   };
+
+  if (Object.keys(completedRouteStepIds).length > 0) {
+    next.completedRouteStepIds = completedRouteStepIds;
+  }
+  if (activeRouteChapterId) {
+    next.activeRouteChapterId = activeRouteChapterId;
+  }
+  if (bookmarkedRouteStepId) {
+    next.bookmarkedRouteStepId = bookmarkedRouteStepId;
+  }
+  if (mapLayerMode) {
+    next.mapLayerMode = mapLayerMode;
+  }
+  if (lastSession) {
+    next.lastSession = lastSession;
+  }
+
+  return next;
 }
 
 function getSafeStorage(explicitStorage?: Storage): Storage | null {
@@ -105,6 +168,115 @@ function getSafeStorage(explicitStorage?: Storage): Storage | null {
     return window.localStorage;
   }
   return null;
+}
+
+// ============================================================================
+// Durable Mobile PWA IndexedDB Mirror + Persistent Storage Protection
+// ============================================================================
+
+function openProgressIdb(): Promise<IDBDatabase | null> {
+  if (typeof indexedDB === 'undefined' || !indexedDB) {
+    return Promise.resolve(null);
+  }
+  return new Promise((resolve) => {
+    try {
+      const request = indexedDB.open(IDB_NAME, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+async function writeProgressToIdb(state: PlayerProgressState): Promise<void> {
+  const db = await openProgressIdb();
+  if (!db) return;
+  try {
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(state, IDB_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch {
+    // Ignore IDB quota or private-mode restrictions
+  } finally {
+    db.close();
+  }
+}
+
+export async function loadProgressFromIdb(): Promise<PlayerProgressState | null> {
+  const db = await openProgressIdb();
+  if (!db) return null;
+  try {
+    const raw = await new Promise<unknown>((resolve) => {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    });
+    if (!raw) return null;
+    return sanitizeProgressState(raw);
+  } catch {
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
+async function clearProgressIdb(): Promise<void> {
+  const db = await openProgressIdb();
+  if (!db) return;
+  try {
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(IDB_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch {
+    // Ignore IDB errors
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * Requests durable OS-protected storage (`navigator.storage.persist()`) so mobile
+ * Safari/Chrome do not evict Home Screen PWA progress during long play breaks.
+ */
+export async function ensurePersistentPhoneStorage(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.storage) {
+    return false;
+  }
+  try {
+    if (typeof navigator.storage.persisted === 'function') {
+      const already = await navigator.storage.persisted();
+      if (already) return true;
+    }
+    if (typeof navigator.storage.persist === 'function') {
+      return await navigator.storage.persist();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function hasAnyStoredProgress(state: PlayerProgressState): boolean {
+  return (
+    Object.keys(state.completedSecretIds).length > 0 ||
+    Object.keys(state.completedRouteStepIds ?? {}).length > 0 ||
+    Boolean(state.bookmarkedRouteStepId) ||
+    state.customScarecrowNotes.length > 0
+  );
 }
 
 export function loadProgressState(storage?: Storage): PlayerProgressState {
@@ -125,11 +297,15 @@ export function loadProgressState(storage?: Storage): PlayerProgressState {
 
 export function saveProgressState(state: PlayerProgressState, storage?: Storage): void {
   const store = getSafeStorage(storage);
-  if (!store) return;
-  try {
-    store.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // Ignore storage quota errors in restricted private browsing modes
+  if (store) {
+    try {
+      store.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // Ignore storage quota errors in restricted private browsing modes
+    }
+  }
+  if (!storage) {
+    void writeProgressToIdb(state);
   }
 }
 
@@ -142,6 +318,9 @@ export function resetProgress(storage?: Storage): PlayerProgressState {
     } catch {
       // Ignore storage errors
     }
+  }
+  if (!storage) {
+    void clearProgressIdb();
   }
   return fresh;
 }
@@ -204,6 +383,8 @@ export function parseImportedProgressJson(jsonText: string): PlayerProgressState
 
 export function createDefaultUrlHashState(): UrlHashState {
   return {
+    view: 'map',
+    chapterId: null,
     regionId: null,
     era: 'all',
     sheet: null,
@@ -221,6 +402,12 @@ export function parseUrlHash(hashInput?: string): UrlHashState {
 
   const params = new URLSearchParams(trimmed);
 
+  const rawView = params.get('view') as WorkspaceViewMode | null;
+  const view: WorkspaceViewMode = rawView && VALID_VIEWS.has(rawView) ? rawView : 'map';
+
+  const rawChapter = params.get('chapter');
+  const chapterId = rawChapter && rawChapter.length > 0 ? rawChapter.slice(0, 48) : null;
+
   const rawRegion = params.get('region');
   const regionId = rawRegion && REGION_BY_ID[rawRegion] ? rawRegion : null;
 
@@ -234,6 +421,8 @@ export function parseUrlHash(hashInput?: string): UrlHashState {
   const spotlight = rawSpotlight === '1' || rawSpotlight === 'true';
 
   return {
+    view,
+    chapterId,
     regionId,
     era,
     sheet,
@@ -244,6 +433,12 @@ export function parseUrlHash(hashInput?: string): UrlHashState {
 export function buildUrlHash(hashState: Partial<UrlHashState>): string {
   const params = new URLSearchParams();
 
+  if (hashState.view && hashState.view !== 'map' && VALID_VIEWS.has(hashState.view)) {
+    params.set('view', hashState.view);
+  }
+  if (hashState.chapterId) {
+    params.set('chapter', hashState.chapterId);
+  }
   if (hashState.regionId && REGION_BY_ID[hashState.regionId]) {
     params.set('region', hashState.regionId);
   }
@@ -265,9 +460,39 @@ export function buildUrlHash(hashState: Partial<UrlHashState>): string {
 // React Hooks for Progress & URL Hash Synchronization
 // ============================================================================
 
+export interface RouteStepSessionMeta {
+  label?: string;
+  regionId?: string | null;
+  chapterId?: string | null;
+}
+
 export function usePlayerProgress() {
   const [state, setState] = useState<PlayerProgressState>(() => loadProgressState());
   const [lastUnlockDelta, setLastUnlockDelta] = useState<UnlockDelta | null>(null);
+  const [isStoragePersisted, setIsStoragePersisted] = useState<boolean>(false);
+
+  // Request OS persistent storage & recover from IndexedDB if localStorage was ever cleared
+  useEffect(() => {
+    let cancelled = false;
+    void ensurePersistentPhoneStorage().then((granted) => {
+      if (!cancelled && granted) {
+        setIsStoragePersisted(true);
+      }
+    });
+
+    const rawLocalExists = Boolean(getSafeStorage()?.getItem(STORAGE_KEY));
+    if (!rawLocalExists) {
+      void loadProgressFromIdb().then((fromIdb) => {
+        if (!cancelled && fromIdb && hasAnyStoredProgress(fromIdb)) {
+          setState(fromIdb);
+        }
+      });
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     saveProgressState(state);
@@ -287,7 +512,22 @@ export function usePlayerProgress() {
       totalUnlocked: 0,
     };
     setState((prev) => {
-      const next = toggleSecretCompleted(prev, secretId, completed);
+      const toggled = toggleSecretCompleted(prev, secretId, completed);
+      const isNowDone = Boolean(toggled.completedSecretIds[secretId]);
+      const secretMeta = SECRET_BY_ID[secretId];
+      const next: PlayerProgressState = secretMeta
+        ? {
+            ...toggled,
+            lastSession: {
+              updatedAt: new Date().toISOString(),
+              lastActionLabel: `${isNowDone ? 'Completed' : 'Unchecked'}: ${secretMeta.title}`,
+              regionId: secretMeta.regionId,
+              chapterId: prev.activeRouteChapterId ?? null,
+              stepId: prev.bookmarkedRouteStepId ?? null,
+            },
+          }
+        : toggled;
+
       computedDelta = computeUnlockDelta(prev, next, secretId);
       if (computedDelta.totalUnlocked > 0) {
         setLastUnlockDelta(computedDelta);
@@ -295,6 +535,70 @@ export function usePlayerProgress() {
       return next;
     });
     return computedDelta;
+  }, []);
+
+  const toggleRouteStep = useCallback(
+    (stepId: string, meta?: RouteStepSessionMeta, completed?: boolean) => {
+      setState((prev) => {
+        const existing = prev.completedRouteStepIds ?? {};
+        const shouldComplete = completed ?? !Boolean(existing[stepId]);
+        const nextSteps = { ...existing };
+        if (shouldComplete) {
+          nextSteps[stepId] = true;
+        } else {
+          delete nextSteps[stepId];
+        }
+
+        const label = meta?.label ?? stepId;
+        return {
+          ...prev,
+          completedRouteStepIds: nextSteps,
+          activeRouteChapterId: meta?.chapterId ?? prev.activeRouteChapterId,
+          lastSession: {
+            updatedAt: new Date().toISOString(),
+            lastActionLabel: `${shouldComplete ? 'Completed Step' : 'Reopened Step'}: ${label}`,
+            regionId: meta?.regionId ?? prev.lastSession?.regionId ?? null,
+            chapterId: meta?.chapterId ?? prev.activeRouteChapterId ?? null,
+            stepId,
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  const setActiveRouteChapter = useCallback((chapterId: string) => {
+    setState((prev) => ({
+      ...prev,
+      activeRouteChapterId: chapterId,
+    }));
+  }, []);
+
+  const setBookmarkedRouteStep = useCallback(
+    (stepId: string | null, meta?: RouteStepSessionMeta) => {
+      setState((prev) => ({
+        ...prev,
+        bookmarkedRouteStepId: stepId,
+        activeRouteChapterId: meta?.chapterId ?? prev.activeRouteChapterId,
+        lastSession: stepId
+          ? {
+              updatedAt: new Date().toISOString(),
+              lastActionLabel: `Pinned Checkpoint: ${meta?.label ?? stepId}`,
+              regionId: meta?.regionId ?? prev.lastSession?.regionId ?? null,
+              chapterId: meta?.chapterId ?? prev.activeRouteChapterId ?? null,
+              stepId,
+            }
+          : prev.lastSession,
+      }));
+    },
+    [],
+  );
+
+  const setMapLayerMode = useCallback((mode: MapLayerMode) => {
+    setState((prev) => ({
+      ...prev,
+      mapLayerMode: mode,
+    }));
   }, []);
 
   const toggleRequirement = useCallback(
@@ -377,9 +681,14 @@ export function usePlayerProgress() {
   return {
     state,
     setState,
+    isStoragePersisted,
     lastUnlockDelta,
     dismissUnlockDelta,
     toggleSecret,
+    toggleRouteStep,
+    setActiveRouteChapter,
+    setBookmarkedRouteStep,
+    setMapLayerMode,
     toggleRequirement,
     selectPreset,
     setEraFilter,

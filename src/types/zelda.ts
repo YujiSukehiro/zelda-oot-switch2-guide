@@ -367,6 +367,72 @@ export interface PlayerProgressState {
   loadoutModeEnabled: boolean;
   customScarecrowNotes: string;
   theme?: 'dark' | 'parchment';
+  completedRouteStepIds?: Record<string, boolean>;
+  activeRouteChapterId?: string;
+  bookmarkedRouteStepId?: string | null;
+  mapLayerMode?: MapLayerMode;
+  lastSession?: LastSessionSnapshot | null;
+}
+
+export type WorkspaceViewMode = 'map' | 'route';
+
+export type MapLayerMode = 'illustrated' | 'schematic';
+
+export interface LastSessionSnapshot {
+  updatedAt: string;
+  lastActionLabel: string;
+  regionId: string | null;
+  chapterId: string | null;
+  stepId?: string | null;
+}
+
+export interface AreaGuidePhase {
+  id: string;
+  title: string;
+  era: 'child' | 'adult' | 'both';
+  steps: string[];
+  secretIds: string[];
+}
+
+export interface AreaWalkthroughGuide {
+  regionId: string;
+  tagline: string;
+  recommendedVisitOrder: string;
+  entrancesAndShortcuts: string[];
+  phases: AreaGuidePhase[];
+  bossStrategy?: {
+    bossName: string;
+    weakness: string;
+    strategy: string;
+  };
+  proTips: string[];
+}
+
+export type RouteStepKind = 'story' | 'dungeon' | 'sweep' | 'boss' | 'quest' | 'switch2';
+
+export interface RouteStep {
+  id: string;
+  title: string;
+  regionId: string;
+  era: Era;
+  kind: RouteStepKind;
+  instructions: string;
+  proTip?: string;
+  secretIds: string[];
+  requiredIds?: string[];
+  unlocksRequirementIds?: string[];
+}
+
+export interface RouteChapter {
+  id: string;
+  number: number;
+  title: string;
+  subtitle: string;
+  era: 'child' | 'adult' | 'cross-era';
+  primaryRegionId: string;
+  estimatedMinutes: number;
+  summary: string;
+  steps: RouteStep[];
 }
 
 export type AccessStatus = 'completed' | 'available-now' | 'available-via-alt' | 'locked';
@@ -504,6 +570,8 @@ export interface StoryPreset {
 export type CompanionSheetId = 'ocarina' | 'quests' | 'diff' | 'search' | 'backup';
 
 export interface UrlHashState {
+  view?: WorkspaceViewMode;
+  chapterId?: string | null;
   regionId: string | null;
   era: 'all' | 'child' | 'adult';
   sheet: string | null;

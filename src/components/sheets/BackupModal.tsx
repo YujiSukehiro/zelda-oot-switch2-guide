@@ -21,6 +21,7 @@ export interface BackupModalProps {
   onExportJson: () => string;
   onImportJson: (jsonText: string) => void;
   onResetProgress: () => void;
+  isStoragePersisted?: boolean;
 }
 
 export function BackupModal({
@@ -31,6 +32,7 @@ export function BackupModal({
   onExportJson,
   onImportJson,
   onResetProgress,
+  isStoragePersisted = false,
 }: BackupModalProps) {
   const [importText, setImportText] = useState('');
   const [confirmingReset, setConfirmingReset] = useState(false);
@@ -161,7 +163,7 @@ export function BackupModal({
           <span>Offline Save Backup, Restore &amp; Reset</span>
         </>
       }
-      subtitle="100% client-side localStorage persistence — export a JSON file anytime to sync across devices"
+      subtitle="Dual localStorage + IndexedDB phone PWA persistence — export a JSON file anytime to sync across devices"
     >
       {/* Current Save Summary */}
       <div className="zelda-callout">
@@ -177,6 +179,11 @@ export function BackupModal({
             Gold Skulltulas: {globalProgress.skulltulasCompleted}/{globalProgress.skulltulasTotal}
           </span>
           <span className="zelda-badge">Owned Gear Flags: {ownedGearCount}</span>
+          <span className="zelda-badge" data-testid="backup-durable-storage-badge">
+            {isStoragePersisted
+              ? '✓ Persistent Phone Storage Protected'
+              : '✓ Dual localStorage + IndexedDB Active'}
+          </span>
         </div>
       </div>
 

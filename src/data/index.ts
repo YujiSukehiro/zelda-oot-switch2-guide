@@ -817,3 +817,13 @@ export const STORY_PRESETS: StoryPreset[] = [
     ownedRequirementIds: REQUIREMENTS.filter((r) => r.category !== 'milestone').map((r) => r.id),
   },
 ];
+
+export { AREA_GUIDES, AREA_GUIDE_BY_REGION_ID } from './areaGuides';
+export {
+  OPTIMAL_ROUTE_CHAPTERS,
+  ROUTE_CHAPTER_BY_ID,
+  ALL_ROUTE_STEPS,
+  ROUTE_STEP_BY_ID,
+  STEP_TO_CHAPTER_ID,
+} from './optimalRoute';
+

@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import {
   Backpack,
+  Compass,
   DatabaseBackup,
   Heart,
+  Map as MapIcon,
   Moon,
   Music,
   ScrollText,
@@ -17,6 +19,7 @@ import type {
   GlobalProgressSummary,
   PlayerProgressState,
   ThemeMode,
+  WorkspaceViewMode,
 } from '../../types/zelda';
 import './sheets.css';
 
@@ -30,6 +33,8 @@ export interface TopCommandBarProps {
   onToggleTheme: (nextTheme: ThemeMode) => void;
   onToggleLoadoutDock: (nextOpen: boolean) => void;
   isLoadoutDockOpen: boolean;
+  activeView?: WorkspaceViewMode;
+  onViewModeChange?: (view: WorkspaceViewMode) => void;
 }
 
 const ERA_OPTIONS: ReadonlyArray<{ id: EraFilter; label: string }> = [
@@ -48,6 +53,8 @@ export function TopCommandBar({
   onToggleTheme,
   onToggleLoadoutDock,
   isLoadoutDockOpen,
+  activeView = 'map',
+  onViewModeChange,
 }: TopCommandBarProps) {
   const isParchment = state.theme === 'parchment';
   const spotlightActive = Boolean(state.switch2SpotlightOnly);
@@ -137,12 +144,42 @@ export function TopCommandBar({
           </div>
         </div>
 
-        {/* Era Lens, Switch 2 Spotlight, Search, Companion Sheets, Loadout & Theme */}
+        {/* Workspace View Switcher, Era Lens, Switch 2 Spotlight, Search, Sheets, Loadout & Theme */}
         <div
           className="zelda-topbar__controls"
           role="toolbar"
           aria-label="Map filters and companion sheets"
         >
+          {onViewModeChange && (
+            <div
+              className="zelda-view-segmented"
+              data-testid="workspace-view-switcher"
+              role="group"
+              aria-label="Primary guide view"
+            >
+              <button
+                type="button"
+                className="zelda-view-segmented__btn"
+                data-testid="view-mode-map"
+                aria-pressed={activeView === 'map'}
+                onClick={() => onViewModeChange('map')}
+              >
+                <MapIcon size={13} aria-hidden="true" />
+                <span>World Map</span>
+              </button>
+              <button
+                type="button"
+                className="zelda-view-segmented__btn"
+                data-testid="view-mode-route"
+                aria-pressed={activeView === 'route'}
+                onClick={() => onViewModeChange('route')}
+              >
+                <Compass size={13} aria-hidden="true" />
+                <span>Optimal Route</span>
+              </button>
+            </div>
+          )}
+
           <div className="zelda-era-segmented" role="group" aria-label="Era filter">
             {ERA_OPTIONS.map((opt) => (
               <button

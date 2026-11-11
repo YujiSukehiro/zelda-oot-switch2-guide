@@ -2,6 +2,7 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { AREA_GUIDE_BY_REGION_ID } from '../../data';
 import {
   computeAllRegionSummaries,
   createDefaultProgressState,
@@ -377,5 +378,42 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
     // Clicking close-dossier-btn closes the dossier
     fireEvent.click(screen.getByTestId('close-dossier-btn'));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('switches to the In-Depth Area Guide tab, renders boss strategies & walkthrough phases, checks off secrets inline, and jumps to the Optimal Route', () => {
+    const state = createDefaultProgressState();
+    const onToggleSecret = vi.fn();
+    const onOpenOptimalRouteForRegion = vi.fn();
+
+    render(
+      <RegionDrawer
+        regionId="deku-tree"
+        state={state}
+        effectiveRequirements={deriveEffectiveRequirements(state)}
+        regionSummaries={computeAllRegionSummaries(state)}
+        areaGuide={AREA_GUIDE_BY_REGION_ID['deku-tree']}
+        onClose={vi.fn()}
+        onSelectRegion={vi.fn()}
+        onToggleSecret={onToggleSecret}
+        onOpenOptimalRouteForRegion={onOpenOptimalRouteForRegion}
+      />,
+    );
+
+    const guideTab = screen.getByTestId('dossier-tab-guide');
+    expect(guideTab).toHaveAttribute('aria-selected', 'false');
+    fireEvent.click(guideTab);
+    expect(guideTab).toHaveAttribute('aria-selected', 'true');
+
+    const guidePanel = screen.getByTestId('dossier-guide-panel');
+    expect(guidePanel).not.toHaveAttribute('hidden');
+    expect(guidePanel).toHaveTextContent(/Gohma/i);
+    expect(guidePanel).toHaveTextContent(/Entrances, Warps & Shortcuts/i);
+
+    const inlineCheck = within(guidePanel).getByTestId('guide-secret-check-gs-057');
+    fireEvent.click(inlineCheck);
+    expect(onToggleSecret).toHaveBeenCalledWith('gs-057', true);
+
+    fireEvent.click(within(guidePanel).getByTestId('dossier-jump-to-route-btn'));
+    expect(onOpenOptimalRouteForRegion).toHaveBeenCalledWith('deku-tree');
   });
 });

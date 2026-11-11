@@ -65,4 +65,35 @@ describe('App Wave 3 Integration', () => {
     const toast = screen.getByTestId('unlock-toast');
     expect(toast).toHaveTextContent(/Hookshot unlocked \d+ new secrets/i);
   });
+
+  it('switches between World Map and Horizontal Optimal Route, syncs shared secret checkboxes, and surfaces Pick Up Where You Left Off banner', () => {
+    render(<App />);
+
+    // Initially no activity -> no resume banner
+    expect(screen.queryByTestId('resume-banner')).not.toBeInTheDocument();
+
+    // Switch to Optimal Route view via TopCommandBar
+    fireEvent.click(screen.getByTestId('view-mode-route'));
+    expect(window.location.hash).toContain('view=route');
+    expect(screen.getByTestId('optimal-route-view')).toBeInTheDocument();
+
+    // Check off the first collectible in Ch. 1 (Kokiri Sword eq-kokiri-sword) directly from Optimal Route
+    const swordCheckbox = screen.getByTestId('route-secret-check-eq-kokiri-sword');
+    fireEvent.click(swordCheckbox);
+    expect(screen.getByTestId('global-progress-pill')).toHaveTextContent('1/231');
+
+    // Resume banner now appears with Pick Up Where You Left Off
+    const resumeBanner = screen.getByTestId('resume-banner');
+    expect(resumeBanner).toHaveTextContent(/Pick Up Where You Left Off/i);
+
+    // Clicking "Area on Map" on the resume banner jumps back to World Map and opens the Region Dossier
+    fireEvent.click(screen.getByTestId('resume-open-map-btn'));
+    expect(window.location.hash).not.toContain('view=route');
+    expect(screen.getByTestId('region-dossier')).toBeInTheDocument();
+
+    // Clicking "Continue Guide" returns right back to the Optimal Route chapter & step
+    fireEvent.click(screen.getByTestId('resume-continue-route-btn'));
+    expect(window.location.hash).toContain('view=route');
+    expect(screen.getByTestId('optimal-route-view')).toBeInTheDocument();
+  });
 });

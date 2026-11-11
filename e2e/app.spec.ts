@@ -135,6 +135,7 @@ test.describe('Static Build Artifacts & Strict Subpath Server Guard', () => {
     expect(swContent.length).toBeGreaterThan(200);
     expect(swContent).toContain('index.html');
     expect(swContent).toContain('icons/icon-192.png');
+    expect(swContent).toContain('maps/hyrule-illustrated.jpg');
     expect(swContent).not.toContain('"/assets/');
 
     // Confirm port 4174 strictly returns HTTP 404 for root-escaped paths outside /Zelda/*
@@ -558,6 +559,62 @@ for (const target of DEPLOY_TARGETS) {
 
       telemetry.assertClean();
     });
+
+    test('verifies Illustrated Hyrule Map asset loading, In-Depth Area Guide walkthrough tab, Horizontal Optimal Route carousel, and durable Resume Banner across reloads', async ({
+      page,
+    }) => {
+      const telemetry = attachZeroErrorTelemetry(page);
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(target.baseUrl, { waitUntil: 'networkidle' });
+      await ensureLoadoutOpen(page, false);
+
+      // 1. Verify Illustrated Map SVG <image> rendered cleanly under both / and /Zelda/
+      const mapLayerToggle = page.getByTestId('map-layer-toggle');
+      await expect(mapLayerToggle).toHaveAttribute('aria-pressed', 'true');
+      const artBackdrop = page.getByTestId('hyrule-illustrated-backdrop');
+      await expect(artBackdrop).toBeVisible();
+      const artBox = await artBackdrop.boundingBox();
+      expect(artBox && artBox.width).toBeGreaterThan(200);
+
+      // 2. Open Inside the Great Deku Tree -> switch to In-Depth Area Guide -> check off gs-057 inline
+      await page.getByTestId('map-node-deku-tree').click();
+      await page.getByTestId('dossier-tab-guide').click();
+      const guidePanel = page.getByTestId('dossier-guide-panel');
+      await expect(guidePanel).toBeVisible();
+      await expect(guidePanel).toContainText('Gohma');
+      await guidePanel.getByTestId('guide-secret-check-gs-057').check();
+      await expect(page.getByTestId('global-progress-pill')).toContainText('1/231');
+
+      // 3. Jump directly from the Area Guide into the Horizontal Optimal Route
+      await guidePanel.getByTestId('dossier-jump-to-route-btn').click();
+      const routeView = page.getByTestId('optimal-route-view');
+      await expect(routeView).toBeVisible();
+      expect(new URL(page.url()).pathname).toBe(target.expectedPathname);
+      expect(new URL(page.url()).hash).toContain('view=route');
+      await assertZeroHorizontalOverflow(page, 'Desktop 1440×900 Optimal Route view');
+
+      // Verify gs-057 is already checked inside Optimal Route (shared checkbox sync!)
+      await expect(routeView.getByTestId('route-secret-check-gs-057')).toBeChecked();
+
+      // Navigate to Chapter 2 via Next chapter button
+      await page.getByTestId('route-next-chapter-btn').click();
+      expect(new URL(page.url()).hash).toContain('chapter=ch-02');
+
+      // Verify Resume Banner is visible, reload page, and verify durable persistence + mobile layout
+      const resumeBanner = page.getByTestId('resume-banner');
+      await expect(resumeBanner).toBeVisible();
+      await expect(resumeBanner).toContainText('Pick Up Where You Left Off');
+
+      await page.reload({ waitUntil: 'networkidle' });
+      await expect(page.getByTestId('resume-banner')).toBeVisible();
+      await expect(page.getByTestId('global-progress-pill')).toContainText('1/231');
+
+      // Check Mobile 390×844 zero horizontal overflow in Optimal Route view
+      await page.setViewportSize({ width: 390, height: 844 });
+      await assertZeroHorizontalOverflow(page, 'Mobile 390×844 Optimal Route view');
+
+      telemetry.assertClean();
+    });
   });
 }
 
@@ -607,6 +664,26 @@ test.describe('Visual QA Screenshot Suite (Desktop 1440×900 & Mobile 390×844)'
       path: path.join(outDir, 'desktop-region-dossier-locks.png'),
       fullPage: false,
     });
+
+    // 2c. Desktop 1440×900 — In-Depth Area Guide Tab (Inside the Great Deku Tree + Illustrated Map)
+    await page.getByTestId('map-node-deku-tree').click();
+    await page.getByTestId('dossier-tab-guide').click();
+    await expect(page.getByTestId('dossier-guide-panel')).toBeVisible();
+    await page.screenshot({
+      path: path.join(outDir, 'desktop-area-guide.png'),
+      fullPage: false,
+    });
+
+    // 2d. Desktop 1440×900 — Horizontal 100% Optimal Route Carousel + Pick Up Where You Left Off Banner
+    await page.getByTestId('guide-secret-check-gs-057').check();
+    await page.getByTestId('view-mode-route').click();
+    await expect(page.getByTestId('optimal-route-view')).toBeVisible();
+    await page.screenshot({
+      path: path.join(outDir, 'desktop-optimal-route.png'),
+      fullPage: false,
+    });
+    await page.getByTestId('view-mode-map').click();
+    await page.getByTestId('map-node-hyrule-field').click();
 
     // 3. Desktop 1440×900 — Switch 2 Ocarina Songbook Modal (Y/X/A/R/L Badges & Scarecrow Notepad)
     await page.getByTestId('open-ocarina-btn').click();

@@ -1377,3 +1377,251 @@
   border-color: var(--color-sapphire-border);
   color: var(--color-sapphire-text);
 }
+
+/* ==========================================================================
+   Primary Dossier Mode Tabs & In-Depth Area Walkthrough Guide
+   Applies modern-web-guidance:
+   - tabs: single-row horizontal scroll container, [aria-selected="true"]::after
+     border-block-end underline (WCAG 1.4.1 + forced-colors safe), zero dimension
+     changes on selection, styles placed on child wrapper inside [role="tabpanel"]
+   ========================================================================== */
+
+.dossier-mode-tablist {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 6px;
+  border-block-end: 1px solid var(--border-default);
+  scrollbar-width: none;
+}
+
+.dossier-mode-tablist::-webkit-scrollbar {
+  display: none;
+}
+
+.dossier-mode-tab {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-block-size: var(--dossier-target-min);
+  padding: 8px 12px 10px;
+  border: 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color var(--duration-fast),
+    background-color var(--duration-fast);
+}
+
+.dossier-mode-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-subtle);
+}
+
+.dossier-mode-tab[aria-selected='true'] {
+  color: var(--color-triforce);
+  background: var(--color-triforce-bg);
+}
+
+.dossier-mode-tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  border-block-end: 3px solid var(--color-triforce);
+}
+
+.dossier-tabpanel-inner,
+.dossier-guide-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.area-guide-banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--color-triforce-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.area-guide-tagline {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.area-guide-visit-order {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.area-guide-visit-order svg {
+  color: var(--color-triforce);
+  flex-shrink: 0;
+  margin-block-start: 2px;
+}
+
+.area-guide-route-jump-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: max(36px, var(--dossier-target-min));
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-sapphire-border);
+  background: var(--color-sapphire-bg);
+  color: var(--color-sapphire-text);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    filter var(--duration-fast),
+    scale var(--duration-fast);
+}
+
+.area-guide-route-jump-btn:hover {
+  filter: brightness(1.08);
+}
+
+.area-guide-route-jump-btn:active {
+  scale: 0.98;
+}
+
+.area-guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-elevated);
+}
+
+.area-guide-boss-card {
+  border-color: var(--color-locked-crimson-border);
+  background: linear-gradient(180deg, var(--color-locked-crimson-bg), var(--bg-surface-elevated));
+}
+
+.area-guide-phase-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.area-guide-card__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.area-guide-bullets,
+.area-guide-steps {
+  margin: 0;
+  padding-inline-start: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.area-guide-steps li::marker {
+  color: var(--color-triforce);
+  font-weight: 800;
+}
+
+.area-guide-phase-secrets {
+  margin-block-start: 4px;
+  padding-block-start: var(--space-2);
+  border-block-start: 1px dashed var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.area-guide-phase-secrets__label {
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.area-guide-secret-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.area-guide-secret-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: max(34px, var(--dossier-target-min));
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-subtle);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color var(--duration-fast);
+}
+
+.area-guide-secret-row label:hover {
+  background: var(--bg-surface-hover);
+}
+
+.area-guide-secret-row input[type='checkbox'] {
+  inline-size: 16px;
+  block-size: 16px;
+  accent-color: var(--color-triforce);
+  flex-shrink: 0;
+}
+
+.area-guide-secret-row.is-checked label {
+  opacity: 0.76;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.area-guide-boss-weakness {
+  font-size: var(--text-xs);
+  color: var(--color-locked-crimson-text);
+}
+
+.area-guide-boss-text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+

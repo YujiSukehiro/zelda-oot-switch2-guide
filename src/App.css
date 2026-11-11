@@ -58,6 +58,12 @@
   container: workspace / inline-size;
 }
 
+.zelda-workspace--route {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 :where(.zelda-workspace > *, .zelda-map-stage > *) {
   min-inline-size: 0;
 }

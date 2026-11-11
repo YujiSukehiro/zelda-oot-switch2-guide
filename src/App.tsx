@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HyruleMapCanvas } from './components/map';
 import { RegionDrawer } from './components/region';
+import { isRouteStepComplete, OptimalRouteView, ResumeBanner } from './components/route';
 import {
   BackupModal,
   LoadoutDock,
@@ -11,7 +12,13 @@ import {
   TopCommandBar,
   UnlockToast,
 } from './components/sheets';
-import { REGION_BY_ID, STORY_PRESETS } from './data';
+import {
+  AREA_GUIDE_BY_REGION_ID,
+  OPTIMAL_ROUTE_CHAPTERS,
+  REGION_BY_ID,
+  ROUTE_CHAPTER_BY_ID,
+  STORY_PRESETS,
+} from './data';
 import {
   computeAllRegionSummaries,
   computeGlobalProgress,
@@ -19,7 +26,12 @@ import {
   deriveEffectiveRequirements,
 } from './lib/gating';
 import { parseUrlHash, usePlayerProgress, useUrlHashState } from './lib/storage';
-import type { CompanionSheetId, EraFilter, ThemeMode } from './types/zelda';
+import type {
+  CompanionSheetId,
+  EraFilter,
+  ThemeMode,
+  WorkspaceViewMode,
+} from './types/zelda';
 import './App.css';
 
 const VALID_COMPANION_SHEETS = new Set<CompanionSheetId>([
@@ -33,9 +45,14 @@ const VALID_COMPANION_SHEETS = new Set<CompanionSheetId>([
 export function App() {
   const {
     state,
+    isStoragePersisted,
     lastUnlockDelta,
     dismissUnlockDelta,
     toggleSecret,
+    toggleRouteStep,
+    setActiveRouteChapter,
+    setBookmarkedRouteStep,
+    setMapLayerMode,
     toggleRequirement,
     selectPreset,
     setEraFilter,
@@ -51,6 +68,7 @@ export function App() {
   const [hashState, updateHashState] = useUrlHashState();
   const [isLoadoutDockOpen, setIsLoadoutDockOpen] = useState<boolean>(false);
   const [initialSongId, setInitialSongId] = useState<string | null>(null);
+  const [highlightedStepId, setHighlightedStepId] = useState<string | null>(null);
   const didBootstrapHashSyncRef = useRef<boolean>(false);
 
   // Derived memoized progression views
@@ -136,6 +154,18 @@ export function App() {
     }
   }, [state.theme]);
 
+  const activeView: WorkspaceViewMode = hashState.view === 'route' ? 'route' : 'map';
+
+  const activeChapterId: string | null = useMemo(() => {
+    if (hashState.chapterId && ROUTE_CHAPTER_BY_ID[hashState.chapterId]) {
+      return hashState.chapterId;
+    }
+    if (state.activeRouteChapterId && ROUTE_CHAPTER_BY_ID[state.activeRouteChapterId]) {
+      return state.activeRouteChapterId;
+    }
+    return null;
+  }, [hashState.chapterId, state.activeRouteChapterId]);
+
   const selectedRegionId =
     hashState.regionId && REGION_BY_ID[hashState.regionId] ? hashState.regionId : null;
 
@@ -144,10 +174,98 @@ export function App() {
       ? (hashState.sheet as CompanionSheetId)
       : null;
 
+  const handleViewModeChange = useCallback(
+    (nextView: WorkspaceViewMode) => {
+      if (nextView === 'route') {
+        updateHashState({
+          view: 'route',
+          chapterId: activeChapterId ?? undefined,
+        });
+      } else {
+        updateHashState({
+          view: 'map',
+          chapterId: null,
+        });
+      }
+    },
+    [activeChapterId, updateHashState],
+  );
+
+  const handleSelectRouteChapter = useCallback(
+    (chapterId: string) => {
+      if (!ROUTE_CHAPTER_BY_ID[chapterId]) return;
+      setActiveRouteChapter(chapterId);
+      setHighlightedStepId(null);
+      updateHashState({
+        view: 'route',
+        chapterId,
+      });
+    },
+    [setActiveRouteChapter, updateHashState],
+  );
+
+  const handleResumeRoute = useCallback(
+    (chapterId: string, stepId: string) => {
+      setActiveRouteChapter(chapterId);
+      setHighlightedStepId(stepId);
+      updateHashState({
+        view: 'route',
+        chapterId,
+      });
+    },
+    [setActiveRouteChapter, updateHashState],
+  );
+
+  const handleOpenOptimalRouteForRegion = useCallback(
+    (regionId: string) => {
+      let matchedChapterId: string | null = null;
+      let matchedStepId: string | null = null;
+
+      // Prefer the earliest unfinished step in that region
+      for (const chapter of OPTIMAL_ROUTE_CHAPTERS) {
+        const unfinished = chapter.steps.find(
+          (s) => s.regionId === regionId && !isRouteStepComplete(s, state),
+        );
+        if (unfinished) {
+          matchedChapterId = chapter.id;
+          matchedStepId = unfinished.id;
+          break;
+        }
+      }
+
+      // Fallback: first step in that region across the route
+      if (!matchedChapterId) {
+        for (const chapter of OPTIMAL_ROUTE_CHAPTERS) {
+          const firstMatch = chapter.steps.find((s) => s.regionId === regionId);
+          if (firstMatch) {
+            matchedChapterId = chapter.id;
+            matchedStepId = firstMatch.id;
+            break;
+          }
+        }
+      }
+
+      const targetChapter = matchedChapterId ?? OPTIMAL_ROUTE_CHAPTERS[0]?.id ?? null;
+      if (targetChapter) {
+        setActiveRouteChapter(targetChapter);
+      }
+      setHighlightedStepId(matchedStepId);
+      updateHashState({
+        view: 'route',
+        chapterId: targetChapter,
+      });
+    },
+    [setActiveRouteChapter, state, updateHashState],
+  );
+
   const handleSelectRegion = useCallback(
     (regionId: string) => {
       if (!REGION_BY_ID[regionId]) return;
-      updateHashState({ regionId });
+      updateHashState({
+        view: 'map',
+        chapterId: null,
+        regionId,
+      });
     },
     [updateHashState],
   );
@@ -217,6 +335,7 @@ export function App() {
 
   const handleResetProgress = useCallback(() => {
     resetAllProgress();
+    setHighlightedStepId(null);
     updateHashState({
       era: 'all',
       spotlight: false,
@@ -230,15 +349,18 @@ export function App() {
     [setTheme],
   );
 
-  const handleSkipToMap = () => {
-    const mapStage = document.getElementById('hyrule-map-stage');
-    mapStage?.focus();
+  const handleSkipToWorkspace = () => {
+    const stageId = activeView === 'route' ? 'optimal-route-stage' : 'hyrule-map-stage';
+    const stage = document.getElementById(stageId);
+    stage?.focus();
   };
 
   return (
     <div className="zelda-app-shell" data-testid="zelda-app-shell">
-      <button type="button" className="zelda-skip-link" onClick={handleSkipToMap}>
-        Skip to interactive Hyrule map
+      <button type="button" className="zelda-skip-link" onClick={handleSkipToWorkspace}>
+        {activeView === 'route'
+          ? 'Skip to horizontal optimal route guide'
+          : 'Skip to interactive Hyrule map'}
       </button>
 
       <TopCommandBar
@@ -251,41 +373,76 @@ export function App() {
         onToggleTheme={handleToggleTheme}
         onToggleLoadoutDock={setIsLoadoutDockOpen}
         isLoadoutDockOpen={isLoadoutDockOpen}
+        activeView={activeView}
+        onViewModeChange={handleViewModeChange}
       />
 
-      <main
-        className={`zelda-workspace ${
-          selectedRegionId ? 'zelda-workspace--with-drawer' : ''
-        }`.trim()}
-      >
-        <div
-          id="hyrule-map-stage"
-          className="zelda-map-stage"
-          tabIndex={-1}
-          aria-label="Hyrule Interactive Map Workspace"
-        >
-          <HyruleMapCanvas
-            state={state}
-            regionSummaries={regionSummaries}
-            selectedRegionId={selectedRegionId}
-            onSelectRegion={handleSelectRegion}
-            onEraFilterChange={handleEraFilterChange}
-            onSpotlightChange={handleSpotlightChange}
-          />
-        </div>
+      <ResumeBanner
+        state={state}
+        chapters={OPTIMAL_ROUTE_CHAPTERS}
+        onResumeRoute={handleResumeRoute}
+        onOpenRegionOnMap={handleSelectRegion}
+      />
 
-        <RegionDrawer
-          regionId={selectedRegionId}
-          state={state}
-          effectiveRequirements={effectiveRequirements}
-          regionSummaries={regionSummaries}
-          onClose={handleCloseRegion}
-          onSelectRegion={handleSelectRegion}
-          onToggleSecret={toggleSecret}
-          onToggleRequirement={toggleRequirement}
-          onOpenSongbook={handleOpenSongbook}
-        />
-      </main>
+      {activeView === 'map' ? (
+        <main
+          className={`zelda-workspace ${
+            selectedRegionId ? 'zelda-workspace--with-drawer' : ''
+          }`.trim()}
+        >
+          <div
+            id="hyrule-map-stage"
+            className="zelda-map-stage"
+            tabIndex={-1}
+            aria-label="Hyrule Interactive Map Workspace"
+          >
+            <HyruleMapCanvas
+              state={state}
+              regionSummaries={regionSummaries}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={handleSelectRegion}
+              onEraFilterChange={handleEraFilterChange}
+              onSpotlightChange={handleSpotlightChange}
+              mapLayerMode={state.mapLayerMode}
+              onMapLayerModeChange={setMapLayerMode}
+            />
+          </div>
+
+          <RegionDrawer
+            regionId={selectedRegionId}
+            state={state}
+            effectiveRequirements={effectiveRequirements}
+            regionSummaries={regionSummaries}
+            areaGuide={selectedRegionId ? AREA_GUIDE_BY_REGION_ID[selectedRegionId] : undefined}
+            onClose={handleCloseRegion}
+            onSelectRegion={handleSelectRegion}
+            onToggleSecret={toggleSecret}
+            onToggleRequirement={toggleRequirement}
+            onOpenSongbook={handleOpenSongbook}
+            onOpenOptimalRouteForRegion={handleOpenOptimalRouteForRegion}
+          />
+        </main>
+      ) : (
+        <main
+          id="optimal-route-stage"
+          tabIndex={-1}
+          aria-label="Optimal 100% Route Workspace"
+          className="zelda-workspace zelda-workspace--route"
+        >
+          <OptimalRouteView
+            chapters={OPTIMAL_ROUTE_CHAPTERS}
+            state={state}
+            activeChapterId={activeChapterId}
+            highlightedStepId={highlightedStepId}
+            onSelectChapter={handleSelectRouteChapter}
+            onToggleRouteStep={toggleRouteStep}
+            onBookmarkStep={setBookmarkedRouteStep}
+            onToggleSecret={toggleSecret}
+            onOpenRegionOnMap={handleSelectRegion}
+            onOpenSongbook={handleOpenSongbook}
+          />
+        </main>
+      )}
 
       <LoadoutDock
         isOpen={isLoadoutDockOpen}
@@ -352,6 +509,7 @@ export function App() {
         onExportJson={exportProgress}
         onImportJson={handleImportJson}
         onResetProgress={handleResetProgress}
+        isStoragePersisted={isStoragePersisted}
       />
     </div>
   );

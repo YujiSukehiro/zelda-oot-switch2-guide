@@ -1,17 +1,22 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  ALL_ROUTE_STEPS,
   ALL_SECRETS,
+  AREA_GUIDE_BY_REGION_ID,
+  AREA_GUIDES,
   ATTACHED_DUNGEONS_BY_REGION,
   DUNGEON_AND_SPECIAL_REGIONS,
   GOLD_SKULLTULAS,
   HEART_PIECES,
   METADATA,
+  OPTIMAL_ROUTE_CHAPTERS,
   OVERWORLD_REGIONS,
   REGION_BY_ID,
   REGIONS,
   REQUIREMENT_BY_ID,
   REQUIREMENT_SOURCE_REGION,
   REQUIREMENTS,
+  ROUTE_CHAPTER_BY_ID,
   SECRET_BY_ID,
   SONGS_AND_QUESTS,
   STORY_PRESETS,
@@ -436,6 +441,8 @@ describe('Storage, Backup JSON Export/Import & URL Hash Routing (src/lib/storage
 
   it('round-trips URL hash state cleanly without touching pathname', () => {
     expect(parseUrlHash('')).toEqual({
+      view: 'map',
+      chapterId: null,
       regionId: null,
       era: 'all',
       sheet: null,
@@ -452,15 +459,34 @@ describe('Storage, Backup JSON Export/Import & URL Hash Routing (src/lib/storage
 
     const parsed = parseUrlHash(built);
     expect(parsed).toEqual({
+      view: 'map',
+      chapterId: null,
       regionId: 'death-mountain-crater',
       era: 'child',
       sheet: 'ocarina',
       spotlight: true,
     });
 
+    const routeHash = buildUrlHash({
+      view: 'route',
+      chapterId: 'ch-06',
+      era: 'adult',
+    });
+    expect(routeHash).toBe('#view=route&chapter=ch-06&era=adult');
+    expect(parseUrlHash(routeHash)).toEqual({
+      view: 'route',
+      chapterId: 'ch-06',
+      regionId: null,
+      era: 'adult',
+      sheet: null,
+      spotlight: false,
+    });
+
     // Default values produce a clean empty hash
     expect(
       buildUrlHash({
+        view: 'map',
+        chapterId: null,
         regionId: null,
         era: 'all',
         sheet: null,
@@ -470,5 +496,69 @@ describe('Storage, Backup JSON Export/Import & URL Hash Routing (src/lib/storage
 
     // Unknown region IDs safely resolve to null
     expect(parseUrlHash('#region=non-existent-zone').regionId).toBeNull();
+  });
+});
+
+describe('Area Walkthrough Guides & Optimal 100% Route Integrity', () => {
+  it('validates all 34 AreaWalkthroughGuides and 232 regional secret mappings', () => {
+    expect(AREA_GUIDES).toHaveLength(34);
+    const seenSecrets = new Set<string>();
+
+    for (const region of REGIONS) {
+      const guide = AREA_GUIDE_BY_REGION_ID[region.id];
+      expect(guide, `missing area guide for ${region.id}`).toBeDefined();
+      expect(guide.tagline.length).toBeGreaterThan(10);
+      expect(guide.recommendedVisitOrder.length).toBeGreaterThan(10);
+      expect(guide.entrancesAndShortcuts.length).toBeGreaterThanOrEqual(2);
+      expect(guide.phases.length).toBeGreaterThanOrEqual(2);
+      expect(guide.proTips.length).toBeGreaterThanOrEqual(2);
+
+      if (region.kind !== 'overworld') {
+        expect(guide.bossStrategy, `missing bossStrategy for ${region.id}`).toBeDefined();
+      }
+
+      for (const phase of guide.phases) {
+        expect(phase.steps.length).toBeGreaterThanOrEqual(1);
+        for (const secId of phase.secretIds) {
+          const sec = SECRET_BY_ID[secId];
+          expect(sec, `unknown secret ${secId} in ${region.id}`).toBeDefined();
+          expect(sec.regionId).toBe(region.id);
+          expect(seenSecrets.has(secId), `duplicate secret ${secId} across area guides`).toBe(false);
+          seenSecrets.add(secId);
+        }
+      }
+    }
+
+    expect(seenSecrets.size).toBe(ALL_SECRETS.length);
+  });
+
+  it('validates all 18 Optimal Route chapters and 231/231 100% countable secret coverage', () => {
+    expect(OPTIMAL_ROUTE_CHAPTERS).toHaveLength(18);
+    expect(ALL_ROUTE_STEPS.length).toBeGreaterThanOrEqual(100);
+
+    const coveredCountable = new Set<string>();
+    for (const chapter of OPTIMAL_ROUTE_CHAPTERS) {
+      expect(ROUTE_CHAPTER_BY_ID[chapter.id]).toBe(chapter);
+      expect(chapter.steps.length).toBeGreaterThanOrEqual(5);
+
+      for (const step of chapter.steps) {
+        expect(REGION_BY_ID[step.regionId], `invalid region ${step.regionId}`).toBeDefined();
+        for (const reqId of step.unlocksRequirementIds ?? []) {
+          expect(REQUIREMENT_BY_ID[reqId], `invalid req ${reqId}`).toBeDefined();
+        }
+        for (const secId of step.secretIds) {
+          const sec = SECRET_BY_ID[secId];
+          expect(sec, `invalid secret ${secId}`).toBeDefined();
+          expect(sec.regionId).toBe(step.regionId);
+          if (sec.countsToward100Percent) {
+            expect(coveredCountable.has(secId), `duplicate countable secret ${secId}`).toBe(false);
+            coveredCountable.add(secId);
+          }
+        }
+      }
+    }
+
+    const expectedCountable = ALL_SECRETS.filter((s) => s.countsToward100Percent);
+    expect(coveredCountable.size).toBe(expectedCountable.length);
   });
 });

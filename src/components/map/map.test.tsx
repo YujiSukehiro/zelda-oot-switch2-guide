@@ -316,4 +316,74 @@ describe('HyruleMapCanvas & Map Nodes', () => {
       }
     }
   });
+
+  it('supports Illustrated vs Topo map layer switching, 2-finger pinch-to-zoom, double-click zoom, and Focus Selected camera centering', () => {
+    const state = createDefaultProgressState();
+    const summaries = computeAllRegionSummaries(state);
+    const onMapLayerModeChange = vi.fn();
+
+    render(
+      <HyruleMapCanvas
+        state={state}
+        regionSummaries={summaries}
+        selectedRegionId="zoras-domain"
+        onSelectRegion={vi.fn()}
+        mapLayerMode="illustrated"
+        onMapLayerModeChange={onMapLayerModeChange}
+      />,
+    );
+
+    const layerToggle = screen.getByTestId('map-layer-toggle');
+    expect(layerToggle).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(layerToggle);
+    expect(onMapLayerModeChange).toHaveBeenCalledWith('schematic');
+
+    const viewport = screen.getByTestId('hyrule-map-viewport');
+    const zoomReset = screen.getByTestId('map-zoom-reset');
+    expect(zoomReset).toHaveTextContent('100%');
+
+    // Simulate 2-finger pinch-to-zoom spreading from 100px apart to 200px apart -> ~200% zoom
+    fireEvent.pointerDown(viewport, {
+      pointerId: 10,
+      pointerType: 'touch',
+      clientX: 200,
+      clientY: 200,
+    });
+    fireEvent.pointerDown(viewport, {
+      pointerId: 11,
+      pointerType: 'touch',
+      clientX: 300,
+      clientY: 200,
+    });
+    fireEvent.pointerMove(viewport, {
+      pointerId: 11,
+      pointerType: 'touch',
+      clientX: 400,
+      clientY: 200,
+    });
+    fireEvent.pointerUp(viewport, {
+      pointerId: 11,
+      pointerType: 'touch',
+      clientX: 400,
+      clientY: 200,
+    });
+    fireEvent.pointerUp(viewport, {
+      pointerId: 10,
+      pointerType: 'touch',
+      clientX: 200,
+      clientY: 200,
+    });
+    expect(zoomReset).toHaveTextContent('200%');
+
+    // Double-click resets back to 100%, and double-clicking again zooms to 200%
+    fireEvent.doubleClick(viewport, { clientX: 250, clientY: 200 });
+    expect(zoomReset).toHaveTextContent('100%');
+    fireEvent.doubleClick(viewport, { clientX: 250, clientY: 200 });
+    expect(zoomReset).toHaveTextContent('200%');
+
+    // Focus Selected centers on Zora's Domain
+    const focusBtn = screen.getByTestId('map-focus-selected');
+    fireEvent.click(focusBtn);
+    expect(zoomReset).not.toHaveTextContent('100%');
+  });
 });

@@ -16,6 +16,7 @@ export default defineConfig({
         'icons/icon-192.png',
         'icons/icon-512.png',
         'icons/icon-maskable-512.png',
+        'maps/hyrule-illustrated.jpg',
       ],
       manifest: {
         name: 'Zelda: Ocarina of Time (Switch 2 Remake) — Map & Secrets Guide',
@@ -55,7 +56,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,jpeg,webp,webmanifest}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
