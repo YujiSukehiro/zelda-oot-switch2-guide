@@ -18,6 +18,8 @@ function toMockEvaluated(
     primaryBlockerGroupKey: isAdult ? 'era-adult' : 'ready',
     primaryBlockerLabel: isAdult ? 'Adult Era Visit' : 'Ready Now',
     primaryBlockerCategory: isAdult ? 'cross-era' : 'other',
+    environmentalConditions: [],
+    visitStage: isAdult ? 'later-era' : 'do-now',
   };
 }
 
@@ -172,8 +174,27 @@ describe('<AreaSubmapView />', () => {
     const forestSecrets: EvaluatedSecret[] = (SECRETS_BY_REGION['forest-temple'] ?? []).map(
       (secret) => toMockEvaluated(secret, true),
     );
-    render(<AreaSubmapView region={forestTemple} evaluatedSecrets={forestSecrets} />);
+    const { unmount: unmountForest } = render(
+      <AreaSubmapView region={forestTemple} evaluatedSecrets={forestSecrets} />,
+    );
     expect(screen.getByText(/Forest Temple — Schematic Sub-Map/i)).toBeDefined();
     expect(screen.getByTestId('dungeon-meta-strip').textContent).toContain('Small Keys: 5');
+    unmountForest();
+
+    // Verify room summaries with inline backticks render via FormattedGuideText without raw backticks
+    const dmtRegion = REGION_BY_ID['death-mountain-trail'];
+    const dmtSecrets: EvaluatedSecret[] = (SECRETS_BY_REGION['death-mountain-trail'] ?? []).map(
+      (secret) => toMockEvaluated(secret, true),
+    );
+    render(
+      <AreaSubmapView
+        region={dmtRegion}
+        evaluatedSecrets={dmtSecrets}
+        selectedRoomId="dmt-meteor-climb"
+      />,
+    );
+    const inspector = screen.getByTestId('submap-inspector');
+    expect(inspector.textContent).not.toContain('`');
+    expect(inspector.querySelector('code.guide-inline-code')?.textContent).toBe('ZR');
   });
 });

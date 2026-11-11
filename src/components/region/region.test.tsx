@@ -166,9 +166,12 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
     const highlights = screen.getByTestId('switch2-highlights');
     expect(highlights).toHaveTextContent('Echo Gem');
 
-    // Ready Right Now includes hp-08 via early Child jump trick
+    // Ready Right Now includes hp-08 via early Child jump trick (expand compact accordion card)
     const readySection = screen.getByTestId('section-ready-now');
     const hp08Card = within(readySection).getByTestId('secret-card-hp-08');
+    if (hp08Card.getAttribute('data-expanded') === 'false') {
+      fireEvent.click(within(hp08Card).getByTestId('secret-expand-btn-hp-08'));
+    }
     const earlyTrick = within(hp08Card).getByTestId('early-trick-hp-08');
     expect(earlyTrick).toHaveTextContent('Early Trick Ready Now');
     expect(earlyTrick).toHaveTextContent('watchtower');
@@ -194,9 +197,13 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
 
   it('renders Death Mountain Crater with Switch 2 highlights, locked buckets, and Fire Temple sub-tab (plus Kokiri Forest 3-tab family)', () => {
     const onSelectRegion = vi.fn();
-    const { unmount } = renderRegionDrawer('death-mountain-crater', undefined, {
-      onSelectRegion,
-    });
+    const { unmount } = renderRegionDrawer(
+      'death-mountain-crater',
+      createChildOverworldState(['bombs']),
+      {
+        onSelectRegion,
+      },
+    );
 
     const highlights = screen.getByTestId('switch2-highlights');
     expect(highlights).toHaveTextContent('NEW HEART PIECE (#3 in Crater)');
@@ -213,6 +220,9 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
 
     // Cross-era Bolero Magic Bean #9 inside Crater has Step 1 / Step 2 badges
     const bean09 = screen.getByTestId('secret-card-bean-09');
+    if (bean09.getAttribute('data-expanded') === 'false') {
+      fireEvent.click(within(bean09).getByTestId('secret-expand-btn-bean-09'));
+    }
     expect(within(bean09).getByTestId('cross-era-steps-bean-09')).toHaveTextContent(
       'Bolero of Fire',
     );
@@ -233,13 +243,13 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
   it('opens RequirementPopover on clicking a Song pill, renders Switch 2 Y/X/A/R/L button badges (and custom Scarecrow notes), and jumps to source region', () => {
     const onSelectRegion = vi.fn();
     const onToggleRequirement = vi.fn();
-    const customState: PlayerProgressState = {
-      ...createDefaultProgressState(),
+    const graveyardState: PlayerProgressState = {
+      ...createChildOverworldState(),
       customScarecrowNotes: 'Y X A R L Y X A',
     };
 
     // Death Mountain Crater has Bolero of Fire ('song-bolero': R L R L A R A R) and Scarecrow's Song ('song-scarecrow') on Fire Temple / Lake Hylia
-    const { unmount } = renderRegionDrawer('graveyard', customState, {
+    const { unmount } = renderRegionDrawer('graveyard', graveyardState, {
       onSelectRegion,
       onToggleRequirement,
     });
@@ -270,7 +280,15 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
     unmount();
 
     // Also verify custom Scarecrow's Song notes render inside RequirementPopover (e.g. Fire Temple gs-068 requires song-scarecrow)
-    renderRegionDrawer('fire-temple', customState);
+    const fireTempleState: PlayerProgressState = {
+      ...graveyardState,
+      ownedRequirementIds: {
+        ...graveyardState.ownedRequirementIds,
+        'era-adult': true,
+        'song-bolero': true,
+      },
+    };
+    renderRegionDrawer('fire-temple', fireTempleState);
     const scarecrowPills = screen.getAllByTestId('req-pill-song-scarecrow');
     fireEvent.click(scarecrowPills[0]);
     const scarecrowPopover = screen.getByTestId('requirement-popover');
@@ -498,6 +516,8 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
           primaryBlockerGroupKey: '',
           primaryBlockerLabel: '',
           primaryBlockerCategory: 'other',
+          environmentalConditions: ['Night Only', 'Bring Bottled Bugs'],
+          visitStage: 'do-now',
         }}
         effectiveRequirements={new Set(['time-night', 'bottled-bug'])}
         compact

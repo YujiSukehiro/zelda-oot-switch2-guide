@@ -106,6 +106,13 @@ describe('Sub-Map Registry & Phase 1 Child Hyrule Coverage', () => {
 
       for (const floor of submap.floors) {
         expect(floor.rooms.length, `${regionId}/${floor.id}: empty rooms`).toBeGreaterThan(0);
+        for (const room of floor.rooms) {
+          if (room.summary) {
+            expect(room.summary).not.toMatch(
+              /\((?:eq|hp|gs|gf|skr|cap|bottle|bean|song|sw2)-[a-z0-9-]+\)/,
+            );
+          }
+        }
         for (const conn of floor.connectors ?? []) {
           if (conn.targetFloorId) {
             expect(
@@ -183,6 +190,8 @@ describe('Sub-Map Registry & Phase 1 Child Hyrule Coverage', () => {
       primaryBlockerGroupKey: 'ready',
       primaryBlockerLabel: 'Ready Now',
       primaryBlockerCategory: 'other',
+      environmentalConditions: [],
+      visitStage: 'do-now',
     });
 
     for (const region of REGIONS) {

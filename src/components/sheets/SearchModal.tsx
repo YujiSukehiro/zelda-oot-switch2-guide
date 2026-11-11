@@ -240,7 +240,7 @@ export function SearchModal({
           <span>Global Hyrule Search</span>
         </>
       }
-      subtitle="Search across all 232 collectibles, 34 regions & dungeons, and 66 progression items"
+      subtitle={`Search across all ${ALL_SECRETS.length} collectibles & milestones, ${REGIONS.length} regions & dungeons, and ${REQUIREMENTS.length} progression items`}
     >
       <div className="zelda-search-bar">
         <Search size={17} aria-hidden="true" style={{ color: 'var(--color-triforce)' }} />

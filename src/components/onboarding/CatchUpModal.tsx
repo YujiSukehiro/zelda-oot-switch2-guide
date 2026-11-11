@@ -226,11 +226,11 @@ export const CatchUpModal: React.FC<CatchUpModalProps> = ({
               const displayTitle =
                 PRESET_DISPLAY_TITLE_OVERRIDES[preset.id] ?? preset.shortLabel ?? preset.label;
               const eraLabel =
-                preset.eraFilter === 'child'
-                  ? 'Child Era'
-                  : preset.eraFilter === 'adult'
+                preset.id === 'endgame'
+                  ? 'Endgame'
+                  : preset.eraFilter === 'adult' || preset.ownedRequirementIds.includes('era-adult')
                     ? 'Adult Era'
-                    : 'Endgame';
+                    : 'Child Era';
 
               return (
                 <button

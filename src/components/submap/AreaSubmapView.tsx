@@ -7,14 +7,10 @@ import {
   type SubmapPin,
   type SubmapRoom,
 } from '../../data/submaps';
+import { FormattedGuideText } from '../region/FormattedGuideText';
 import './AreaSubmapView.css';
 
-interface ExtendedEvaluatedSecret extends EvaluatedSecret {
-  visitStage?: 'completed' | 'do-now' | 'later-gear' | 'later-era';
-  environmentalConditions?: string[];
-  isRegionLocked?: boolean;
-  regionLockReason?: string;
-}
+type ExtendedEvaluatedSecret = EvaluatedSecret;
 
 export interface AreaSubmapViewProps {
   region: Region;
@@ -1126,7 +1122,9 @@ export const AreaSubmapView: React.FC<AreaSubmapViewProps> = ({
                 </div>
                 <p className="area-submap__inspector-title">{selectedRoomObj.label}</p>
                 {selectedRoomObj.summary && (
-                  <p className="area-submap__inspector-note">{selectedRoomObj.summary}</p>
+                  <p className="area-submap__inspector-note">
+                    <FormattedGuideText text={selectedRoomObj.summary} />
+                  </p>
                 )}
               </div>
               <div className="area-submap__inspector-actions">
@@ -1171,7 +1169,9 @@ export const AreaSubmapView: React.FC<AreaSubmapViewProps> = ({
                 </p>
                 {(inspectorPin.note || inspectorEval?.secret.locationHint) && (
                   <p className="area-submap__inspector-note">
-                    {inspectorPin.note ?? inspectorEval?.secret.locationHint}
+                    <FormattedGuideText
+                      text={(inspectorPin.note ?? inspectorEval?.secret.locationHint)!}
+                    />
                   </p>
                 )}
               </div>

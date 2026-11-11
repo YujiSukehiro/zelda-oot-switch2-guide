@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Delete, MapPin, Mic, Music, Save, Sparkles, Trash2 } from 'lucide-react';
 import { METADATA, REGION_BY_ID, SONGS_AND_QUESTS } from '../../data';
+import { deriveOwnedInventoryRequirements } from '../../lib/gating';
 import type { OcarinaSong, PlayerProgressState } from '../../types/zelda';
 import {
   NoteBadge,
@@ -31,7 +32,6 @@ export function OcarinaModal({
   isOpen,
   onClose,
   state,
-  effectiveRequirements,
   onToggleRequirement,
   onSaveScarecrowNotes,
   onSelectRegion,
@@ -44,6 +44,10 @@ export function OcarinaModal({
     text: string;
   } | null>(null);
   const highlightedCardRef = useRef<HTMLElement | null>(null);
+  const ownedInventoryReqs = useMemo(
+    () => deriveOwnedInventoryRequirements(state),
+    [state],
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -123,7 +127,7 @@ export function OcarinaModal({
   });
 
   const learnedTotal = SONGS_AND_QUESTS.ocarinaSongs.filter((s) =>
-    effectiveRequirements.has(s.id),
+    ownedInventoryReqs.has(s.id),
   ).length;
 
   return (
@@ -322,7 +326,7 @@ export function OcarinaModal({
       {/* All 13 Song Cards */}
       <div className="zelda-card-grid">
         {visibleSongs.map((song) => {
-          const isLearned = effectiveRequirements.has(song.id);
+          const isLearned = ownedInventoryReqs.has(song.id);
           const isHighlighted = initialSongId === song.id;
           const regionName = REGION_BY_ID[song.regionId]?.name ?? song.regionId;
           const buttonsToRender =

@@ -1389,7 +1389,7 @@ export function HyruleMapCanvas({
             </span>
           </div>
           <p className="hyrule-map-tooltip__sw2-note">
-            <strong>Switch 2 Remake (`zora-thawed`):</strong> Clearing the Water Temple actually{' '}
+            <strong>Switch 2 Remake:</strong> Clearing the Water Temple actually{' '}
             <strong>unfreezes Zora&apos;s Domain</strong> in the Adult Era, reopening this underwater
             diving tunnel for a 25-second Eyeball Frog Biggoron Sword run!
           </p>

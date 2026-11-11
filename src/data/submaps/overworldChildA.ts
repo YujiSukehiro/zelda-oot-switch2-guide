@@ -1079,7 +1079,7 @@ export const OVERWORLD_CHILD_A_SUBMAPS: RegionSubmapDefinition[] = [
             polygon: '545,355 765,355 765,525 545,525',
             labelPos: { x: 655, y: 465 },
             accent: 'treasure',
-            summary: 'Blow up the boulder past the Caution sign and play Zelda’s Lullaby for the Charged Spin Attack (gf-02)!',
+            summary: 'Blow up the boulder past the Caution sign and play Zelda’s Lullaby for the Charged Spin Attack!',
           },
           {
             id: 'hc-moat-crate',

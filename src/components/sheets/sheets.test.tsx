@@ -222,6 +222,31 @@ describe('OcarinaModal', () => {
     fireEvent.click(modal);
     expect(onClose).toHaveBeenCalledTimes(3);
   });
+
+  it('keeps unlearned songs at 0/13 Learned when Checklist Mode is active', () => {
+    const checklistState = createDefaultProgressState();
+    checklistState.loadoutModeEnabled = false;
+    const effective = deriveEffectiveRequirements(checklistState);
+
+    render(
+      <OcarinaModal
+        isOpen={true}
+        onClose={vi.fn()}
+        state={checklistState}
+        effectiveRequirements={effective}
+        onToggleRequirement={vi.fn()}
+        onSaveScarecrowNotes={vi.fn()}
+        onSelectRegion={vi.fn()}
+      />,
+    );
+
+    const modal = screen.getByTestId('ocarina-modal');
+    expect(modal).toHaveTextContent('(0/13 Learned)');
+    expect(screen.getByTestId('song-learned-btn-song-lullaby')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
 });
 
 describe('QuestsModal & Switch2DiffModal', () => {
@@ -278,6 +303,8 @@ describe('QuestsModal & Switch2DiffModal', () => {
       />,
     );
 
+    const diffDialog = screen.getByTestId('switch2-diff-modal');
+    expect(diffDialog.textContent).not.toMatch(/\((?:hp|gs|gf)-\d+/);
     expect(screen.getByTestId('diff-card-bottle-01')).toHaveTextContent(/Golden Bug/i);
     expect(screen.getByTestId('diff-card-skr-20')).toHaveTextContent(/Echo Gem/i);
     expect(screen.getByTestId('diff-card-sw2-hall-of-fallen-foes')).toHaveTextContent(/84/);
@@ -288,7 +315,7 @@ describe('QuestsModal & Switch2DiffModal', () => {
 });
 
 describe('SearchModal', () => {
-  it('finds "Golden Bug" -> bottle-01 (market) and "Echo Gem" -> skr-20 (kakariko-village)', () => {
+  it('displays dynamic Phase 1 counts and finds "Golden Bug" -> bottle-01 and "Echo Gem" -> skr-20', () => {
     const state = createDefaultProgressState();
     const effective = deriveEffectiveRequirements(state);
     const onClose = vi.fn();
@@ -304,6 +331,10 @@ describe('SearchModal', () => {
         onSelectRegion={onSelectRegion}
         onToggleSecret={onToggleSecret}
       />,
+    );
+
+    expect(screen.getByTestId('search-modal')).toHaveTextContent(
+      'Search across all 271 collectibles & milestones, 34 regions & dungeons, and 69 progression items',
     );
 
     const searchInput = screen.getByTestId('global-search-input');

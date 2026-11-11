@@ -288,6 +288,79 @@ export function countCompletedSkulltulas(
 }
 
 /**
+ * Derives the player's actual owned progression requirements for Pause Subscreens
+ * (`InventoryModal`, `OcarinaModal`) without applying the Checklist Mode unlock-all
+ * override and without auto-injecting unowned environmental cues (`deku-sticks`,
+ * `bottled-bug`, `blue-fire`, `time-night`, `time-day`).
+ */
+export function deriveOwnedInventoryRequirements(state: PlayerProgressState): Set<string> {
+  const owned = new Set<string>();
+
+  for (const [reqId, isOwned] of Object.entries(state.ownedRequirementIds)) {
+    if (isOwned) {
+      owned.add(reqId);
+    }
+  }
+
+  // Sync completed Optimal Route steps -> unlocked requirements
+  if (state.completedRouteStepIds) {
+    for (const [stepId, isCompleted] of Object.entries(state.completedRouteStepIds)) {
+      if (!isCompleted) continue;
+      const step = ROUTE_STEP_BY_ID[stepId];
+      if (step?.unlocksRequirementIds) {
+        for (const reqId of step.unlocksRequirementIds) {
+          owned.add(reqId);
+        }
+      }
+    }
+  }
+
+  // Auto-derive Gold Skulltula token milestones
+  const gsCount = countCompletedSkulltulas(state.completedSecretIds);
+  for (const milestone of SKULLTULA_TOKEN_MILESTONES) {
+    if (gsCount >= milestone.threshold) {
+      owned.add(milestone.reqId);
+    }
+  }
+
+  // Sync checked collectible secrets -> owned requirements
+  for (const [secretId, isCompleted] of Object.entries(state.completedSecretIds)) {
+    if (!isCompleted) continue;
+    const syncedReqs = SECRET_TO_REQUIREMENTS_MAP[secretId];
+    if (syncedReqs) {
+      for (const reqId of syncedReqs) {
+        owned.add(reqId);
+      }
+    }
+  }
+
+  // Transitive item/upgrade hierarchies
+  if (owned.has('giants-wallet')) {
+    owned.add('adults-wallet');
+    owned.add('rupees-100');
+  } else if (owned.has('adults-wallet')) {
+    owned.add('rupees-100');
+  }
+
+  if (owned.has('longshot')) {
+    owned.add('hookshot');
+  }
+
+  if (owned.has('golden-scale')) {
+    owned.add('silver-scale');
+  }
+
+  if (owned.has('golden-gauntlets')) {
+    owned.add('silver-gauntlets');
+    owned.add('goron-bracelet');
+  } else if (owned.has('silver-gauntlets')) {
+    owned.add('goron-bracelet');
+  }
+
+  return owned;
+}
+
+/**
  * Derives the full active set of satisfied requirement IDs from:
  * 1. Checklist Mode override (`!state.loadoutModeEnabled` -> unlocks all requirements)
  * 2. Explicitly owned requirements (`state.ownedRequirementIds`)
@@ -307,68 +380,7 @@ export function deriveEffectiveRequirements(state: PlayerProgressState): Set<str
     ]);
   }
 
-  const effective = new Set<string>();
-
-  for (const [reqId, isOwned] of Object.entries(state.ownedRequirementIds)) {
-    if (isOwned) {
-      effective.add(reqId);
-    }
-  }
-
-  // Sync completed Optimal Route steps -> unlocked requirements
-  if (state.completedRouteStepIds) {
-    for (const [stepId, isCompleted] of Object.entries(state.completedRouteStepIds)) {
-      if (!isCompleted) continue;
-      const step = ROUTE_STEP_BY_ID[stepId];
-      if (step?.unlocksRequirementIds) {
-        for (const reqId of step.unlocksRequirementIds) {
-          effective.add(reqId);
-        }
-      }
-    }
-  }
-
-  // Auto-derive Gold Skulltula token milestones
-  const gsCount = countCompletedSkulltulas(state.completedSecretIds);
-  for (const milestone of SKULLTULA_TOKEN_MILESTONES) {
-    if (gsCount >= milestone.threshold) {
-      effective.add(milestone.reqId);
-    }
-  }
-
-  // Sync checked collectible secrets -> owned requirements
-  for (const [secretId, isCompleted] of Object.entries(state.completedSecretIds)) {
-    if (!isCompleted) continue;
-    const syncedReqs = SECRET_TO_REQUIREMENTS_MAP[secretId];
-    if (syncedReqs) {
-      for (const reqId of syncedReqs) {
-        effective.add(reqId);
-      }
-    }
-  }
-
-  // Transitive item/upgrade hierarchies
-  if (effective.has('giants-wallet')) {
-    effective.add('adults-wallet');
-    effective.add('rupees-100');
-  } else if (effective.has('adults-wallet')) {
-    effective.add('rupees-100');
-  }
-
-  if (effective.has('longshot')) {
-    effective.add('hookshot');
-  }
-
-  if (effective.has('golden-scale')) {
-    effective.add('silver-scale');
-  }
-
-  if (effective.has('golden-gauntlets')) {
-    effective.add('silver-gauntlets');
-    effective.add('goron-bracelet');
-  } else if (effective.has('silver-gauntlets')) {
-    effective.add('goron-bracelet');
-  }
+  const effective = deriveOwnedInventoryRequirements(state);
 
   // Environmental & renewable conditions are surfaced as soft badges on cards
   // rather than hard progression locks.
@@ -1562,9 +1574,23 @@ export function toggleSecretCompleted(
 
   const nextOwned = { ...state.ownedRequirementIds };
   const syncedReqs = SECRET_TO_REQUIREMENTS_MAP[secretId];
-  if (syncedReqs && nextValue) {
-    for (const reqId of syncedReqs) {
-      nextOwned[reqId] = true;
+  if (syncedReqs) {
+    if (nextValue) {
+      for (const reqId of syncedReqs) {
+        nextOwned[reqId] = true;
+      }
+    } else {
+      for (const reqId of syncedReqs) {
+        const stillGrantedByAnotherSecret = Object.entries(SECRET_TO_REQUIREMENTS_MAP).some(
+          ([otherSecretId, reqIds]) =>
+            otherSecretId !== secretId &&
+            Boolean(nextCompleted[otherSecretId]) &&
+            reqIds.includes(reqId),
+        );
+        if (!stillGrantedByAnotherSecret) {
+          delete nextOwned[reqId];
+        }
+      }
     }
   }
 
@@ -1580,16 +1606,59 @@ export function toggleRequirementOwned(
   requirementId: string,
   owned?: boolean,
 ): PlayerProgressState {
-  const nextValue = owned ?? !state.ownedRequirementIds[requirementId];
+  const currentlyOwned = deriveOwnedInventoryRequirements(state).has(requirementId);
+  const nextValue = owned ?? !currentlyOwned;
   const nextOwned = { ...state.ownedRequirementIds };
+  let nextCompleted = state.completedSecretIds;
+  let nextCompletedSteps = state.completedRouteStepIds;
+
   if (nextValue) {
     nextOwned[requirementId] = true;
   } else {
     delete nextOwned[requirementId];
+
+    // Also uncheck any completed secrets in SECRET_TO_REQUIREMENTS_MAP that auto-grant `requirementId`
+    for (const [secId, syncedReqs] of Object.entries(SECRET_TO_REQUIREMENTS_MAP)) {
+      if (nextCompleted[secId] && syncedReqs.includes(requirementId)) {
+        if (nextCompleted === state.completedSecretIds) {
+          nextCompleted = { ...state.completedSecretIds };
+        }
+        delete nextCompleted[secId];
+        for (const siblingReqId of syncedReqs) {
+          if (siblingReqId !== requirementId) {
+            nextOwned[siblingReqId] = true;
+          }
+        }
+      }
+    }
+
+    // Also uncheck any completed route steps whose `unlocksRequirementIds` auto-grant `requirementId`
+    if (nextCompletedSteps) {
+      for (const [stepId, isStepDone] of Object.entries(nextCompletedSteps)) {
+        if (!isStepDone) continue;
+        const step = ROUTE_STEP_BY_ID[stepId];
+        if (step?.unlocksRequirementIds?.includes(requirementId)) {
+          if (nextCompletedSteps === state.completedRouteStepIds) {
+            nextCompletedSteps = { ...state.completedRouteStepIds };
+          }
+          delete nextCompletedSteps[stepId];
+          for (const siblingReqId of step.unlocksRequirementIds) {
+            if (siblingReqId !== requirementId) {
+              nextOwned[siblingReqId] = true;
+            }
+          }
+        }
+      }
+    }
   }
+
   return {
     ...state,
     ownedRequirementIds: nextOwned,
+    completedSecretIds: nextCompleted,
+    ...(nextCompletedSteps !== state.completedRouteStepIds
+      ? { completedRouteStepIds: nextCompletedSteps }
+      : {}),
   };
 }
 

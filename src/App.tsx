@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { GuidedAreaWorkspace, type GuidedLensId } from './components/guided';
+import { InventoryModal } from './components/inventory';
 import { HyruleMapCanvas } from './components/map';
+import { CatchUpModal, type CatchUpSelection } from './components/onboarding';
 import { RegionDrawer } from './components/region';
 import { isRouteStepComplete, OptimalRouteView, ResumeBanner } from './components/route';
 import {
@@ -12,14 +15,18 @@ import {
   TopCommandBar,
   UnlockToast,
 } from './components/sheets';
+import { AreaSubmapView } from './components/submap';
 import {
   AREA_GUIDE_BY_REGION_ID,
   OPTIMAL_ROUTE_CHAPTERS,
+  REGIONS,
   REGION_BY_ID,
   ROUTE_CHAPTER_BY_ID,
   STORY_PRESETS,
 } from './data';
+import { getSecretRoomMapForRegion } from './data/submaps';
 import {
+  categorizeRegionSecrets,
   computeAllRegionSummaries,
   computeGlobalProgress,
   countCompletedSkulltulas,
@@ -29,6 +36,7 @@ import { parseUrlHash, usePlayerProgress, useUrlHashState } from './lib/storage'
 import type {
   CompanionSheetId,
   EraFilter,
+  PlayerProgressState,
   ThemeMode,
   WorkspaceViewMode,
 } from './types/zelda';
@@ -41,6 +49,27 @@ const VALID_COMPANION_SHEETS = new Set<CompanionSheetId>([
   'search',
   'backup',
 ]);
+
+const VALID_GUIDED_LENSES = new Set<GuidedLensId>(['copilot', 'rooms', 'quests']);
+
+function shouldAutoPromptCatchUp(state: PlayerProgressState): boolean {
+  if (state.hasCompletedOnboarding) return false;
+  if (Object.keys(state.completedSecretIds).length > 0) return false;
+  if (Object.keys(state.completedRouteStepIds ?? {}).length > 0) return false;
+  if (state.bookmarkedRouteStepId || state.lastSession) return false;
+  if (state.customScarecrowNotes.length > 0) return false;
+
+  if (typeof window !== 'undefined') {
+    const rawHash = window.location.hash.startsWith('#')
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+    if (rawHash.trim().length > 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 export function App() {
   const {
@@ -55,6 +84,7 @@ export function App() {
     setMapLayerMode,
     toggleRequirement,
     selectPreset,
+    completeOnboarding,
     setEraFilter,
     setSwitch2Spotlight,
     setLoadoutMode,
@@ -67,9 +97,24 @@ export function App() {
 
   const [hashState, updateHashState] = useUrlHashState();
   const [isLoadoutDockOpen, setIsLoadoutDockOpen] = useState<boolean>(false);
+  const [isInventoryOpen, setIsInventoryOpen] = useState<boolean>(false);
+  const [isCatchUpOpen, setIsCatchUpOpen] = useState<boolean>(() =>
+    shouldAutoPromptCatchUp(state),
+  );
+  const [hideCompletedOnMap, setHideCompletedOnMap] = useState<boolean>(false);
   const [initialSongId, setInitialSongId] = useState<string | null>(null);
   const [highlightedStepId, setHighlightedStepId] = useState<string | null>(null);
+
   const didBootstrapHashSyncRef = useRef<boolean>(false);
+  const wasAutoCatchUpPromptRef = useRef<boolean>(isCatchUpOpen);
+
+  // If IndexedDB recovers an existing save asynchronously on mount, close auto-prompted onboarding
+  useEffect(() => {
+    if (wasAutoCatchUpPromptRef.current && !shouldAutoPromptCatchUp(state)) {
+      wasAutoCatchUpPromptRef.current = false;
+      setIsCatchUpOpen(false);
+    }
+  }, [state]);
 
   // Derived memoized progression views
   const effectiveRequirements = useMemo(() => deriveEffectiveRequirements(state), [state]);
@@ -154,7 +199,17 @@ export function App() {
     }
   }, [state.theme]);
 
-  const activeView: WorkspaceViewMode = hashState.view === 'route' ? 'route' : 'map';
+  const activeView: WorkspaceViewMode =
+    hashState.view === 'route'
+      ? 'route'
+      : hashState.view === 'area'
+        ? 'area'
+        : 'map';
+
+  const activeLens: GuidedLensId =
+    hashState.lens && VALID_GUIDED_LENSES.has(hashState.lens as GuidedLensId)
+      ? (hashState.lens as GuidedLensId)
+      : 'copilot';
 
   const activeChapterId: string | null = useMemo(() => {
     if (hashState.chapterId && ROUTE_CHAPTER_BY_ID[hashState.chapterId]) {
@@ -169,6 +224,29 @@ export function App() {
   const selectedRegionId =
     hashState.regionId && REGION_BY_ID[hashState.regionId] ? hashState.regionId : null;
 
+  const areaRegionId = useMemo(() => {
+    if (selectedRegionId) return selectedRegionId;
+    if (state.lastSession?.regionId && REGION_BY_ID[state.lastSession.regionId]) {
+      return state.lastSession.regionId;
+    }
+    return 'kokiri-forest';
+  }, [selectedRegionId, state.lastSession?.regionId]);
+
+  const areaRegion = REGION_BY_ID[areaRegionId] ?? REGIONS[0];
+
+  const areaEvaluatedSecrets = useMemo(
+    () =>
+      categorizeRegionSecrets(areaRegion.id, state, 'blocker', {
+        effectiveReqs: effectiveRequirements,
+      }).allEvaluated,
+    [areaRegion.id, effectiveRequirements, state],
+  );
+
+  const areaSecretRoomMap = useMemo(
+    () => getSecretRoomMapForRegion(areaRegion, areaEvaluatedSecrets),
+    [areaEvaluatedSecrets, areaRegion],
+  );
+
   const activeSheet: CompanionSheetId | null =
     hashState.sheet && VALID_COMPANION_SHEETS.has(hashState.sheet as CompanionSheetId)
       ? (hashState.sheet as CompanionSheetId)
@@ -180,16 +258,59 @@ export function App() {
         updateHashState({
           view: 'route',
           chapterId: activeChapterId ?? undefined,
+          lens: undefined,
+        });
+      } else if (nextView === 'area') {
+        updateHashState({
+          view: 'area',
+          chapterId: null,
+          regionId: areaRegionId,
+          lens: activeLens,
         });
       } else {
         updateHashState({
           view: 'map',
           chapterId: null,
+          lens: undefined,
         });
       }
     },
-    [activeChapterId, updateHashState],
+    [activeChapterId, activeLens, areaRegionId, updateHashState],
   );
+
+  const handleEnterAreaWorkspace = useCallback(
+    (regionId: string, lens?: GuidedLensId) => {
+      if (!REGION_BY_ID[regionId]) return;
+      updateHashState({
+        view: 'area',
+        chapterId: null,
+        regionId,
+        lens: lens ?? activeLens,
+      });
+    },
+    [activeLens, updateHashState],
+  );
+
+  const handleLensChange = useCallback(
+    (nextLens: GuidedLensId) => {
+      updateHashState({
+        view: 'area',
+        chapterId: null,
+        regionId: areaRegionId,
+        lens: nextLens,
+      });
+    },
+    [areaRegionId, updateHashState],
+  );
+
+  const handleBackToWorldMap = useCallback(() => {
+    updateHashState({
+      view: 'map',
+      chapterId: null,
+      regionId: null,
+      lens: undefined,
+    });
+  }, [updateHashState]);
 
   const handleSelectRouteChapter = useCallback(
     (chapterId: string) => {
@@ -199,6 +320,7 @@ export function App() {
       updateHashState({
         view: 'route',
         chapterId,
+        lens: undefined,
       });
     },
     [setActiveRouteChapter, updateHashState],
@@ -211,6 +333,7 @@ export function App() {
       updateHashState({
         view: 'route',
         chapterId,
+        lens: undefined,
       });
     },
     [setActiveRouteChapter, updateHashState],
@@ -253,21 +376,35 @@ export function App() {
       updateHashState({
         view: 'route',
         chapterId: targetChapter,
+        lens: undefined,
       });
     },
     [setActiveRouteChapter, state, updateHashState],
   );
 
-  const handleSelectRegion = useCallback(
+  const handleSelectRegionOnMap = useCallback(
     (regionId: string) => {
       if (!REGION_BY_ID[regionId]) return;
       updateHashState({
         view: 'map',
         chapterId: null,
         regionId,
+        lens: undefined,
       });
     },
     [updateHashState],
+  );
+
+  const handleSelectRegionFromToast = useCallback(
+    (regionId: string) => {
+      if (!REGION_BY_ID[regionId]) return;
+      if (activeView === 'area') {
+        handleEnterAreaWorkspace(regionId);
+      } else {
+        handleSelectRegionOnMap(regionId);
+      }
+    },
+    [activeView, handleEnterAreaWorkspace, handleSelectRegionOnMap],
   );
 
   const handleCloseRegion = useCallback(() => {
@@ -293,6 +430,8 @@ export function App() {
   const handleOpenSheet = useCallback(
     (sheet: CompanionSheetId) => {
       setInitialSongId(null);
+      setIsInventoryOpen(false);
+      setIsCatchUpOpen(false);
       updateHashState({ sheet });
     },
     [updateHashState],
@@ -305,21 +444,106 @@ export function App() {
 
   const handleOpenSongbook = useCallback(
     (songId?: string) => {
+      setIsInventoryOpen(false);
       setInitialSongId(songId ?? null);
       updateHashState({ sheet: 'ocarina' });
     },
     [updateHashState],
   );
 
+  const handleOpenInventory = useCallback(() => {
+    setIsCatchUpOpen(false);
+    if (activeSheet) {
+      updateHashState({ sheet: null });
+    }
+    setIsInventoryOpen((prev) => !prev);
+  }, [activeSheet, updateHashState]);
+
+  const handleOpenCatchUp = useCallback(() => {
+    wasAutoCatchUpPromptRef.current = false;
+    setIsInventoryOpen(false);
+    if (activeSheet) {
+      updateHashState({ sheet: null });
+    }
+    setIsCatchUpOpen(true);
+  }, [activeSheet, updateHashState]);
+
+  const handleCloseCatchUp = useCallback(() => {
+    wasAutoCatchUpPromptRef.current = false;
+    setIsCatchUpOpen(false);
+    completeOnboarding();
+  }, [completeOnboarding]);
+
+  const handleApplyCatchUp = useCallback(
+    (selection: CatchUpSelection) => {
+      wasAutoCatchUpPromptRef.current = false;
+      selectPreset(selection.presetId, {
+        markPriorSecretsAndSteps: selection.markPriorSecretsAndSteps,
+      });
+      completeOnboarding();
+      setIsCatchUpOpen(false);
+
+      const matchedPreset = STORY_PRESETS.find((p) => p.id === selection.presetId);
+      const nextEra = matchedPreset?.eraFilter ?? state.activeEraFilter;
+      const validTargetRegion = REGION_BY_ID[selection.targetRegionId]
+        ? selection.targetRegionId
+        : 'kokiri-forest';
+
+      if (selection.playStyle === 'guided') {
+        updateHashState({
+          view: 'area',
+          chapterId: null,
+          regionId: validTargetRegion,
+          lens: 'copilot',
+          era: nextEra,
+        });
+      } else if (selection.playStyle === 'route') {
+        let targetChapterId: string | null = null;
+        for (const chapter of OPTIMAL_ROUTE_CHAPTERS) {
+          if (chapter.steps.some((s) => s.regionId === validTargetRegion)) {
+            targetChapterId = chapter.id;
+            break;
+          }
+        }
+        if (targetChapterId) {
+          setActiveRouteChapter(targetChapterId);
+        }
+        updateHashState({
+          view: 'route',
+          chapterId: targetChapterId ?? OPTIMAL_ROUTE_CHAPTERS[0]?.id ?? null,
+          regionId: validTargetRegion,
+          lens: undefined,
+          era: nextEra,
+        });
+      } else {
+        updateHashState({
+          view: 'map',
+          chapterId: null,
+          regionId: validTargetRegion,
+          lens: undefined,
+          era: nextEra,
+        });
+      }
+    },
+    [
+      completeOnboarding,
+      selectPreset,
+      setActiveRouteChapter,
+      state.activeEraFilter,
+      updateHashState,
+    ],
+  );
+
   const handleSelectPreset = useCallback(
     (presetId: string) => {
       selectPreset(presetId);
+      completeOnboarding();
       const matchedPreset = STORY_PRESETS.find((p) => p.id === presetId);
       if (matchedPreset) {
         updateHashState({ era: matchedPreset.eraFilter });
       }
     },
-    [selectPreset, updateHashState],
+    [completeOnboarding, selectPreset, updateHashState],
   );
 
   const handleImportJson = useCallback(
@@ -350,7 +574,12 @@ export function App() {
   );
 
   const handleSkipToWorkspace = () => {
-    const stageId = activeView === 'route' ? 'optimal-route-stage' : 'hyrule-map-stage';
+    const stageId =
+      activeView === 'route'
+        ? 'optimal-route-stage'
+        : activeView === 'area'
+          ? 'guided-area-stage'
+          : 'hyrule-map-stage';
     const stage = document.getElementById(stageId);
     stage?.focus();
   };
@@ -360,7 +589,9 @@ export function App() {
       <button type="button" className="zelda-skip-link" onClick={handleSkipToWorkspace}>
         {activeView === 'route'
           ? 'Skip to horizontal optimal route guide'
-          : 'Skip to interactive Hyrule map'}
+          : activeView === 'area'
+            ? 'Skip to guided area co-pilot & floor map'
+            : 'Skip to interactive Hyrule map'}
       </button>
 
       <TopCommandBar
@@ -373,15 +604,20 @@ export function App() {
         onToggleTheme={handleToggleTheme}
         onToggleLoadoutDock={setIsLoadoutDockOpen}
         isLoadoutDockOpen={isLoadoutDockOpen}
+        onOpenInventory={handleOpenInventory}
+        isInventoryOpen={isInventoryOpen}
+        onOpenCatchUp={handleOpenCatchUp}
+        isCatchUpOpen={isCatchUpOpen}
         activeView={activeView}
         onViewModeChange={handleViewModeChange}
+        showAreaViewOption={true}
       />
 
       <ResumeBanner
         state={state}
         chapters={OPTIMAL_ROUTE_CHAPTERS}
         onResumeRoute={handleResumeRoute}
-        onOpenRegionOnMap={handleSelectRegion}
+        onOpenRegionOnMap={handleSelectRegionOnMap}
       />
 
       {activeView === 'map' ? (
@@ -400,9 +636,12 @@ export function App() {
               state={state}
               regionSummaries={regionSummaries}
               selectedRegionId={selectedRegionId}
-              onSelectRegion={handleSelectRegion}
+              onSelectRegion={handleSelectRegionOnMap}
+              onEnterAreaMap={handleEnterAreaWorkspace}
               onEraFilterChange={handleEraFilterChange}
               onSpotlightChange={handleSpotlightChange}
+              hideCompleted={hideCompletedOnMap}
+              onHideCompletedChange={setHideCompletedOnMap}
               mapLayerMode={state.mapLayerMode}
               onMapLayerModeChange={setMapLayerMode}
             />
@@ -415,11 +654,45 @@ export function App() {
             regionSummaries={regionSummaries}
             areaGuide={selectedRegionId ? AREA_GUIDE_BY_REGION_ID[selectedRegionId] : undefined}
             onClose={handleCloseRegion}
-            onSelectRegion={handleSelectRegion}
+            onSelectRegion={handleSelectRegionOnMap}
             onToggleSecret={toggleSecret}
             onToggleRequirement={toggleRequirement}
             onOpenSongbook={handleOpenSongbook}
             onOpenOptimalRouteForRegion={handleOpenOptimalRouteForRegion}
+            onOpenAreaWorkspace={handleEnterAreaWorkspace}
+          />
+        </main>
+      ) : activeView === 'area' ? (
+        <main
+          id="guided-area-stage"
+          tabIndex={-1}
+          aria-label="Guided Area Co-Pilot and Floor Map Workspace"
+          className="zelda-workspace zelda-workspace--area"
+        >
+          <GuidedAreaWorkspace
+            regionId={areaRegion.id}
+            state={state}
+            effectiveRequirements={effectiveRequirements}
+            regionSummaries={regionSummaries}
+            areaGuide={AREA_GUIDE_BY_REGION_ID[areaRegion.id]}
+            evaluatedSecretsOverride={areaEvaluatedSecrets}
+            secretRoomMap={areaSecretRoomMap}
+            lastUnlockDelta={lastUnlockDelta}
+            activeLens={activeLens}
+            onLensChange={handleLensChange}
+            onSelectRegion={handleEnterAreaWorkspace}
+            onBackToWorldMap={handleBackToWorldMap}
+            onToggleSecret={toggleSecret}
+            onToggleRequirement={toggleRequirement}
+            onOpenSongbook={handleOpenSongbook}
+            renderSubmap={(submapProps) => (
+              <AreaSubmapView
+                {...submapProps}
+                onToggleSecret={(secretId, completed) => {
+                  toggleSecret(secretId, completed);
+                }}
+              />
+            )}
           />
         </main>
       ) : (
@@ -438,7 +711,7 @@ export function App() {
             onToggleRouteStep={toggleRouteStep}
             onBookmarkStep={setBookmarkedRouteStep}
             onToggleSecret={toggleSecret}
-            onOpenRegionOnMap={handleSelectRegion}
+            onOpenRegionOnMap={handleSelectRegionOnMap}
             onOpenSongbook={handleOpenSongbook}
           />
         </main>
@@ -455,13 +728,35 @@ export function App() {
         onToggleLoadoutMode={setLoadoutMode}
         lastUnlockDelta={lastUnlockDelta}
         onDismissUnlockDelta={dismissUnlockDelta}
-        onSelectRegion={handleSelectRegion}
+        onSelectRegion={handleSelectRegionFromToast}
       />
 
       <UnlockToast
         delta={lastUnlockDelta}
         onDismiss={dismissUnlockDelta}
-        onSelectRegion={handleSelectRegion}
+        onSelectRegion={handleSelectRegionFromToast}
+      />
+
+      <CatchUpModal
+        isOpen={isCatchUpOpen}
+        onClose={handleCloseCatchUp}
+        onApplyCatchUp={handleApplyCatchUp}
+        defaultPlayStyle={
+          activeView === 'route' ? 'route' : activeView === 'map' ? 'guided' : 'guided'
+        }
+      />
+
+      <InventoryModal
+        isOpen={isInventoryOpen}
+        onClose={() => setIsInventoryOpen(false)}
+        state={state}
+        effectiveRequirements={effectiveRequirements}
+        globalProgress={globalProgress}
+        onToggleRequirement={toggleRequirement}
+        onToggleSecret={toggleSecret}
+        onToggleLoadoutMode={setLoadoutMode}
+        onOpenCatchUp={handleOpenCatchUp}
+        onOpenSongbook={handleOpenSongbook}
       />
 
       <OcarinaModal
@@ -471,7 +766,7 @@ export function App() {
         effectiveRequirements={effectiveRequirements}
         onToggleRequirement={toggleRequirement}
         onSaveScarecrowNotes={setScarecrowNotes}
-        onSelectRegion={handleSelectRegion}
+        onSelectRegion={handleSelectRegionOnMap}
         initialSongId={initialSongId}
       />
 
@@ -481,7 +776,7 @@ export function App() {
         state={state}
         effectiveRequirements={effectiveRequirements}
         onToggleSecret={toggleSecret}
-        onSelectRegion={handleSelectRegion}
+        onSelectRegion={handleSelectRegionOnMap}
       />
 
       <Switch2DiffModal
@@ -489,7 +784,7 @@ export function App() {
         onClose={handleCloseSheet}
         state={state}
         onToggleSecret={toggleSecret}
-        onSelectRegion={handleSelectRegion}
+        onSelectRegion={handleSelectRegionOnMap}
       />
 
       <SearchModal
@@ -497,7 +792,7 @@ export function App() {
         onClose={handleCloseSheet}
         state={state}
         effectiveRequirements={effectiveRequirements}
-        onSelectRegion={handleSelectRegion}
+        onSelectRegion={handleSelectRegionFromToast}
         onToggleSecret={toggleSecret}
       />
 

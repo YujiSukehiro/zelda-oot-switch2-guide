@@ -58,7 +58,7 @@ const REMAKE_COMPARISON_CARDS: ReadonlyArray<{
     title: 'Pieces of Heart (36 Total)',
     classic: '1 in Ice Cavern + 2 Stone of Agony grottos in Hyrule Field.',
     switch2:
-      'Zero Heart Pieces inside dungeons! Added 2 cross-era "Fairy’s Thoughts" puzzles in Hyrule Field (hp-05, hp-06) + 1 DMC Business Scrub (hp-21), and Gerudo Valley’s crate is now a Hookshot-able Chest.',
+      'Zero Heart Pieces inside dungeons! Added 2 cross-era "Fairy’s Thoughts" puzzles in Hyrule Field + 1 Death Mountain Crater Business Scrub, and Gerudo Valley’s crate is now a Hookshot-able Chest.',
     badge: '3 Relocated',
   },
   {

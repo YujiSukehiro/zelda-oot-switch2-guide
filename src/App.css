@@ -1,9 +1,10 @@
 /* ==========================================================================
    Zelda: Ocarina of Time (Switch 2 Remake) — App Shell & Workspace Layout
    Applies modern-web-guidance:
+   - css-layout (min-inline-size: 0, overscroll-behavior: contain, scrollbar-gutter: stable)
    - responsive-design (100dvh with 100vh fallback, zero horizontal overflow)
    - size-aware-styling (named @container workspace / inline-size)
-   - form-factor-adaptation (min-inline-size: 0, safe-area-inset-*, touch ergonomics)
+   - form-factor-adaptation (safe-area-inset-*, touch ergonomics)
    - dark-mode-toggle (color-scheme & theme synchronization)
    ========================================================================== */
 
@@ -64,6 +65,13 @@
   overflow: hidden;
 }
 
+.zelda-workspace--area {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
 :where(.zelda-workspace > *, .zelda-map-stage > *) {
   min-inline-size: 0;
 }
@@ -104,6 +112,29 @@
   .zelda-map-stage .hyrule-map-shell,
   .zelda-map-stage .hyrule-map-viewport {
     min-block-size: 0;
+  }
+
+  .zelda-workspace--area {
+    overflow: hidden;
+  }
+
+  .zelda-workspace--area > .guided-workspace {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    block-size: 100%;
+    overflow: hidden;
+  }
+
+  .zelda-workspace--area .guided-workspace__map-pane {
+    min-block-size: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+  }
+
+  .zelda-workspace--area .guided-lens-panel-scroll {
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
   }
 
   /* Keep both the SVG map and expanded Loadout dock balanced inside 900px desktop viewports */

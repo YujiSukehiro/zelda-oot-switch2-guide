@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Backpack, Check, Flag, Lock, Music, Shield, Unlock } from 'lucide-react';
-import { REQUIREMENT_BY_ID, SONGS_AND_QUESTS } from '../../data';
+import { REQUIREMENT_BY_ID, SECRET_BY_ID, SONGS_AND_QUESTS } from '../../data';
+import { deriveOwnedInventoryRequirements } from '../../lib/gating';
 import type { GlobalProgressSummary, PlayerProgressState } from '../../types/zelda';
 import {
   NoteSequence,
@@ -168,7 +169,6 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
   isOpen,
   onClose,
   state,
-  effectiveRequirements,
   globalProgress,
   onToggleRequirement,
   onToggleSecret,
@@ -180,15 +180,25 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const { containers: heartContainers, quarterRemainder } = deriveHeartMeterStats(globalProgress);
 
-  const isOwned = (reqId: string): boolean =>
-    Boolean(state.ownedRequirementIds[reqId]) ||
-    effectiveRequirements.has(reqId) ||
-    Boolean(state.completedSecretIds[reqId]);
+  const ownedInventoryReqs = useMemo(
+    () => deriveOwnedInventoryRequirements(state),
+    [state],
+  );
 
-  const handleToggleQuestToken = (tokenId: string) => {
-    const nextOwned = !isOwned(tokenId);
-    onToggleRequirement(tokenId);
-    onToggleSecret?.(tokenId, nextOwned);
+  const isOwned = (reqId: string): boolean => ownedInventoryReqs.has(reqId);
+
+  const isMedallionOwned = (medallionId: string): boolean =>
+    Boolean(state.completedSecretIds[medallionId]);
+
+  const handleToggleSpiritualStone = (stoneId: string) => {
+    const nextOwned = !isOwned(stoneId);
+    onToggleRequirement(stoneId, nextOwned);
+    onToggleSecret?.(stoneId, nextOwned);
+  };
+
+  const handleToggleMedallion = (medallionId: string) => {
+    const nextOwned = !isMedallionOwned(medallionId);
+    onToggleSecret?.(medallionId, nextOwned);
   };
 
   const tabs: ReadonlyArray<{ id: InventorySubscreenTab; label: string; icon: React.ReactNode }> = [
@@ -430,7 +440,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                         data-testid={`inventory-quest-${stone.id}`}
                         aria-pressed={owned}
                         title={req?.howToGet ?? `Obtained by clearing ${stone.source}`}
-                        onClick={() => handleToggleQuestToken(stone.id)}
+                        onClick={() => handleToggleSpiritualStone(stone.id)}
                       >
                         <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
                           <polygon
@@ -451,8 +461,8 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                 <h3 className="oot-quest-card__title">6 Sage Medallions</h3>
                 <div className="oot-crest-grid">
                   {SAGE_MEDALLIONS.map((med) => {
-                    const owned = isOwned(med.id);
-                    const req = REQUIREMENT_BY_ID[med.id];
+                    const owned = isMedallionOwned(med.id);
+                    const medSecret = SECRET_BY_ID[med.id];
                     return (
                       <button
                         key={med.id}
@@ -460,8 +470,8 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                         className="oot-crest-btn"
                         data-testid={`inventory-quest-${med.id}`}
                         aria-pressed={owned}
-                        title={req?.howToGet ?? med.label}
-                        onClick={() => handleToggleQuestToken(med.id)}
+                        title={medSecret?.howToGet ?? med.label}
+                        onClick={() => handleToggleMedallion(med.id)}
                       >
                         <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
                           <polygon

@@ -29,14 +29,19 @@ describe('CatchUpModal — Playthrough Sync Wizard', () => {
     expect(screen.getByTestId('catchup-style-route')).toHaveAttribute('aria-pressed', 'false');
 
     // Step 2 includes Fresh Start, Goron City — 1st Visit, Post-Dodongo, 3 Stones, Post-Forest, Post-Water, Endgame
-    expect(screen.getByTestId('catchup-preset-fresh-start')).toBeInTheDocument();
+    // with accurate Child Era / Adult Era / Endgame eyebrow badges (Bug #1 regression guard)
+    expect(screen.getByTestId('catchup-preset-fresh-start')).toHaveTextContent('Child Era');
     const goronVisitCard = screen.getByTestId('catchup-preset-goron-city-visit-1');
     expect(goronVisitCard).toHaveTextContent(/Goron City — 1st Visit/i);
-    expect(screen.getByTestId('catchup-preset-post-dodongo')).toBeInTheDocument();
-    expect(screen.getByTestId('catchup-preset-three-stones')).toBeInTheDocument();
-    expect(screen.getByTestId('catchup-preset-post-forest-temple')).toBeInTheDocument();
-    expect(screen.getByTestId('catchup-preset-post-water-temple')).toBeInTheDocument();
-    expect(screen.getByTestId('catchup-preset-endgame')).toBeInTheDocument();
+    expect(goronVisitCard).toHaveTextContent('Child Era');
+    expect(screen.getByTestId('catchup-preset-post-dodongo')).toHaveTextContent('Child Era');
+    expect(screen.getByTestId('catchup-preset-three-stones')).toHaveTextContent('Child Era');
+    expect(screen.getByTestId('catchup-preset-fresh-adult-hookshot')).toHaveTextContent(
+      'Adult Era',
+    );
+    expect(screen.getByTestId('catchup-preset-post-forest-temple')).toHaveTextContent('Adult Era');
+    expect(screen.getByTestId('catchup-preset-post-water-temple')).toHaveTextContent('Adult Era');
+    expect(screen.getByTestId('catchup-preset-endgame')).toHaveTextContent('Endgame');
 
     // Select Goron City — 1st Visit and verify markPriorSecretsAndSteps checkbox is checked
     fireEvent.click(goronVisitCard);

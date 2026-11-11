@@ -158,16 +158,16 @@
     }
   ],
   "magicBeans": [
-    { "id": "bean-01", "buyCost": 10, "regionId": "zoras-river", "location": "Directly beside the Magic Bean Seller at Zora's River entrance", "adultPayoff": "Shortcut up Zora's River & alternate jump to Lower River Pillar Heart Piece (hp-22).", "hasSkulltulaBug": false },
+    { "id": "bean-01", "buyCost": 10, "regionId": "zoras-river", "location": "Directly beside the Magic Bean Seller at Zora's River entrance", "adultPayoff": "Shortcut up Zora's River & alternate jump to Lower River Pillar Heart Piece.", "hasSkulltulaBug": false },
     { "id": "bean-02", "buyCost": 20, "regionId": "kokiri-forest", "location": "Directly behind the Kokiri Shop", "adultPayoff": "Rides along upper Kokiri canopy for continuous Blue Rupees.", "hasSkulltulaBug": true },
     { "id": "bean-03", "buyCost": 30, "regionId": "lost-woods", "location": "Bridge area (Left, Left from Kokiri Forest entrance)", "adultPayoff": "Direct shortcut up onto the Kokiri <-> Hyrule Field bridge + Blue Rupees.", "hasSkulltulaBug": true },
-    { "id": "bean-04", "buyCost": 40, "regionId": "lost-woods", "location": "Forest Stage butterfly clearing (Right, Left, Right, Left, Straight, Left)", "adultPayoff": "Required for Gold Skulltula #6 (gs-006) on the upper ledge.", "hasSkulltulaBug": true },
-    { "id": "bean-05", "buyCost": 50, "regionId": "graveyard", "location": "Left side of Kakariko Graveyard against cliff wall", "adultPayoff": "Primary path to the Graveyard High Cliff Crate Heart Piece (hp-13).", "hasSkulltulaBug": true },
-    { "id": "bean-06", "buyCost": 60, "regionId": "death-mountain-trail", "location": "Right outside the entrance to Dodongo's Cavern", "adultPayoff": "Primary path to Dodongo's Cavern Entrance Cliff Heart Piece (hp-18) & shortcut up trail.", "hasSkulltulaBug": true },
-    { "id": "bean-07", "buyCost": 70, "regionId": "lake-hylia", "location": "Right outside the Lakeside Laboratory", "adultPayoff": "Primary path to Lakeside Laboratory Rooftop Heart Piece (hp-30).", "hasSkulltulaBug": true },
+    { "id": "bean-04", "buyCost": 40, "regionId": "lost-woods", "location": "Forest Stage butterfly clearing (Right, Left, Right, Left, Straight, Left)", "adultPayoff": "Required for Gold Skulltula #6 on the upper ledge.", "hasSkulltulaBug": true },
+    { "id": "bean-05", "buyCost": 50, "regionId": "graveyard", "location": "Left side of Kakariko Graveyard against cliff wall", "adultPayoff": "Primary path to the Graveyard High Cliff Crate Heart Piece.", "hasSkulltulaBug": true },
+    { "id": "bean-06", "buyCost": 60, "regionId": "death-mountain-trail", "location": "Right outside the entrance to Dodongo's Cavern", "adultPayoff": "Primary path to Dodongo's Cavern Entrance Cliff Heart Piece & shortcut up trail.", "hasSkulltulaBug": true },
+    { "id": "bean-07", "buyCost": 70, "regionId": "lake-hylia", "location": "Right outside the Lakeside Laboratory", "adultPayoff": "Primary path to Lakeside Laboratory Rooftop Heart Piece.", "hasSkulltulaBug": true },
     { "id": "bean-08", "buyCost": 80, "regionId": "gerudo-valley", "location": "Bottom canyon ledge beside the Cow (Cucco-glide down)", "adultPayoff": "Scenic ride up canyon waterfalls for Red/Blue Rupees.", "hasSkulltulaBug": true },
-    { "id": "bean-09", "buyCost": 90, "regionId": "death-mountain-crater", "location": "Beside the Bolero of Fire warp pad (requires learning Bolero as Adult first!)", "adultPayoff": "Required for Volcano Bean Spire Heart Piece (hp-20).", "hasSkulltulaBug": true },
-    { "id": "bean-10", "buyCost": 100, "regionId": "desert-colossus", "location": "Right of the Spirit Temple stairs (requires learning Requiem of Spirit as Adult first!)", "adultPayoff": "Required for Desert Colossus Stone Archway Heart Piece (hp-36) and Mesa Skulltula (gs-056).", "hasSkulltulaBug": true }
+    { "id": "bean-09", "buyCost": 90, "regionId": "death-mountain-crater", "location": "Beside the Bolero of Fire warp pad (requires learning Bolero as Adult first!)", "adultPayoff": "Required for Volcano Bean Spire Heart Piece.", "hasSkulltulaBug": true },
+    { "id": "bean-10", "buyCost": 100, "regionId": "desert-colossus", "location": "Right of the Spirit Temple stairs (requires learning Requiem of Spirit as Adult first!)", "adultPayoff": "Required for Desert Colossus Stone Archway Heart Piece and Mesa Skulltula.", "hasSkulltulaBug": true }
   ],
   "happyMaskQuest": [
     {

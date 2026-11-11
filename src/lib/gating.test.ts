@@ -34,6 +34,7 @@ import {
   computeUnlockDelta,
   createDefaultProgressState,
   deriveEffectiveRequirements,
+  deriveOwnedInventoryRequirements,
   evaluateRegionReachability,
   evaluateSecret,
   SECRET_TO_REQUIREMENTS_MAP,
@@ -238,10 +239,21 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     expect(SECRET_BY_ID['eq-biggoron-sword']?.howToGet).not.toContain('.json');
 
     const rawSecretSlugPattern =
-      /`(?:eq|hp|gs|gf|skr|cap|bottle|bean|song|poe|mask|biggoron|cow|grotto|sw2|boss-hc|stone|medallion|trial)-[a-z0-9-]+`/;
+      /`(?:eq|hp|gs|gf|skr|cap|bottle|bean|song|poe|mask|biggoron|cow|grotto|sw2|boss-hc|stone|medallion|trial)-[a-z0-9-]+`|\((?:eq|hp|gs|gf|skr|cap|bottle|bean|song|poe|mask|biggoron|cow|grotto|sw2|boss-hc|stone|medallion|trial)-[a-z0-9-]+\)/;
     for (const sec of ALL_SECRETS) {
-      expect(sec.howToGet).not.toMatch(/\.json\b/i);
-      expect(sec.howToGet).not.toMatch(rawSecretSlugPattern);
+      for (const prose of [
+        sec.howToGet,
+        sec.locationHint ?? '',
+        sec.rewardText ?? '',
+        sec.switch2Notes ?? '',
+        sec.proTip ?? '',
+      ]) {
+        expect(prose).not.toMatch(/\.json\b/i);
+        expect(prose).not.toMatch(rawSecretSlugPattern);
+      }
+    }
+    for (const bean of SONGS_AND_QUESTS.magicBeans) {
+      expect(bean.adultPayoff).not.toMatch(rawSecretSlugPattern);
     }
     for (const guide of AREA_GUIDES) {
       const proseChunks = [
@@ -792,6 +804,47 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
     expect(transEff.has('silver-scale')).toBe(true);
     expect(transEff.has('silver-gauntlets')).toBe(true);
     expect(transEff.has('goron-bracelet')).toBe(true);
+
+    // Unchecking progression secrets cleanly removes synced ownedRequirementIds (Bug #3 regression guard)
+    let toggleBackState = createDefaultProgressState();
+    toggleBackState = toggleSecretCompleted(toggleBackState, 'stone-emerald', true);
+    expect(toggleBackState.ownedRequirementIds['stone-emerald']).toBe(true);
+    expect(
+      evaluateRegionReachability('hyrule-field', deriveEffectiveRequirements(toggleBackState))
+        .isReachable,
+    ).toBe(true);
+
+    toggleBackState = toggleSecretCompleted(toggleBackState, 'stone-emerald', false);
+    expect(toggleBackState.completedSecretIds['stone-emerald']).toBeUndefined();
+    expect(toggleBackState.ownedRequirementIds['stone-emerald']).toBeUndefined();
+    expect(
+      evaluateRegionReachability('hyrule-field', deriveEffectiveRequirements(toggleBackState))
+        .isReachable,
+    ).toBe(false);
+
+    // Multi-secret requirement (bottle-01 + bottle-02 -> 'bottle'): stays owned until last bottle is unchecked
+    toggleBackState = toggleSecretCompleted(toggleBackState, 'bottle-01', true);
+    toggleBackState = toggleSecretCompleted(toggleBackState, 'bottle-02', true);
+    toggleBackState = toggleSecretCompleted(toggleBackState, 'bottle-01', false);
+    expect(toggleBackState.ownedRequirementIds['bottle']).toBe(true);
+    toggleBackState = toggleSecretCompleted(toggleBackState, 'bottle-02', false);
+    expect(toggleBackState.ownedRequirementIds['bottle']).toBeUndefined();
+
+    // Unowning a secret-backed requirement via toggleRequirementOwned also clears completedSecretIds (Bug #4c guard)
+    let invState = toggleSecretCompleted(createDefaultProgressState(), 'eq-hookshot', true);
+    invState = toggleSecretCompleted(invState, 'gf-01', true);
+    expect(deriveOwnedInventoryRequirements(invState).has('hookshot')).toBe(true);
+    expect(deriveOwnedInventoryRequirements(invState).has('deku-sticks')).toBe(false);
+
+    invState = toggleRequirementOwned(invState, 'hookshot');
+    expect(invState.completedSecretIds['eq-hookshot']).toBeUndefined();
+    expect(deriveOwnedInventoryRequirements(invState).has('hookshot')).toBe(false);
+
+    // Turning off 'dins-fire' unchecks 'gf-01' while preserving sibling 'magic-meter'
+    invState = toggleRequirementOwned(invState, 'dins-fire');
+    expect(invState.completedSecretIds['gf-01']).toBeUndefined();
+    expect(deriveOwnedInventoryRequirements(invState).has('dins-fire')).toBe(false);
+    expect(deriveOwnedInventoryRequirements(invState).has('magic-meter')).toBe(true);
   });
 
   it('computes accurate unlock deltas when toggling Bombs or Hookshot ON, and computes regional/global summaries', () => {
