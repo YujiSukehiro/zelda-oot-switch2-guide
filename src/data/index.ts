@@ -508,11 +508,22 @@ const normalizedCowsAndGrottos: UnifiedSecret[] = SONGS_AND_QUESTS.cowsAndKeyGro
   countsToward100Percent: true,
 }));
 
+export const THREADS_OF_TIME_QUEST_IDS = [
+  'sw2-thread-malon',
+  'sw2-thread-darunia',
+  'sw2-thread-ruto',
+  'sw2-thread-nabooru',
+  'sw2-thread-impa',
+  'sw2-thread-saria',
+] as const;
+
 const normalizedSwitch2Exclusives: UnifiedSecret[] = SONGS_AND_QUESTS.switch2Exclusives.map(
   (sw2) => ({
     id: sw2.id,
     title: sw2.title,
-    subtitle: 'Switch 2 Remake Exclusive',
+    subtitle: sw2.id.startsWith('sw2-thread-')
+      ? 'Threads of Time Quest (Switch 2)'
+      : 'Switch 2 Remake Exclusive',
     category: 'switch2-exclusive',
     regionId: sw2.regionId,
     era: sw2.era,
@@ -522,6 +533,7 @@ const normalizedSwitch2Exclusives: UnifiedSecret[] = SONGS_AND_QUESTS.switch2Exc
     switch2Status: 'new-switch2',
     howToGet: sw2.description,
     countsToward100Percent: true,
+    crossEraSteps: parseCrossEraSteps(sw2.description),
   }),
 );
 
@@ -943,6 +955,10 @@ export const STORY_PRESETS: StoryPreset[] = [
   },
 ];
 
+export const THREADS_OF_TIME_SECRETS: UnifiedSecret[] = THREADS_OF_TIME_QUEST_IDS.map(
+  (id) => SECRET_BY_ID[id],
+).filter((sec): sec is UnifiedSecret => Boolean(sec));
+
 export { AREA_GUIDES, AREA_GUIDE_BY_REGION_ID } from './areaGuides';
 export {
   OPTIMAL_ROUTE_CHAPTERS,
@@ -951,4 +967,21 @@ export {
   ROUTE_STEP_BY_ID,
   STEP_TO_CHAPTER_ID,
 } from './optimalRoute';
+export {
+  FOE_GALLERY_WINGS,
+  HALL_OF_FALLEN_FOES_STATUES,
+  FOE_STATUE_BY_ID,
+  BOSS_RUSH_GAUNTLETS,
+  BOSS_RUSH_GAUNTLET_BY_ID,
+} from './hallOfFallenFoes';
+export {
+  SCARECROW_SPOTS,
+  PIERRE_SETUP_REMINDER,
+  GROTTO_OPEN_METHODS,
+  ECHO_GEM_GUIDE,
+  HIDDEN_GROTTOS_DIRECTORY,
+  FISHING_GUIDE_DATA,
+  SHOP_VS_FREE_GEAR,
+  MANDATORY_RUPEE_BUDGETS,
+} from './companionReference';
 

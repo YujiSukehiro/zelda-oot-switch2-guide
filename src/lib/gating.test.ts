@@ -23,7 +23,17 @@ import {
   SONGS_AND_QUESTS,
   STORY_PRESETS,
   STORY_TOKENS,
+  THREADS_OF_TIME_QUEST_IDS,
+  THREADS_OF_TIME_SECRETS,
   UPGRADES_AND_BOTTLES,
+  HALL_OF_FALLEN_FOES_STATUES,
+  FOE_GALLERY_WINGS,
+  BOSS_RUSH_GAUNTLETS,
+  SCARECROW_SPOTS,
+  HIDDEN_GROTTOS_DIRECTORY,
+  FISHING_GUIDE_DATA,
+  SHOP_VS_FREE_GEAR,
+  MANDATORY_RUPEE_BUDGETS,
 } from '../data';
 import {
   applyStoryPreset,
@@ -53,7 +63,7 @@ import {
 } from './storage';
 
 describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () => {
-  it('matches every expected count in METADATA.expectedCounts and totals 271 normalized secrets (270 countable)', () => {
+  it('matches every expected count in METADATA.expectedCounts and totals 276 normalized secrets (275 countable)', () => {
     const exp = METADATA.expectedCounts;
 
     expect(OVERWORLD_REGIONS).toHaveLength(exp.overworldRegions); // 21
@@ -77,7 +87,9 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     expect(byCat('mask-trade')).toHaveLength(exp.happyMaskTrades); // 4
     expect(byCat('biggoron-step')).toHaveLength(exp.biggoronTradeSteps); // 12
     expect(byCat('cow-or-grotto')).toHaveLength(5);
-    expect(byCat('switch2-exclusive')).toHaveLength(3);
+    expect(byCat('switch2-exclusive')).toHaveLength(8); // 6 Threads of Time + Hall of Fallen Foes + Thawed Zora's Domain
+    expect(THREADS_OF_TIME_SECRETS).toHaveLength(exp.threadsOfTimeQuests ?? 6);
+    expect(SECRET_BY_ID['sw2-threads-of-time']).toBeUndefined();
 
     // Phase 1 Core Subcategories (39 newly checkable cards)
     expect(bySubCat('dungeon-item')).toHaveLength(16);
@@ -89,8 +101,8 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     expect(STORY_TOKENS).toHaveLength(9);
     expect(GANON_TRIALS).toHaveLength(6);
 
-    expect(ALL_SECRETS).toHaveLength(271);
-    expect(Object.keys(SECRET_BY_ID)).toHaveLength(271);
+    expect(ALL_SECRETS).toHaveLength(276);
+    expect(Object.keys(SECRET_BY_ID)).toHaveLength(276);
 
     // 56 Overworld + 44 Dungeon Gold Skulltulas (51 Child + 49 Adult)
     const overworldGs = GOLD_SKULLTULAS.filter(
@@ -119,7 +131,7 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
 
     // skr-50 cross-lists hp-10 so countsToward100Percent is false only on skr-50
     expect(SECRET_BY_ID['skr-50']?.countsToward100Percent).toBe(false);
-    expect(ALL_SECRETS.filter((s) => s.countsToward100Percent)).toHaveLength(270);
+    expect(ALL_SECRETS.filter((s) => s.countsToward100Percent)).toHaveLength(275);
   });
 
   it('validates that every secret, preset, and requirement maps to valid regions and requirement IDs', () => {
@@ -908,8 +920,8 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
     expect(ganonSummary.isReachable).toBe(false);
 
     const global = computeGlobalProgress(fresh);
-    expect(global.totalCount).toBe(270);
-    expect(global.allTotalCount).toBe(271);
+    expect(global.totalCount).toBe(275);
+    expect(global.allTotalCount).toBe(276);
     expect(global.heartPiecesTotal).toBe(36);
     expect(global.bossHeartsTotal).toBe(8);
     expect(global.skulltulasTotal).toBe(100);
@@ -1079,5 +1091,92 @@ describe('Area Walkthrough Guides & Optimal 100% Route Integrity', () => {
 
     const expectedCountable = ALL_SECRETS.filter((s) => s.countsToward100Percent);
     expect(coveredCountable.size).toBe(expectedCountable.length);
+  });
+});
+
+
+describe('Phase 2 Switch 2 Deep Content: 6 Threads of Time, 84 Foe Statues & Companion Reference', () => {
+  it('validates all 6 individual Threads of Time quests and their progression gating', () => {
+    expect(THREADS_OF_TIME_QUEST_IDS).toEqual([
+      'sw2-thread-malon',
+      'sw2-thread-darunia',
+      'sw2-thread-ruto',
+      'sw2-thread-nabooru',
+      'sw2-thread-impa',
+      'sw2-thread-saria',
+    ]);
+    expect(THREADS_OF_TIME_SECRETS).toHaveLength(6);
+
+    const fresh = createDefaultProgressState();
+    for (const quest of THREADS_OF_TIME_SECRETS) {
+      expect(quest.countsToward100Percent).toBe(true);
+      expect(quest.category).toBe('switch2-exclusive');
+      expect(evaluateSecret(quest, fresh).status).toBe('locked');
+    }
+
+    // Unlocking Zora's Domain reachability + Adult + Zora Thawed makes Ruto's quest available-now!
+    const zoraState = {
+      ...fresh,
+      ownedRequirementIds: {
+        ...fresh.ownedRequirementIds,
+        'era-adult': true,
+        'stone-emerald': true,
+        ocarina: true,
+        'song-lullaby': true,
+        bombs: true,
+        'zora-thawed': true,
+      },
+    };
+    expect(evaluateSecret(SECRET_BY_ID['sw2-thread-ruto'], zoraState).status).toBe('available-now');
+    expect(evaluateSecret(SECRET_BY_ID['sw2-thread-nabooru'], zoraState).status).toBe('locked');
+  });
+
+  it('validates all 84 Hall of Fallen Foes statues, 5 gallery wings, Boss Rush gauntlets & companion reference datasets', () => {
+    expect(HALL_OF_FALLEN_FOES_STATUES).toHaveLength(
+      METADATA.expectedCounts.hallOfFallenFoesStatues,
+    );
+    expect(HALL_OF_FALLEN_FOES_STATUES).toHaveLength(84);
+    expect(FOE_GALLERY_WINGS).toHaveLength(5);
+    expect(BOSS_RUSH_GAUNTLETS).toHaveLength(3);
+
+    const seenIds = new Set<string>();
+    const seenNums = new Set<number>();
+    const wingSet = new Set<string>();
+    const rawSlugPattern = /\((?:hp|gs|gf|skr|sw2)-\d+|\.json|\*\*/;
+
+    for (const statue of HALL_OF_FALLEN_FOES_STATUES) {
+      expect(seenIds.has(statue.id)).toBe(false);
+      expect(seenNums.has(statue.number)).toBe(false);
+      seenIds.add(statue.id);
+      seenNums.add(statue.number);
+      wingSet.add(statue.wing);
+
+      expect(statue.number).toBeGreaterThanOrEqual(1);
+      expect(statue.number).toBeLessThanOrEqual(84);
+      expect(REGION_BY_ID[statue.primaryRegionId]).toBeDefined();
+      expect(statue.howToLog).not.toMatch(rawSlugPattern);
+      expect(statue.rareTip ?? '').not.toMatch(rawSlugPattern);
+    }
+    expect(wingSet.size).toBe(5);
+    expect(HALL_OF_FALLEN_FOES_STATUES.filter((s) => s.isRareOrMissable).length).toBeGreaterThanOrEqual(7);
+
+    // Companion Reference integrity
+    expect(SCARECROW_SPOTS.length).toBeGreaterThanOrEqual(10);
+    for (const spot of SCARECROW_SPOTS) {
+      expect(REGION_BY_ID[spot.regionId]).toBeDefined();
+      expect(spot.whereToStand).not.toMatch(rawSlugPattern);
+      expect(spot.reward).not.toMatch(rawSlugPattern);
+    }
+
+    expect(HIDDEN_GROTTOS_DIRECTORY.length).toBeGreaterThanOrEqual(16);
+    for (const grotto of HIDDEN_GROTTOS_DIRECTORY) {
+      expect(REGION_BY_ID[grotto.regionId]).toBeDefined();
+      expect(grotto.locationAndSteps).not.toMatch(rawSlugPattern);
+    }
+
+    expect(FISHING_GUIDE_DATA.sinkingLureSpots).toHaveLength(4);
+    expect(SHOP_VS_FREE_GEAR.length).toBeGreaterThanOrEqual(6);
+    expect(MANDATORY_RUPEE_BUDGETS.map((b) => b.totalRupees)).toContain(550);
+    expect(MANDATORY_RUPEE_BUDGETS.map((b) => b.totalRupees)).toContain(1175);
   });
 });

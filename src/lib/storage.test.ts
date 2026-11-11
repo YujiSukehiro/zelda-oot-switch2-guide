@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { THREADS_OF_TIME_QUEST_IDS } from '../data';
 import {
   buildUrlHash,
   parseImportedProgressJson,
@@ -147,5 +148,52 @@ describe('Player Progress Hook, Cross-Listed Sync & Catch-Up Presets (src/lib/st
       spotlight: false,
       lens: 'copilot',
     });
+  });
+
+  it('migrates legacy sw2-threads-of-time saves to all 6 sw2-thread-* quests and persists Foe Statues & Boss Rush medals', () => {
+    const legacyState = sanitizeProgressState({
+      version: 1,
+      completedSecretIds: {
+        'sw2-threads-of-time': true,
+        'hp-01': true,
+      },
+      completedFoeStatueIds: {
+        'foe-01': true,
+        'foe-999-invalid': true,
+      },
+      bossRushMedals: {
+        'gauntlet-child': 'gold',
+        'gauntlet-invalid': 'master',
+      },
+    });
+
+    expect(legacyState.completedSecretIds['sw2-threads-of-time']).toBeUndefined();
+    expect(legacyState.completedSecretIds['hp-01']).toBe(true);
+    for (const threadId of THREADS_OF_TIME_QUEST_IDS) {
+      expect(legacyState.completedSecretIds[threadId]).toBe(true);
+    }
+    expect(legacyState.completedFoeStatueIds).toEqual({ 'foe-01': true });
+    expect(legacyState.bossRushMedals).toEqual({ 'gauntlet-child': 'gold' });
+
+    // Hook persistence & URL hash support for sheet=foes and sheet=reference
+    const { result } = renderHook(() => usePlayerProgress());
+    act(() => {
+      result.current.toggleFoeStatue('foe-06', true);
+      result.current.setBossRushMedal('gauntlet-master', 'master');
+    });
+    expect(result.current.state.completedFoeStatueIds?.['foe-06']).toBe(true);
+    expect(result.current.state.bossRushMedals?.['gauntlet-master']).toBe('master');
+
+    act(() => {
+      result.current.toggleFoeStatue('foe-06', false);
+      result.current.setBossRushMedal('gauntlet-master', 'none');
+    });
+    expect(result.current.state.completedFoeStatueIds).toBeUndefined();
+    expect(result.current.state.bossRushMedals).toBeUndefined();
+
+    expect(parseUrlHash('#sheet=foes').sheet).toBe('foes');
+    expect(parseUrlHash('#sheet=reference').sheet).toBe('reference');
+    expect(buildUrlHash({ sheet: 'foes' })).toBe('#sheet=foes');
+    expect(buildUrlHash({ sheet: 'reference' })).toBe('#sheet=reference');
   });
 });

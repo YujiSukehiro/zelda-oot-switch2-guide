@@ -13,8 +13,10 @@ import {
   ScrollText,
   Search,
   Sun,
+  Swords,
   Zap,
 } from 'lucide-react';
+import { HALL_OF_FALLEN_FOES_STATUES, METADATA } from '../../data';
 import type {
   CompanionSheetId,
   EraFilter,
@@ -169,9 +171,17 @@ export function TopCommandBar({
     onToggleLoadoutDock?.(true);
   };
 
+  const loggedFoesCount = HALL_OF_FALLEN_FOES_STATUES.reduce(
+    (acc, statue) => acc + (state.completedFoeStatueIds?.[statue.id] ? 1 : 0),
+    0,
+  );
+  const totalFoesCount = METADATA.expectedCounts.hallOfFallenFoesStatues;
+
   const hasActiveRefSheet =
     activeSheet === 'ocarina' ||
     activeSheet === 'quests' ||
+    activeSheet === 'foes' ||
+    activeSheet === 'reference' ||
     activeSheet === 'diff' ||
     activeSheet === 'backup';
 
@@ -338,7 +348,7 @@ export function TopCommandBar({
                 hasActiveRefSheet ? ' is-active-sheet' : ''
               }`}
               data-testid="open-reference-menu-btn"
-              aria-label="Reference sheets: Ocarina Songbook, Quests, Switch 2 Changes, and Backup"
+              aria-label="Reference sheets: Ocarina Songbook, Quests, Hall of Fallen Foes, Field Guide, Switch 2 Changes, and Backup"
             >
               <BookOpen size={14} aria-hidden="true" />
               <span className="zelda-cmd-btn__label">Reference</span>
@@ -374,7 +384,37 @@ export function TopCommandBar({
                 <ScrollText size={14} aria-hidden="true" />
                 <div>
                   <strong>Side Quests</strong>
-                  <span>Biggoron&apos;s Sword &amp; Happy Mask Shop chains</span>
+                  <span>Threads of Time (6), Biggoron&apos;s Sword &amp; Happy Mask chains</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="zelda-ref-menu__item"
+                data-testid="open-foes-btn"
+                aria-pressed={activeSheet === 'foes'}
+                onClick={() => handleOpenSheetFromMenu('foes')}
+              >
+                <Swords size={14} aria-hidden="true" />
+                <div>
+                  <strong>
+                    Hall of Fallen Foes ({loggedFoesCount}/{totalFoesCount})
+                  </strong>
+                  <span>84-statue Switch 2 bestiary, straggler tips &amp; Boss Rush medals</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="zelda-ref-menu__item"
+                data-testid="open-reference-btn"
+                aria-pressed={activeSheet === 'reference'}
+                onClick={() => handleOpenSheetFromMenu('reference')}
+              >
+                <Compass size={14} aria-hidden="true" />
+                <div>
+                  <strong>Field Guide (Grottos, Pierre &amp; Fishing)</strong>
+                  <span>Scarecrow spots, Echo Gem grottos, Hylian Loach &amp; free gear</span>
                 </div>
               </button>
 

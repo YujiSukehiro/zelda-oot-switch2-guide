@@ -283,13 +283,58 @@
       "description": "Unlocked after beating the Forest Temple, returning to Child Link, viewing Kaepora Gaebora's scene in Kakariko Village, and sleeping in any green-glowing bed (Link's House, Kakariko, or Lake Hylia). Automatically populates 84 enemy & boss statues as you defeat foes (no camera required!), lets you rematch any boss or mini-boss (including Dark Link and Iron Knuckles), and features timed Boss Rush Gauntlets graded Bronze / Silver / Gold / Master."
     },
     {
-      "id": "sw2-threads-of-time",
-      "title": "Threads of Time & Tapestry Tracker",
-      "regionId": "market",
-      "era": "both",
-      "gateTier": "tier-0-immediate",
-      "requiredIds": ["era-child"],
-      "description": "Press Minus (-) to open the new Threads of Time journal and press Y for the dual-era Tapestry view. Tracks 6 headline side quest chains ('Malon's Friend', 'Happy Mask Shopkeeper', 'To the Great Fairy', 'Stir the Scarecrow's Soul!', 'From a Pocket Egg Comes...', and 'Broken Windmill, Dry Well') with COMPLETE stamps."
+      "id": "sw2-thread-malon",
+      "title": "Threads of Time: Malon's Ranch Song",
+      "regionId": "lon-lon-ranch",
+      "era": "cross-era",
+      "gateTier": "tier-4-cross-era",
+      "requiredIds": ["era-adult", "epona", "song-epona", "time-travel"],
+      "description": "Open the Threads of Time journal (press Minus, then Y for the dual-era Tapestry) to complete Malon's cross-era character epilogue at Lon Lon Ranch. Step 1 (Child Link): Wake Talon at Hyrule Castle and learn Epona's Song from Malon inside the ranch corral. Step 2 (Adult Link): Win Epona from Ingo, clear Malon's obstacle course after unlocking Time Travel, and speak with Malon beside the corral fence to perform a duet of Epona's Song and stamp her Thread COMPLETE."
+    },
+    {
+      "id": "sw2-thread-darunia",
+      "title": "Threads of Time: Darunia's Goron Heirloom",
+      "regionId": "goron-city",
+      "era": "cross-era",
+      "gateTier": "tier-4-cross-era",
+      "requiredIds": ["era-adult", "megaton-hammer", "time-travel"],
+      "description": "Complete Darunia and young Link the Goron's multi-era Thread of Time inside Goron City. Step 1 (Child Link): Cheer up Patriarch Darunia with Saria's Song and seal your vow of Sworn Brotherhood after Dodongo's Cavern. Step 2 (Adult Link): Wield the Megaton Hammer to awaken Darunia as the Fire Sage in the Fire Temple, then return to Goron City's bottom patriarch chamber and speak with young Link the Goron to inspect Darunia's Sworn-Brother Heirloom and stamp his Thread COMPLETE."
+    },
+    {
+      "id": "sw2-thread-ruto",
+      "title": "Threads of Time: Ruto & the Unfrozen Domain",
+      "regionId": "zoras-domain",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "zora-thawed"],
+      "description": "Experience Switch 2's landmark post-Water Temple restoration of Zora's Domain. Defeat Morpha in the Water Temple to awaken Princess Ruto as the Water Sage and permanently thaw the ice sealing Zora's Domain, then return to King Zora's throne room and the restored waterfall basin to celebrate with the Zora court and stamp Ruto's Thread of Time COMPLETE."
+    },
+    {
+      "id": "sw2-thread-nabooru",
+      "title": "Threads of Time: Nabooru's Desert Accord",
+      "regionId": "gerudo-fortress",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "gerudo-card", "mirror-shield"],
+      "description": "Forge the desert alliance between the Gerudo thieves and Hyrule in Nabooru's Switch 2 Thread of Time. Earn the Gerudo Membership Card by freeing all four Carpenters, claim the Mirror Shield and awaken Nabooru as the Spirit Sage in the Spirit Temple, then speak with Nabooru's second-in-command atop Gerudo's Fortress overlooking the repaired canyon bridge to stamp her Thread COMPLETE."
+    },
+    {
+      "id": "sw2-thread-impa",
+      "title": "Threads of Time: Impa's Sheikah Legacy",
+      "regionId": "kakariko-village",
+      "era": "cross-era",
+      "gateTier": "tier-4-cross-era",
+      "requiredIds": ["era-adult", "hover-boots", "lens-of-truth", "time-travel"],
+      "description": "Uncover the hidden history of Kakariko's protector in Impa's Switch 2 Thread of Time. Step 1 (Child Link): Drain Kakariko's well with the Song of Storms and claim the Sheikah heirloom Lens of Truth from the Bottom of the Well. Step 2 (Adult Link): Earn the Hover Boots and awaken Impa as the Shadow Sage in the Shadow Temple, then step inside Impa's House in Kakariko Village and inspect her hidden Sheikah chronicle with the Lens of Truth to stamp her Thread COMPLETE."
+    },
+    {
+      "id": "sw2-thread-saria",
+      "title": "Threads of Time: Saria's Eternal Forest",
+      "regionId": "sacred-forest-meadow",
+      "era": "cross-era",
+      "gateTier": "tier-4-cross-era",
+      "requiredIds": ["era-adult", "bow", "song-saria", "time-travel"],
+      "description": "Revisit Link and Saria's bond across eras at the Sacred Forest Meadow sanctum. Step 1 (Child Link): Learn Saria's Song on the tree stump inside the Sacred Forest Meadow terrace. Step 2 (Adult Link): Defeat Phantom Ganon with the Fairy Bow to awaken Saria as the Forest Sage and unlock Time Travel, then return to the quiet tree stump outside the Forest Temple and play Saria's Song to hear her forest echo across time and stamp her Thread COMPLETE."
     },
     {
       "id": "sw2-zelda-notes",

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Delete, MapPin, Mic, Music, Save, Sparkles, Trash2 } from 'lucide-react';
-import { METADATA, REGION_BY_ID, SONGS_AND_QUESTS } from '../../data';
+import { Check, Compass, Delete, MapPin, Mic, Music, Save, Sparkles, Trash2 } from 'lucide-react';
+import { METADATA, REGION_BY_ID, SCARECROW_SPOTS, SONGS_AND_QUESTS } from '../../data';
 import { deriveOwnedInventoryRequirements } from '../../lib/gating';
 import type { OcarinaSong, PlayerProgressState } from '../../types/zelda';
 import {
@@ -20,6 +20,7 @@ export interface OcarinaModalProps {
   onToggleRequirement: (requirementId: string, owned?: boolean) => void;
   onSaveScarecrowNotes: (notes: string) => void;
   onSelectRegion: (regionId: string) => void;
+  onOpenPierreDirectory?: () => void;
   initialSongId?: string | null;
 }
 
@@ -35,6 +36,7 @@ export function OcarinaModal({
   onToggleRequirement,
   onSaveScarecrowNotes,
   onSelectRegion,
+  onOpenPierreDirectory,
   initialSongId,
 }: OcarinaModalProps) {
   const [filterTab, setFilterTab] = useState<SongFilterTab>('all');
@@ -391,18 +393,40 @@ export function OcarinaModal({
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
                   {regionName}
                 </span>
-                <button
-                  type="button"
-                  className="zelda-link-btn"
-                  data-testid={`song-jump-btn-${song.id}`}
-                  onClick={() => {
-                    onSelectRegion(song.regionId);
-                    onClose();
-                  }}
-                >
-                  <MapPin size={13} aria-hidden="true" />
-                  <span>Jump to {regionName}</span>
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {song.id === 'song-scarecrow' ? (
+                    <button
+                      type="button"
+                      className="zelda-link-btn"
+                      data-testid="open-pierre-directory-btn"
+                      onClick={() => {
+                        if (onOpenPierreDirectory) {
+                          onOpenPierreDirectory();
+                          return;
+                        }
+                        if (typeof window !== 'undefined') {
+                          window.location.hash = '#sheet=reference';
+                        }
+                      }}
+                    >
+                      <Compass size={13} aria-hidden="true" />
+                      <span>Pierre Spots Directory ({SCARECROW_SPOTS.length}) →</span>
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    className="zelda-link-btn"
+                    data-testid={`song-jump-btn-${song.id}`}
+                    onClick={() => {
+                      onSelectRegion(song.regionId);
+                      onClose();
+                    }}
+                  >
+                    <MapPin size={13} aria-hidden="true" />
+                    <span>Jump to {regionName}</span>
+                  </button>
+                </div>
               </div>
             </article>
           );

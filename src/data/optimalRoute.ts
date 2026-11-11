@@ -130,15 +130,15 @@ export const OPTIMAL_ROUTE_CHAPTERS: RouteChapter[] = [
       },
       {
         id: 'ch-02-step-02',
-        title: 'Market Arrival, Threads of Time, Guardhouse Crate & Shooting Gallery',
+        title: 'Market Arrival, Guardhouse Crate & Daytime Shooting Gallery',
         regionId: 'market',
         era: 'child',
         kind: 'sweep',
         instructions:
-          'Press Minus (-) to open the Threads of Time quest log (and Y for the dual-era Tapestry). Duck into the Guardhouse right inside the gate to smash pots for Rupees and roll into the corner crate for Gold Skulltula #14. Before dusk, pay 20 Rupees at the Market Shooting Gallery and score a perfect 10/10 round for the 50-Seed Biggest Bullet Bag.',
+          'Press Minus (-) anytime to open the Threads of Time quest log (and Y for the dual-era Tapestry tracking your 6 major character arcs). Duck into the Guardhouse right inside the gate to smash pots for Rupees and roll into the corner crate for Gold Skulltula #14. Before dusk, pay 20 Rupees at the Market Shooting Gallery and score a perfect 10/10 round for the 50-Seed Biggest Bullet Bag.',
         proTip:
           'Win the Shooting Gallery Bullet Bag during daytime now; Bombchu Bowling across the square unlocks in Chapter 5 right after you earn the Bomb Bag!',
-        secretIds: ['sw2-threads-of-time', 'gs-014', 'cap-seeds-50'],
+        secretIds: ['gs-014', 'cap-seeds-50'],
         requiredIds: ['era-child', 'slingshot', 'rupees-100'],
       },
       {
@@ -963,6 +963,28 @@ export const OPTIMAL_ROUTE_CHAPTERS: RouteChapter[] = [
         requiredIds: ['era-adult', 'epona', 'bow', 'bottle'],
         unlocksRequirementIds: ['song-prelude', 'time-travel'],
       },
+      {
+        id: 'ch-09-step-09',
+        title: "Sacred Forest Meadow: Saria's Eternal Forest (Threads of Time)",
+        regionId: 'sacred-forest-meadow',
+        era: 'cross-era',
+        kind: 'switch2',
+        instructions:
+          "With Time Travel newly unlocked, warp via Minuet of Forest to the quiet tree stump outside the Forest Temple and play Saria's Song (R → A → Y → R → A → Y) to hear Saria's cross-era forest echo and stamp Threads of Time: Saria's Eternal Forest COMPLETE!",
+        secretIds: ['sw2-thread-saria'],
+        requiredIds: ['era-adult', 'bow', 'song-saria', 'time-travel'],
+      },
+      {
+        id: 'ch-09-step-10',
+        title: "Lon Lon Ranch: Malon's Ranch Song (Threads of Time)",
+        regionId: 'lon-lon-ranch',
+        era: 'cross-era',
+        kind: 'switch2',
+        instructions:
+          "Ride Epona into restored Lon Lon Ranch and speak with Malon beside the corral fence to perform a cross-era duet of Epona's Song (X → Y → A → X → Y → A), stamping Threads of Time: Malon's Ranch Song COMPLETE!",
+        secretIds: ['sw2-thread-malon'],
+        requiredIds: ['era-adult', 'epona', 'song-epona', 'time-travel'],
+      },
     ],
   },
   {
@@ -1222,6 +1244,17 @@ export const OPTIMAL_ROUTE_CHAPTERS: RouteChapter[] = [
         secretIds: ['gs-062', 'gs-065'],
         requiredIds: ['era-adult', 'song-scarecrow', 'hookshot'],
       },
+      {
+        id: 'ch-11-step-09',
+        title: "Goron City: Darunia's Goron Heirloom (Threads of Time)",
+        regionId: 'goron-city',
+        era: 'cross-era',
+        kind: 'switch2',
+        instructions:
+          "Step back inside Goron City's 1F patriarch chamber now that Darunia has awakened as the Fire Sage and speak with young Link the Goron beside the pedestal to inspect Darunia's Sworn-Brother Heirloom, stamping Threads of Time: Darunia's Goron Heirloom COMPLETE!",
+        secretIds: ['sw2-thread-darunia'],
+        requiredIds: ['era-adult', 'megaton-hammer', 'time-travel'],
+      },
     ],
   },
   {
@@ -1419,13 +1452,13 @@ export const OPTIMAL_ROUTE_CHAPTERS: RouteChapter[] = [
       },
       {
         id: 'ch-13-step-08',
-        title: 'Thawed Zora\'s Domain: Waterfall Skulltula & Biggoron Step #9 (Eyeball Frog)',
+        title: 'Thawed Zora\'s Domain: Ruto\'s Thread of Time, Waterfall Skulltula & Eyeball Frog',
         regionId: 'zoras-domain',
         era: 'adult',
         kind: 'switch2',
         instructions:
-          'Visit lively, newly unfrozen Zora\'s Domain! At night, look left from the top of the restored waterfall and Hookshot Gold Skulltula #38. Then show the Prescription to King Zora—he hands you the Eyeball Frog on a strict 2:30 timer (NO warp songs!).',
-        secretIds: ['gs-038', 'biggoron-step-9'],
+          'Visit lively, newly unfrozen Zora\'s Domain! Celebrate with the restored Zora court in King Zora\'s throne room to stamp Threads of Time: Ruto & the Unfrozen Domain COMPLETE. At night, look left from the top of the restored waterfall and Hookshot Gold Skulltula #38, then show the Prescription to King Zora—he hands you the Eyeball Frog on a strict 2:30 timer (NO warp songs!).',
+        secretIds: ['sw2-thread-ruto', 'gs-038', 'biggoron-step-9'],
         requiredIds: ['era-adult', 'zora-thawed', 'time-night', 'hookshot'],
       },
       {
@@ -1521,6 +1554,17 @@ export const OPTIMAL_ROUTE_CHAPTERS: RouteChapter[] = [
           'Float across the final gap in Hover Boots and drop onto the giant bongo drum! Shoot both severed hands with the Fairy Bow (wearing Hover Boots dampens the drum bounce!), flick on the Lens of Truth, put one arrow into Bongo Bongo\'s charging red eye, and deliver 2–3 Biggoron\'s Sword jump-slashes to claim Boss Heart Container #7 and the Shadow Medallion!',
         secretIds: ['boss-hc-shadow', 'medallion-shadow'],
         requiredIds: ['era-adult', 'hover-boots', 'bow', 'lens-of-truth'],
+      },
+      {
+        id: 'ch-14-step-06',
+        title: "Kakariko Village: Impa's Sheikah Legacy (Threads of Time)",
+        regionId: 'kakariko-village',
+        era: 'cross-era',
+        kind: 'switch2',
+        instructions:
+          "Return down to Kakariko Village now that Impa has awakened as the Shadow Sage, enter Impa's House, and inspect her hidden Sheikah chronicle with the Lens of Truth to stamp Threads of Time: Impa's Sheikah Legacy COMPLETE!",
+        secretIds: ['sw2-thread-impa'],
+        requiredIds: ['era-adult', 'hover-boots', 'lens-of-truth', 'time-travel'],
       },
     ],
   },
@@ -1708,6 +1752,17 @@ export const OPTIMAL_ROUTE_CHAPTERS: RouteChapter[] = [
           'Reflect light onto the 4F sun wall with your Mirror Shield, claim the Boss Key (using Hover Boots/Bow past the fake chest), shatter the giant statue\'s face from the upper mirror room, and Longshot onto the chains. Defeat Brainwashed Nabooru\'s Iron Knuckle armor, then battle Twinrova: in Phase 1 bounce Koume\'s fire beam into Kotake (or vice versa); in Phase 2 absorb THREE consecutive blasts of the SAME element into your Mirror Shield to unleash a reflected torrent and carve Twinrova down with Biggoron\'s Sword for Boss Heart Container #8 and the Spirit Medallion!',
         secretIds: ['boss-hc-spirit', 'medallion-spirit'],
         requiredIds: ['era-adult', 'silver-gauntlets', 'mirror-shield', 'longshot', 'bombs'],
+      },
+      {
+        id: 'ch-16-step-08',
+        title: "Gerudo's Fortress: Nabooru's Desert Accord (Threads of Time)",
+        regionId: 'gerudo-fortress',
+        era: 'adult',
+        kind: 'switch2',
+        instructions:
+          "Visit Gerudo's Fortress holding the Gerudo Membership Card and Mirror Shield after awakening Nabooru as the Spirit Sage, and speak with Nabooru's lieutenant overlooking the repaired canyon bridge to stamp Threads of Time: Nabooru's Desert Accord COMPLETE (all 6/6 Threads of Time complete!)!",
+        secretIds: ['sw2-thread-nabooru'],
+        requiredIds: ['era-adult', 'gerudo-card', 'mirror-shield'],
       },
     ],
   },
