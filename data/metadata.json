@@ -1,0 +1,98 @@
+{
+  "game": {
+    "title": "The Legend of Zelda: Ocarina of Time",
+    "edition": "Nintendo Switch 2 Remake (2026)",
+    "platform": "Nintendo Switch 2",
+    "releaseDate": "2026-11-05",
+    "latestPatch": "1.1.1",
+    "summary": "Ground-up modern reconstruction of Ocarina of Time for Nintendo Switch 2 featuring free camera control, manual jump (X) and dash (hold A), third-person over-the-shoulder aiming with gyro, microphone Ocarina input, 5 Empty Bottles, rebalanced 200/500/1000-Rupee Wallets, Great Fairy Rupee offerings, the Echo Gem replacing the Stone of Agony, 3 relocated cross-era/Scrub Heart Pieces, shifted Gold Skulltulas with daytime faint web cues, Zora's Domain unfreezing after the Water Temple, the Threads of Time quest log, the Hall of Fallen Foes (84 enemy/boss statues & boss rush), and Zelda Notes companion integration."
+  },
+  "expectedCounts": {
+    "overworldRegions": 21,
+    "dungeonsAndSpecialAreas": 13,
+    "totalRegions": 34,
+    "heartPieces": 36,
+    "bossHeartContainers": 8,
+    "startingHearts": 3,
+    "maxHearts": 20,
+    "goldSkulltulasTotal": 100,
+    "goldSkulltulasOverworld": 56,
+    "goldSkulltulasDungeon": 44,
+    "emptyBottles": 5,
+    "greatFairies": 6,
+    "greatFairyTotalRupeeCost": 1175,
+    "ocarinaSongs": 13,
+    "magicBeanLocations": 10,
+    "magicBeanTotalRupeeCost": 550,
+    "happyMaskTrades": 4,
+    "biggoronTradeSteps": 12,
+    "hallOfFallenFoesStatues": 84,
+    "bigPoesTotal": 10,
+    "bigPoeBottlePoints": 500
+  },
+  "gateTiers": [
+    {
+      "id": "tier-0-immediate",
+      "order": 0,
+      "label": "Grab Right Now (No Gear / First Visit)",
+      "shortLabel": "Immediate",
+      "badgeColor": "emerald",
+      "description": "Collectibles and secrets accessible immediately upon reaching the area in its native era without special dungeon items or songs."
+    },
+    {
+      "id": "tier-1-utility",
+      "order": 1,
+      "label": "Time, Rupees & Bottle Utility",
+      "shortLabel": "Night / Bugs / Rupees",
+      "badgeColor": "sky",
+      "description": "Locked only behind Nighttime, Rupees/Wallet capacity, or releasing Bottled Bugs into Soft Soil patches."
+    },
+    {
+      "id": "tier-2-song",
+      "order": 2,
+      "label": "Ocarina Melody Gates",
+      "shortLabel": "Song Gate",
+      "badgeColor": "indigo",
+      "description": "Requires playing one or more specific Ocarina melodies (Zelda's Lullaby, Epona's Song, Saria's Song, Sun's Song, Song of Storms, Warp Songs, or Scarecrow's Song)."
+    },
+    {
+      "id": "tier-3-child-gear",
+      "order": 3,
+      "label": "Child Dungeon & Sidequest Gear",
+      "shortLabel": "Child Gear",
+      "badgeColor": "amber",
+      "description": "Locked behind Child-era progression tools: Slingshot, Bombs, Boomerang, Silver Scale, Magic Meter/Din's Fire, Lens of Truth, or Happy Masks."
+    },
+    {
+      "id": "tier-4-cross-era",
+      "order": 4,
+      "label": "Cross-Era Time-Travel Puzzles (Child <-> Adult)",
+      "shortLabel": "Cross-Era",
+      "badgeColor": "purple",
+      "description": "Requires preparation in one era and payoff in the other: Magic Bean platforms, Song of Storms Windmill, and Switch 2 'Fairy's Thoughts' cross-era puzzles."
+    },
+    {
+      "id": "tier-5-adult-gear",
+      "order": 5,
+      "label": "Adult Dungeon Gear & Endgame",
+      "shortLabel": "Adult Gear",
+      "badgeColor": "rose",
+      "description": "Locked behind Adult Link progression: Epona, Hookshot/Longshot, Bow, Megaton Hammer, Iron/Hover Boots, Tunics, Golden Scale, Silver/Golden Gauntlets."
+    }
+  ],
+  "switch2Controls": {
+    "jump": "X Button (Dedicated manual jump added in Switch 2 Remake)",
+    "dash": "Hold A Button",
+    "camera": "Right Stick (Free 360° camera) + ZL Lock-On / Recenter",
+    "aiming": "Over-the-shoulder 3rd-person reticle + optional Joy-Con 2 / Pro Controller Gyro",
+    "questLog": "Minus (-) Button -> Threads of Time & Tapestry View (Y)",
+    "ocarinaNotes": {
+      "Y": "Left Note (Classic C-Left / D2)",
+      "X": "Up Note (Classic C-Up / D5)",
+      "A": "Right Note (Classic C-Right / B4)",
+      "R": "Down Note (Classic C-Down / F4)",
+      "L": "Low Note (Classic A Button / D4)",
+      "microphone": "Optional Switch 2 built-in microphone humming/whistling or real instrument pitch detection"
+    }
+  }
+}

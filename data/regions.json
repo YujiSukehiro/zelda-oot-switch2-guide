@@ -1,0 +1,695 @@
+[
+  {
+    "id": "kokiri-forest",
+    "name": "Kokiri Forest",
+    "kind": "overworld",
+    "biome": "forest",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 745, "y": 535 },
+    "connectedRegions": ["hyrule-field", "lost-woods", "deku-tree", "hall-of-fallen-foes"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 3
+    },
+    "summary": "Link's childhood home beneath the Great Deku Tree. Houses the Kokiri Sword training crawlspace, Kokiri Shop, Link's House (with unlockable Cow & Hall of Fallen Foes dream bed), and entrance to the Lost Woods.",
+    "switch2Highlights": [
+      "Clearing thrown/blocking rocks for Kokiri kids yields bonus early Rupees.",
+      "Link's House bed glows green after clearing the Forest Temple to enter the new Hall of Fallen Foes.",
+      "Behind Know-It-All Brothers' House Gold Skulltula is tucked slightly deeper against the treehouse wall."
+    ]
+  },
+  {
+    "id": "lost-woods",
+    "name": "Lost Woods",
+    "kind": "overworld",
+    "biome": "forest",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 780, "y": 465 },
+    "connectedRegions": ["kokiri-forest", "sacred-forest-meadow", "goron-city", "zoras-river", "hyrule-field"],
+    "expectedTallies": {
+      "heartPieces": 2,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 3
+    },
+    "summary": "Misty labyrinth connecting Kokiri Forest to Sacred Forest Meadow, with shortcuts to Goron City and Zora's River. Packed with Skull Kid musical games, target shooting, Business Scrub upgrades, and the hidden Forest Stage.",
+    "switch2Highlights": [
+      "The infamous N64 Poacher's Saw bug that permanently locked out the Forest Stage Deku Nut upgrade is FIXED in the Switch 2 Remake!",
+      "2 Magic Bean patches here: Bridge shortcut (left from entrance) and Forest Stage clearing."
+    ]
+  },
+  {
+    "id": "sacred-forest-meadow",
+    "name": "Sacred Forest Meadow",
+    "kind": "overworld",
+    "biome": "forest",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 835, "y": 425 },
+    "connectedRegions": ["lost-woods", "forest-temple"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 1
+    },
+    "summary": "Hedge maze guarded by Wolfos and Mad Scrubs/Moblins leading to Saria's stump (Child) and the Forest Temple & Minuet of Forest warp pad (Adult).",
+    "switch2Highlights": [
+      "Contains a Fairy Fountain grotto beneath the ladder in the maze and a Bomb grotto near the temple stairs."
+    ]
+  },
+  {
+    "id": "hyrule-field",
+    "name": "Hyrule Field",
+    "kind": "overworld",
+    "biome": "field",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 480, "y": 420 },
+    "connectedRegions": ["kokiri-forest", "market", "lon-lon-ranch", "kakariko-village", "zoras-river", "lake-hylia", "gerudo-valley"],
+    "expectedTallies": {
+      "heartPieces": 2,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 3
+    },
+    "summary": "Vast central hub of Hyrule connecting every major province. Hosts the Running Man, 10 Big Poe hunting spawns as Adult Link, Cow grotto, and three brand-new cross-era Switch 2 Remake puzzles.",
+    "switch2Highlights": [
+      "MAJOR SWITCH 2 CHANGE: Both old Stone of Agony grotto Heart Pieces were REMOVED and replaced by 2 cross-era 'Fairy's Thoughts' puzzles (Northern Moat Lonely Tree Password Scrub & Western Canyon Time-Locked Chest).",
+      "Gold Skulltula count increased from 2 to 3, adding a new cross-era SE Peahat Wetland Grotto Skulltula.",
+      "Big Poe hunting now awards the Empty Bottle at 500 points (5 Big Poes) instead of 1,000 points!"
+    ]
+  },
+  {
+    "id": "lon-lon-ranch",
+    "name": "Lon Lon Ranch",
+    "kind": "overworld",
+    "biome": "field",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 465, "y": 445 },
+    "connectedRegions": ["hyrule-field"],
+    "expectedTallies": {
+      "heartPieces": 1,
+      "skulltulasChild": 3,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 3
+    },
+    "summary": "Talon and Malon's horse ranch in central Hyrule. Where Child Link wins the Super Cucco Bottle, learns Epona's Song, and solves the shed crate puzzle; Adult Link races Ingo to free Epona and win a Cow for Link's House.",
+    "switch2Highlights": [
+      "Gold Skulltula tally in Lon Lon Ranch is 3 (all Child Link; 1 shifted to Hyrule Field compared to N64's 4).",
+      "Obstacle course race after rescuing Epona rewards a Cow delivered to Link's House in Kokiri Forest."
+    ]
+  },
+  {
+    "id": "market",
+    "name": "Hyrule Castle Town Market",
+    "kind": "overworld",
+    "biome": "town",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 505, "y": 245 },
+    "connectedRegions": ["hyrule-field", "hyrule-castle", "outside-ganons-castle"],
+    "expectedTallies": {
+      "heartPieces": 3,
+      "skulltulasChild": 1,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 1
+    },
+    "summary": "Bustling Child-era capital (ruined ReDead town in Adult era) plus the Temple of Time. Home to the Potion Shop, Happy Mask Shop, Shooting Gallery, Bombchu Bowling Alley, Treasure Chest Shop, Back Alley, and Guardhouse / Poe Shop.",
+    "switch2Highlights": [
+      "NEW 5TH BOTTLE: Enter the Market Potion Shop as Child Link and catch the escaped Golden Bug for the shopkeeper to keep the Empty Bottle + free Red Potion!",
+      "Poe Collector in the ruined Adult Guardhouse gives an Empty Bottle at 500 points (5 Big Poes) and a Gold Rupee (200) at 1,000 points.",
+      "Old Treasure Chest Shop glitches are patched; bring the Lens of Truth at night."
+    ]
+  },
+  {
+    "id": "hyrule-castle",
+    "name": "Hyrule Castle Grounds (Child)",
+    "kind": "overworld",
+    "biome": "castle",
+    "parentRegionId": null,
+    "eras": ["child"],
+    "mapCoords": { "x": 505, "y": 155 },
+    "connectedRegions": ["market"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 2
+    },
+    "summary": "Child-era royal grounds where Link wakes Talon, sneaks into the courtyard to receive Zelda's Letter and Zelda's Lullaby, opens the Song of Storms grotto, and visits Great Fairy Fountain #2.",
+    "switch2Highlights": [
+      "Great Fairy Fountain #2 (dead-end boulder past gate) now charges 50 Rupees and grants the Charged Spin Attack (swapped with Din's Fire!)."
+    ]
+  },
+  {
+    "id": "outside-ganons-castle",
+    "name": "Outside Ganon's Castle (Adult)",
+    "kind": "overworld",
+    "biome": "castle",
+    "parentRegionId": null,
+    "eras": ["adult"],
+    "mapCoords": { "x": 535, "y": 145 },
+    "connectedRegions": ["market", "ganons-castle"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 1
+    },
+    "summary": "Adult-era lava moat where Hyrule Castle once stood. Houses 1 Gold Skulltula on the ruined stone arch and the final Great Fairy Fountain behind a massive Golden Gauntlets obelisk.",
+    "switch2Highlights": [
+      "Great Fairy Fountain #6 (Double Defense) requires Golden Gauntlets + Zelda's Lullaby + 500 Rupees (requires Adult's or Giant's Wallet!)."
+    ]
+  },
+  {
+    "id": "kakariko-village",
+    "name": "Kakariko Village",
+    "kind": "overworld",
+    "biome": "town",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 640, "y": 250 },
+    "connectedRegions": ["hyrule-field", "graveyard", "death-mountain-trail", "bottom-of-the-well"],
+    "expectedTallies": {
+      "heartPieces": 4,
+      "skulltulasChild": 5,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 6
+    },
+    "summary": "Sheikah village at the foot of Death Mountain. Contains the House of Skulltula, Windmill (Song of Storms), Cucco Lady (Bottle & Pocket Egg), Adult Shooting Gallery, Odd Medicine Granny, and Bottom of the Well.",
+    "switch2Highlights": [
+      "House of Skulltula rewards updated: 10 = Adult's Wallet (500), 20 = Echo Gem (NEW!), 30 = Giant's Wallet (1,000), 40 = 20 Bombchus, 50 = Piece of Heart, 100 = Infinite Gold Rupees.",
+      "Contains a glowing bed (post-Forest Temple) connecting to the Hall of Fallen Foes."
+    ]
+  },
+  {
+    "id": "graveyard",
+    "name": "Kakariko Graveyard",
+    "kind": "overworld",
+    "biome": "shadow",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 720, "y": 265 },
+    "connectedRegions": ["kakariko-village", "shadow-temple"],
+    "expectedTallies": {
+      "heartPieces": 4,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 2
+    },
+    "summary": "Sacred burial ground east of Kakariko. Holds the Royal Family's Tomb (Sun's Song), ReDead Grave, Shield Grave, Dampé's Gravedigging Tour (Child), Dampé's Ghost Race (Hookshot + Heart Piece), Magic Bean plot, and Shadow Temple ledge.",
+    "switch2Highlights": [
+      "Grab free Hylian Shield early in the 1st-row flower grave as Child Link to save 80 Rupees."
+    ]
+  },
+  {
+    "id": "death-mountain-trail",
+    "name": "Death Mountain Trail",
+    "kind": "overworld",
+    "biome": "mountain",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 675, "y": 165 },
+    "connectedRegions": ["kakariko-village", "goron-city", "death-mountain-crater", "dodongos-cavern"],
+    "expectedTallies": {
+      "heartPieces": 1,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 4
+    },
+    "summary": "Rocky ascent from Kakariko Gate to the volcano summit. Connects to Dodongo's Cavern, Goron City, Summit Great Fairy Fountain #1, Kaepora Gaebora roof flight, Biggoron (Adult), and a Cow Grotto.",
+    "switch2Highlights": [
+      "Summit Great Fairy Fountain #1 now costs 25 Rupees and grants Magic Meter + Din's Fire immediately (huge early boost!)."
+    ]
+  },
+  {
+    "id": "goron-city",
+    "name": "Goron City",
+    "kind": "overworld",
+    "biome": "mountain",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 730, "y": 145 },
+    "connectedRegions": ["death-mountain-trail", "lost-woods", "death-mountain-crater"],
+    "expectedTallies": {
+      "heartPieces": 1,
+      "skulltulasChild": 1,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 2
+    },
+    "summary": "Four-tiered subterranean Goron stronghold. Grants Goron's Bracelet, Spinning Urn Heart Piece & Bomb Bag upgrade (Child), and Goron Tunic + Crater shortcut (Adult).",
+    "switch2Highlights": [
+      "Bomb the cracked wall to Lost Woods for a fast two-way Child/Adult shortcut."
+    ]
+  },
+  {
+    "id": "death-mountain-crater",
+    "name": "Death Mountain Crater",
+    "kind": "overworld",
+    "biome": "mountain",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 725, "y": 85 },
+    "connectedRegions": ["death-mountain-trail", "goron-city", "fire-temple"],
+    "expectedTallies": {
+      "heartPieces": 3,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 2
+    },
+    "summary": "Superheated volcanic caldera housing the Bolero of Fire warp pad, Fire Temple entrance, Great Fairy Fountain #4 (Double Magic), and three Pieces of Heart.",
+    "switch2Highlights": [
+      "NEW HEART PIECE (#3 in Crater): Drop down to the left ledge from the summit entrance as Child Link, hit the Business Scrub with Slingshot, and buy a Piece of Heart for 100 Rupees (replaces the removed Ice Cavern piece!).",
+      "Great Fairy Fountain #4 (behind Megaton Hammer rocks) now costs 200 Rupees for Double Magic."
+    ]
+  },
+  {
+    "id": "zoras-river",
+    "name": "Zora's River",
+    "kind": "overworld",
+    "biome": "water",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 735, "y": 375 },
+    "connectedRegions": ["hyrule-field", "lost-woods", "zoras-domain"],
+    "expectedTallies": {
+      "heartPieces": 4,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 4
+    },
+    "summary": "Canyon river linking Hyrule Field to Zora's Domain. Home to the Magic Bean Seller (550 Rupees for all 10 beans), Cucco platforming pillars, and the 5 Musical Frogs.",
+    "switch2Highlights": [
+      "Manual jump (X) makes navigating river ledges smoother, though Cucco glides or Hover Boots are still needed for high pillars."
+    ]
+  },
+  {
+    "id": "zoras-domain",
+    "name": "Zora's Domain",
+    "kind": "overworld",
+    "biome": "water",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 855, "y": 340 },
+    "connectedRegions": ["zoras-river", "zoras-fountain", "lake-hylia", "lost-woods"],
+    "expectedTallies": {
+      "heartPieces": 1,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 1
+    },
+    "summary": "Waterfall sanctuary of the Zora royal family. Features the Silver Scale Diving Game, Ruto's Letter delivery, Torch-lighting chest, and King Zora's Eyeball Frog step.",
+    "switch2Highlights": [
+      "LANDMARK SWITCH 2 CHANGE: Beating the Water Temple actually UNFREEZES Zora's Domain! Restores Zora NPCs and reopens the Lake Hylia <-> Zora's Domain <-> Lost Woods underwater shortcut for Adult Link (huge for Biggoron's Sword!)."
+    ]
+  },
+  {
+    "id": "zoras-fountain",
+    "name": "Zora's Fountain",
+    "kind": "overworld",
+    "biome": "water",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 920, "y": 290 },
+    "connectedRegions": ["zoras-domain", "jabu-jabus-belly", "ice-cavern"],
+    "expectedTallies": {
+      "heartPieces": 2,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 3
+    },
+    "summary": "Sacred source behind King Zora's throne. Hosts Lord Jabu-Jabu in the Child era, floating icebergs & Ice Cavern in the Adult era, Great Fairy Fountain #3, and a hidden Silver Gauntlets Skulltula tunnel.",
+    "switch2Highlights": [
+      "Great Fairy Fountain #3 (SE bombable boulder) costs 100 Rupees for Farore's Wind."
+    ]
+  },
+  {
+    "id": "lake-hylia",
+    "name": "Lake Hylia",
+    "kind": "overworld",
+    "biome": "water",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 420, "y": 600 },
+    "connectedRegions": ["hyrule-field", "zoras-domain", "water-temple", "gerudo-valley"],
+    "expectedTallies": {
+      "heartPieces": 3,
+      "skulltulasChild": 3,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 5
+    },
+    "summary": "Expansive southern lake featuring the Lakeside Laboratory, Fishing Pond, Ruto's Letter bottle dive, Scarecrow's Song scarecrows (Bonooru & Pierre), Water Temple, and Fire Arrows sun shrine.",
+    "switch2Highlights": [
+      "Refined fishing physics & ambient lake wildlife.",
+      "Contains a glowing bed connecting to the Hall of Fallen Foes."
+    ]
+  },
+  {
+    "id": "gerudo-valley",
+    "name": "Gerudo Valley",
+    "kind": "overworld",
+    "biome": "desert",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 285, "y": 385 },
+    "connectedRegions": ["hyrule-field", "gerudo-fortress", "lake-hylia"],
+    "expectedTallies": {
+      "heartPieces": 2,
+      "skulltulasChild": 2,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 4
+    },
+    "summary": "Deep western river canyon spanned by a wooden bridge (broken in Adult era until Epona/Longshot). Features the Carpenters' Tent, Waterfall secret alcove, Gorge Ledge Heart Piece chest, and Magic Bean cow ledge.",
+    "switch2Highlights": [
+      "SWITCH 2 TWEAK: The Heart Piece across the gorge is now in a Treasure Chest instead of a wooden crate, so Adult Link can Hookshot straight onto it (or Child Link can Cucco-glide)!"
+    ]
+  },
+  {
+    "id": "gerudo-fortress",
+    "name": "Gerudo's Fortress",
+    "kind": "overworld",
+    "biome": "desert",
+    "parentRegionId": null,
+    "eras": ["adult"],
+    "mapCoords": { "x": 235, "y": 260 },
+    "connectedRegions": ["gerudo-valley", "haunted-wasteland", "gerudo-training-ground"],
+    "expectedTallies": {
+      "heartPieces": 2,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 2
+    },
+    "summary": "Cliffside stronghold of the Gerudo thieves. Rescue 4 Carpenters to earn the Gerudo Membership Card, unlock the Horseback Archery Range (Heart Piece + Biggest Quiver), and enter the Gerudo Training Ground.",
+    "switch2Highlights": [
+      "Gyro aiming makes hitting 1,000 pts (Heart Piece) and 1,500 pts (Biggest Quiver) in Horseback Archery dramatically smoother."
+    ]
+  },
+  {
+    "id": "haunted-wasteland",
+    "name": "Haunted Wasteland (Mirage Desert)",
+    "kind": "overworld",
+    "biome": "desert",
+    "parentRegionId": null,
+    "eras": ["adult"],
+    "mapCoords": { "x": 175, "y": 320 },
+    "connectedRegions": ["gerudo-fortress", "desert-colossus"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 1,
+      "skulltulasTotal": 1
+    },
+    "summary": "Sandstorm-swept desert between Gerudo's Fortress and Desert Colossus. Requires Longshot/Hover Boots over the River of Sand + Lens of Truth to follow the Poe Guide, plus houses the Bombchu Carpet Merchant and 1 Gold Skulltula.",
+    "switch2Highlights": [
+      "Indexed as 'Mirage Desert' / 'Haunted Wasteland' on map counters with 1 Adult Gold Skulltula inside the stone shelter."
+    ]
+  },
+  {
+    "id": "desert-colossus",
+    "name": "Desert Colossus",
+    "kind": "overworld",
+    "biome": "desert",
+    "parentRegionId": null,
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 95, "y": 290 },
+    "connectedRegions": ["haunted-wasteland", "spirit-temple"],
+    "expectedTallies": {
+      "heartPieces": 1,
+      "skulltulasChild": 1,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 3
+    },
+    "summary": "Ancient monument housing the Spirit Temple, Requiem of Spirit warp pad (giving Child Link access!), Magic Bean stone arch Heart Piece, Song of Storms oasis pond, and Great Fairy Fountain #5.",
+    "switch2Highlights": [
+      "Great Fairy Fountain #5 (cracked rock wall between two palm trees) costs 300 Rupees for Nayru's Love (requires Adult's Wallet!)."
+    ]
+  },
+  {
+    "id": "deku-tree",
+    "name": "Inside the Great Deku Tree",
+    "kind": "dungeon",
+    "biome": "forest",
+    "parentRegionId": "kokiri-forest",
+    "eras": ["child"],
+    "mapCoords": { "x": 815, "y": 555 },
+    "connectedRegions": ["kokiri-forest"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 4,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 4
+    },
+    "summary": "1st Child Dungeon. Grants Fairy Slingshot, Kokiri's Emerald, and 1 Boss Heart Container (Queen Gohma). Contains 4 Gold Skulltulas (3 obtainable first visit; 4th requires Bombs + Boomerang backtrack).",
+    "switch2Highlights": [
+      "Queen Gohma features overhauled animations and multi-phase attack patterns."
+    ]
+  },
+  {
+    "id": "dodongos-cavern",
+    "name": "Dodongo's Cavern",
+    "kind": "dungeon",
+    "biome": "mountain",
+    "parentRegionId": "death-mountain-trail",
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 645, "y": 185 },
+    "connectedRegions": ["death-mountain-trail"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 3,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 5
+    },
+    "summary": "2nd Child Dungeon. Grants Bomb Bag, Goron's Ruby, and 1 Boss Heart Container (King Dodongo). Contains 5 Gold Skulltulas (some easier via Boomerang, Scarecrow's Song + Hookshot, or Adult backtrack).",
+    "switch2Highlights": [
+      "Includes subtle room geometry updates and new bombable secret alcoves."
+    ]
+  },
+  {
+    "id": "jabu-jabus-belly",
+    "name": "Inside Jabu-Jabu's Belly",
+    "kind": "dungeon",
+    "biome": "water",
+    "parentRegionId": "zoras-fountain",
+    "eras": ["child"],
+    "mapCoords": { "x": 905, "y": 315 },
+    "connectedRegions": ["zoras-fountain"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 4,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 4
+    },
+    "summary": "3rd Child Dungeon (Child-only — inaccessible as Adult!). Grants Boomerang, Zora's Sapphire, and 1 Boss Heart Container (Barinade). All 4 Gold Skulltulas can be collected during your initial run.",
+    "switch2Highlights": [
+      "Child-only dungeon; return via Pedestal of Time if you missed any of the 4 Skulltulas."
+    ]
+  },
+  {
+    "id": "forest-temple",
+    "name": "Forest Temple",
+    "kind": "dungeon",
+    "biome": "forest",
+    "parentRegionId": "sacred-forest-meadow",
+    "eras": ["adult"],
+    "mapCoords": { "x": 870, "y": 410 },
+    "connectedRegions": ["sacred-forest-meadow"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 5,
+      "skulltulasTotal": 5
+    },
+    "summary": "1st Adult Dungeon (requires Hookshot). Grants Fairy Bow, Forest Medallion, Boss Heart Container (Phantom Ganon), and unlocks Prelude of Light / Time Travel + Hall of Fallen Foes.",
+    "switch2Highlights": [
+      "Completing Forest Temple unlocks both Pedestal of Time era-swapping AND the Hall of Fallen Foes dream world!"
+    ]
+  },
+  {
+    "id": "fire-temple",
+    "name": "Fire Temple",
+    "kind": "dungeon",
+    "biome": "mountain",
+    "parentRegionId": "death-mountain-crater",
+    "eras": ["adult"],
+    "mapCoords": { "x": 760, "y": 75 },
+    "connectedRegions": ["death-mountain-crater"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 5,
+      "skulltulasTotal": 5
+    },
+    "summary": "2nd Adult Dungeon (Goron Tunic required). Grants Megaton Hammer, Fire Medallion, and Boss Heart Container (Volvagia). Contains 5 Gold Skulltulas (2 require Scarecrow's Song + Hookshot).",
+    "switch2Highlights": [
+      "Bring Scarecrow's Song already registered so you can grab all 5 Gold Skulltulas in a single pass!"
+    ]
+  },
+  {
+    "id": "ice-cavern",
+    "name": "Ice Cavern",
+    "kind": "mini-dungeon",
+    "biome": "water",
+    "parentRegionId": "zoras-fountain",
+    "eras": ["adult"],
+    "mapCoords": { "x": 940, "y": 250 },
+    "connectedRegions": ["zoras-fountain"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 3,
+      "skulltulasTotal": 3
+    },
+    "summary": "Adult Mini-Dungeon in Zora's Fountain. Source of free Blue Fire, Iron Boots, Serenade of Water, and 3 Gold Skulltulas (Hookshot required).",
+    "switch2Highlights": [
+      "IMPORTANT SWITCH 2 CHANGE: The classic Red Ice Piece of Heart inside Ice Cavern was REMOVED (relocated to the Death Mountain Crater Business Scrub)! Zero Heart Pieces are inside dungeons now."
+    ]
+  },
+  {
+    "id": "water-temple",
+    "name": "Water Temple",
+    "kind": "dungeon",
+    "biome": "water",
+    "parentRegionId": "lake-hylia",
+    "eras": ["adult"],
+    "mapCoords": { "x": 435, "y": 635 },
+    "connectedRegions": ["lake-hylia"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 5,
+      "skulltulasTotal": 5
+    },
+    "summary": "3rd Adult Dungeon (Iron Boots + Hookshot; Zora Tunic strongly advised). Grants Longshot, Water Medallion, Boss Heart Container (Morpha), refills Lake Hylia (enabling Fire Arrows), and thaws Zora's Domain!",
+    "switch2Highlights": [
+      "Quick-equip Iron Boots, visual water-level color cues, Dark Link rematch unlocked in Hall of Fallen Foes, AND clearing Water Temple thaws Zora's Domain!"
+    ]
+  },
+  {
+    "id": "bottom-of-the-well",
+    "name": "Bottom of the Well",
+    "kind": "mini-dungeon",
+    "biome": "shadow",
+    "parentRegionId": "kakariko-village",
+    "eras": ["child"],
+    "mapCoords": { "x": 665, "y": 270 },
+    "connectedRegions": ["kakariko-village"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 3,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 3
+    },
+    "summary": "Child Mini-Dungeon unlocked by playing Song of Storms inside the Kakariko Windmill. Grants the Lens of Truth and houses 3 Gold Skulltulas (Boomerang required).",
+    "switch2Highlights": [
+      "Grab Lens of Truth as soon as you unlock Time Travel — needed for Market Treasure Chest Shop, Haunted Wasteland, Shadow Temple, and Spirit/Bongo Bongo."
+    ]
+  },
+  {
+    "id": "shadow-temple",
+    "name": "Shadow Temple",
+    "kind": "dungeon",
+    "biome": "shadow",
+    "parentRegionId": "graveyard",
+    "eras": ["adult"],
+    "mapCoords": { "x": 765, "y": 265 },
+    "connectedRegions": ["graveyard"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 5,
+      "skulltulasTotal": 5
+    },
+    "summary": "4th Adult Dungeon (requires Nocturne of Shadow + Din's Fire + Lens of Truth + Hookshot/Longshot). Grants Hover Boots, Shadow Medallion, and Boss Heart Container (Bongo Bongo). Contains 5 Gold Skulltulas.",
+    "switch2Highlights": [
+      "1 Gold Skulltula atop the phantom ship bird statue uses Scarecrow's Song + Longshot."
+    ]
+  },
+  {
+    "id": "spirit-temple",
+    "name": "Spirit Temple",
+    "kind": "dungeon",
+    "biome": "desert",
+    "parentRegionId": "desert-colossus",
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 65, "y": 265 },
+    "connectedRegions": ["desert-colossus"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 3,
+      "skulltulasAdult": 2,
+      "skulltulasTotal": 5
+    },
+    "summary": "5th Adult (Dual-Era!) Dungeon. Child wing grants Silver Gauntlets (and 3 Skulltulas); Adult wing grants Mirror Shield, Spirit Medallion, Boss Heart Container (Twinrova), and 2 Skulltulas.",
+    "switch2Highlights": [
+      "Requires Requiem of Spirit to warp Child Link across the desert."
+    ]
+  },
+  {
+    "id": "gerudo-training-ground",
+    "name": "Gerudo Training Ground",
+    "kind": "mini-dungeon",
+    "biome": "desert",
+    "parentRegionId": "gerudo-fortress",
+    "eras": ["adult"],
+    "mapCoords": { "x": 255, "y": 225 },
+    "connectedRegions": ["gerudo-fortress"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 0
+    },
+    "summary": "Optional Adult combat & puzzle gauntlet (10 Rupees entry after earning Gerudo Membership Card). Collect 7–9 Small Keys (Silver Gauntlets, Megaton Hammer, Hover/Iron Boots, Lens of Truth, Song of Time, Bow) to claim the Ice Arrows.",
+    "switch2Highlights": [
+      "Updated jump & hookshot physics streamline maze traversal; Iron Knuckles logged here populate the Hall of Fallen Foes."
+    ]
+  },
+  {
+    "id": "ganons-castle",
+    "name": "Inside Ganon's Castle",
+    "kind": "dungeon",
+    "biome": "castle",
+    "parentRegionId": "outside-ganons-castle",
+    "eras": ["adult"],
+    "mapCoords": { "x": 535, "y": 105 },
+    "connectedRegions": ["outside-ganons-castle"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 0
+    },
+    "summary": "Final Dungeon unlocked with all 6 Medallions + Light Arrows. Houses 6 Elemental Barrier Trials and the Golden Gauntlets (inside the Shadow Trial — step back outside afterward for Double Defense!).",
+    "switch2Highlights": [
+      "Grab Golden Gauntlets in the Shadow Trial, then immediately step back outside Ganon's Castle with 500 Rupees to unlock Double Defense before climbing Ganon's Tower!"
+    ]
+  },
+  {
+    "id": "hall-of-fallen-foes",
+    "name": "Hall of Fallen Foes (NEW Switch 2 Hub)",
+    "kind": "special",
+    "biome": "dream",
+    "parentRegionId": "kokiri-forest",
+    "eras": ["child", "adult"],
+    "mapCoords": { "x": 715, "y": 565 },
+    "connectedRegions": ["kokiri-forest", "kakariko-village", "lake-hylia"],
+    "expectedTallies": {
+      "heartPieces": 0,
+      "skulltulasChild": 0,
+      "skulltulasAdult": 0,
+      "skulltulasTotal": 0
+    },
+    "summary": "Brand-new dream-realm museum & boss-rush arena hosted by Kaepora Gaebora. Unlocked after beating the Forest Temple, returning to Child Link, viewing the Kakariko scene, and sleeping in any green-glowing bed.",
+    "switch2Highlights": [
+      "Houses 84 Enemy & Boss Statues automatically logged as you defeat foes across Hyrule.",
+      "Replay any defeated Boss or Mini-Boss (including Dark Link & Iron Knuckles) on a timer.",
+      "Tackle Boss Rush Gauntlets for Bronze / Silver / Gold / Master medals synced with Zelda Notes global leaderboards."
+    ]
+  }
+]

@@ -1,0 +1,414 @@
+{
+  "bottles": [
+    {
+      "id": "bottle-01",
+      "title": "Market Potion Shop — Escaped Golden Bug (NEW 5th Bottle!)",
+      "regionId": "market",
+      "era": "child",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child"],
+      "switch2Status": "new-switch2",
+      "howToGet": "NEW IN SWITCH 2 REMAKE: Enter the Potion Shop on the east side of Hyrule Castle Town Market as Child Link. The shopkeeper is panicking over an escaped Golden Bug skittering across the floor. Speak to him to borrow a bottle, scoop up the bug, and return it—he lets you keep the Empty Bottle permanently AND gives you a free Red Potion!"
+    },
+    {
+      "id": "bottle-02",
+      "title": "Lon Lon Ranch — Talon's Super Cucco Game",
+      "regionId": "lon-lon-ranch",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "weird-egg", "rupees-100"],
+      "switch2Status": "classic",
+      "howToGet": "After waking Talon outside Hyrule Castle with the hatched Pocket Cucco, visit Talon inside the main farmhouse at Lon Lon Ranch and pay 10 Rupees to play his Super Cucco game. Pick up all 3 marked Super Cuccos among the flock within 30 seconds to earn a Bottle of Lon Lon Milk."
+    },
+    {
+      "id": "bottle-03",
+      "title": "Kakariko Village — Anju's 7 Lost Cuccos",
+      "regionId": "kakariko-village",
+      "era": "child",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child"],
+      "switch2Status": "classic",
+      "howToGet": "Speak to the Cucco Lady (Anju) beside the pen near the Graveyard exit during the day as Child Link, then gather and toss all 7 Cuccos into her pen: (1) by village entrance, (2) near Skulltula gate, (3) inside wooden crate halfway up stairs, (4) outside Potion Shop, (5) by Cucco pen, (6) use #5 to glide over the Windmill fence, and (7) climb ladder behind Windmill fence."
+    },
+    {
+      "id": "bottle-04",
+      "title": "Lake Hylia — Princess Ruto's Letter",
+      "regionId": "lake-hylia",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "silver-scale"],
+      "switch2Status": "classic",
+      "howToGet": "After winning the Silver Scale in Zora's Domain, swim into Lake Hylia (immediately outside the Zora's Domain underwater warp tunnel), dive down to grab the sunken Bottle containing Ruto's Letter, and show it to King Zora so he steps aside and hands back the emptied Bottle."
+    },
+    {
+      "id": "bottle-05",
+      "title": "Castle Town Poe Collector — 5 Big Poes (500 Points)",
+      "regionId": "market",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "epona", "bow", "bottle"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "SWITCH 2 UPDATE: Threshold cut in half from 1,000 to 500 points! Ride Epona across Hyrule Field as Adult Link (day or night), shoot at least 5 of the 10 specific Big Poes with the Fairy Bow (2 arrows each), scoop their spirits into Bottles, and sell them to the Poe Collector in the ruined Castle Town Guardhouse (100 pts + 50 Rupees each). Hitting 500 pts awards the Empty Bottle; hitting all 1,000 pts (10 Big Poes) awards a repeatable/bonus Gold Rupee (200 Rupees)."
+    }
+  ],
+  "bigPoeLocations": [
+    { "id": "bp-01", "regionId": "hyrule-field", "spot": "Lone tree directly west of Castle Town drawbridge", "cue": "Gallop past the tree toward the signpost on Epona." },
+    { "id": "bp-02", "regionId": "hyrule-field", "spot": "Signpost at the northern Lon Lon Ranch T-junction", "cue": "Ride straight toward the wooden signpost." },
+    { "id": "bp-03", "regionId": "hyrule-field", "spot": "Stone wall corner just west of Kakariko Village stairs", "cue": "Gallop along the stone ledge bordering the river." },
+    { "id": "bp-04", "regionId": "hyrule-field", "spot": "Gray boulder on the grassy hill east of Lon Lon Ranch", "cue": "Ride close to the isolated gray boulder." },
+    { "id": "bp-05", "regionId": "hyrule-field", "spot": "Bush cluster along the eastern Kokiri/Lost Woods wall", "cue": "Ride through the bushes south of Zora's River entrance." },
+    { "id": "bp-06", "regionId": "hyrule-field", "spot": "SE Peahat wetland grove / clump of trees", "cue": "Gallop past the trees near the southern wall." },
+    { "id": "bp-07", "regionId": "hyrule-field", "spot": "Southern grass plain north of Lake Hylia fences", "cue": "Ride near the small gray boulder in the south-central plain." },
+    { "id": "bp-08", "regionId": "hyrule-field", "spot": "V-junction of the two rivers in western Hyrule Field", "cue": "Gallop across the riverbank fork on Epona." },
+    { "id": "bp-09", "regionId": "hyrule-field", "spot": "Red canyon wall overhang before Gerudo Valley", "cue": "Ride along the southern cliff shadow near the sand transition." },
+    { "id": "bp-10", "regionId": "hyrule-field", "spot": "Lone tree in the far NW Gerudo Valley approach", "cue": "Gallop toward the tree north of the Gerudo Valley path." }
+  ],
+  "greatFairies": [
+    {
+      "id": "gf-01",
+      "title": "Death Mountain Summit Great Fairy",
+      "reward": "Magic Meter & Din's Fire",
+      "regionId": "death-mountain-trail",
+      "era": "both",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["bombs", "song-lullaby", "rupees-100"],
+      "rupeeCost": 25,
+      "switch2Status": "updated-switch2",
+      "howToGet": "SWITCH 2 CHANGE: Bomb the boulder blocking the doorway at the summit of Death Mountain Trail, step onto the Triforce pad, play Zelda's Lullaby, and offer 25 Rupees. Grants BOTH your Magic Meter AND Din's Fire right away (swapped with Hyrule Castle's Spin Attack from N64!)."
+    },
+    {
+      "id": "gf-02",
+      "title": "Hyrule Castle Grounds Great Fairy",
+      "reward": "Charged Spin Attack",
+      "regionId": "hyrule-castle",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bombs", "magic-meter", "song-lullaby", "rupees-100"],
+      "rupeeCost": 50,
+      "switch2Status": "updated-switch2",
+      "howToGet": "SWITCH 2 CHANGE: Past the Hyrule Castle gate as Child Link, follow the right-hand sign past the sleeping/woken Talon spot and bomb the boulder blocking the cul-de-sac crawlspace. Play Zelda's Lullaby and offer 50 Rupees to unlock the magic-enhanced Charged Spin Attack."
+    },
+    {
+      "id": "gf-03",
+      "title": "Zora's Fountain Great Fairy",
+      "reward": "Farore's Wind",
+      "regionId": "zoras-fountain",
+      "era": "both",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["bombs", "magic-meter", "song-lullaby", "rupees-100"],
+      "rupeeCost": 100,
+      "switch2Status": "updated-switch2",
+      "howToGet": "Swim to the small SE island in Zora's Fountain, bomb the gray boulder against the cliff wall, play Zelda's Lullaby inside, and offer 100 Rupees to receive Farore's Wind (dungeon warp-point spell)."
+    },
+    {
+      "id": "gf-04",
+      "title": "Death Mountain Crater Great Fairy",
+      "reward": "Double Magic Meter",
+      "regionId": "death-mountain-crater",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "goron-tunic", "megaton-hammer", "song-lullaby", "rupees-100"],
+      "rupeeCost": 200,
+      "switch2Status": "updated-switch2",
+      "howToGet": "Cross the wooden bridge to the west side of Death Mountain Crater as Adult Link, smash the two red boulders with the Megaton Hammer, play Zelda's Lullaby inside, and offer 200 Rupees to double your Magic Meter."
+    },
+    {
+      "id": "gf-05",
+      "title": "Desert Colossus Great Fairy",
+      "reward": "Nayru's Love",
+      "regionId": "desert-colossus",
+      "era": "both",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["bombs", "magic-meter", "song-lullaby", "adults-wallet"],
+      "rupeeCost": 300,
+      "switch2Status": "updated-switch2",
+      "howToGet": "In the NE corner of Desert Colossus, bomb the cracked rock wall nestled between two palm trees, play Zelda's Lullaby inside, and offer 300 Rupees (requires at least the 500-Rupee Adult's Wallet!) to receive Nayru's Love."
+    },
+    {
+      "id": "gf-06",
+      "title": "Outside Ganon's Castle Great Fairy",
+      "reward": "Double Defense (White Heart Outlines)",
+      "regionId": "outside-ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "golden-gauntlets", "song-lullaby", "adults-wallet"],
+      "rupeeCost": 500,
+      "switch2Status": "updated-switch2",
+      "howToGet": "After obtaining the Golden Gauntlets inside Ganon's Castle (Shadow Trial), step back outside to the ruined courtyard, cross the invisible/collapsed bridge side to lift the giant black obelisk, play Zelda's Lullaby, and offer 500 Rupees (requires Adult's or Giant's Wallet!) for Double Defense."
+    }
+  ],
+  "skulltulaRewards": [
+    {
+      "id": "skr-10",
+      "tokens": 10,
+      "reward": "Adult's Wallet (500 Rupees)",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["tokens-10"],
+      "switch2Status": "updated-switch2",
+      "notes": "Boosted from 200 Rupees in N64 to 500 Rupees in Switch 2 (baseline Kokiri Wallet starts at 200). Mandatory for late-game Great Fairies!"
+    },
+    {
+      "id": "skr-20",
+      "tokens": 20,
+      "reward": "Echo Gem (NEW Skulltula Tracker!)",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["tokens-20"],
+      "switch2Status": "new-switch2",
+      "notes": "Replaces the Stone/Shard of Agony! Equipable relic that glows and pulses via HD Rumble 2 & audio cues whenever an uncollected Gold Skulltula is nearby."
+    },
+    {
+      "id": "skr-30",
+      "tokens": 30,
+      "reward": "Giant's Wallet (1,000 Rupees)",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["tokens-30"],
+      "switch2Status": "updated-switch2",
+      "notes": "Boosted from 500 Rupees in N64 to 1,000 Rupees in Switch 2."
+    },
+    {
+      "id": "skr-40",
+      "tokens": 40,
+      "reward": "20 Bombchus",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["tokens-40"],
+      "switch2Status": "updated-switch2",
+      "notes": "Doubled from 10 Bombchus in N64 to 20 Bombchus."
+    },
+    {
+      "id": "skr-50",
+      "tokens": 50,
+      "reward": "Piece of Heart (hp-10)",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["tokens-50"],
+      "switch2Status": "classic",
+      "notes": "Also cross-listed as Piece of Heart #10."
+    },
+    {
+      "id": "skr-100",
+      "tokens": 100,
+      "reward": "Unlimited Gold Rupees (200 Rupees per visit)",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["tokens-100"],
+      "switch2Status": "classic",
+      "notes": "Breaks the curse on the wealthy father in the center of the House of Skulltula; exit and re-enter anytime for free 200 Rupees."
+    }
+  ],
+  "capacityUpgrades": [
+    {
+      "id": "cap-seeds-40",
+      "item": "Bigger Deku Seed Bullet Bag (40)",
+      "regionId": "lost-woods",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "slingshot"],
+      "switch2Status": "classic",
+      "howToGet": "Turn Right from the Lost Woods entrance and shoot the center bullseye of the hanging target 3 times in a row (scoring 100, 100, 100) with the Fairy Slingshot."
+    },
+    {
+      "id": "cap-seeds-50",
+      "item": "Biggest Deku Seed Bullet Bag (50)",
+      "regionId": "market",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "slingshot", "rupees-100"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Win a perfect 10/10 round at the Hyrule Castle Town Market Shooting Gallery during the day as Child Link (20 Rupees; gyro aiming supported in Switch 2)."
+    },
+    {
+      "id": "cap-sticks-20",
+      "item": "Deku Stick Upgrade #1 (20)",
+      "regionId": "lost-woods",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "deku-shield", "rupees-100"],
+      "switch2Status": "classic",
+      "howToGet": "From Lost Woods entrance go Left, Left, drop to the lower grassy floor under the Hyrule Field bridge, deflect the Business Scrub's nut, and buy the upgrade for 40 Rupees."
+    },
+    {
+      "id": "cap-sticks-30",
+      "item": "Deku Stick Upgrade #2 (30)",
+      "regionId": "lost-woods",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "skull-mask"],
+      "switch2Status": "classic",
+      "howToGet": "Borrow the Skull Mask from the Happy Mask Shop, drop into the hidden grotto hidden among the tall grass/butterflies in the Forest Stage clearing (Right, Left, Right, Left, Straight, Left), and stand before the Scrub elders wearing the Skull Mask."
+    },
+    {
+      "id": "cap-nuts-30",
+      "item": "Deku Nut Upgrade #1 (30)",
+      "regionId": "lost-woods",
+      "era": "both",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["bombs", "rupees-100"],
+      "switch2Status": "classic",
+      "howToGet": "Just outside Sacred Forest Meadow in Lost Woods (Right, Left, Right, Left, Straight, Right), bomb the boulder to enter a hidden grotto, defeat/deflect the right-hand Business Scrub, and buy the upgrade for 40 Rupees."
+    },
+    {
+      "id": "cap-nuts-40",
+      "item": "Deku Nut Upgrade #2 (40)",
+      "regionId": "lost-woods",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "mask-of-truth"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Wear the Mask of Truth inside the Lost Woods Forest Stage grotto as Child Link. (SWITCH 2 BUG FIX: Obtaining the Poacher's Saw as Adult Link no longer permanently glitches this upgrade out of existence!)"
+    },
+    {
+      "id": "cap-bombs-30",
+      "item": "Bigger Bomb Bag (30)",
+      "regionId": "goron-city",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bombs"],
+      "switch2Status": "classic",
+      "howToGet": "Stop the giant rolling Goron (Hot Rodder Goron) on 3F of Goron City as Child Link by detonating a Bomb inside the tunnel right as he rolls through (or win at Market Bombchu Bowling; doing both yields 30 then 40!)."
+    },
+    {
+      "id": "cap-bombs-40",
+      "item": "Biggest Bomb Bag (40)",
+      "regionId": "market",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bombs", "rupees-100"],
+      "switch2Status": "classic",
+      "howToGet": "Win the Bomb Bag grand prize at the Market Bombchu Bowling Alley as Child Link after already claiming the Goron City Bomb Bag upgrade (or vice versa)."
+    },
+    {
+      "id": "cap-quiver-40",
+      "item": "Bigger Quiver (40)",
+      "regionId": "kakariko-village",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bow", "rupees-100"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Score a perfect 10/10 Rupees round at the newly completed Kakariko Village Shooting Gallery as Adult Link (20 Rupees; gyro aiming supported)."
+    },
+    {
+      "id": "cap-quiver-50",
+      "item": "Biggest Quiver (50)",
+      "regionId": "gerudo-fortress",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "gerudo-card", "epona", "bow", "rupees-100"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Score 1,500+ points in the Horseback Archery Range at Gerudo's Fortress while riding Epona."
+    }
+  ],
+  "gearAndEquipment": [
+    {
+      "id": "eq-kokiri-sword",
+      "name": "Kokiri Sword",
+      "regionId": "kokiri-forest",
+      "era": "child",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child"],
+      "howToGet": "Crawl through the small hole behind the fenced training hillside in SW Kokiri Forest and open the chest at the end of the boulder corridor."
+    },
+    {
+      "id": "eq-hylian-shield",
+      "name": "Hylian Shield (Free Graveyard Secret)",
+      "regionId": "graveyard",
+      "era": "both",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child"],
+      "howToGet": "Instead of paying 80 Rupees at the Market Bazaar, pull back the front-row grave with flowers in Kakariko Graveyard at night to drop into a pit holding a free Hylian Shield!"
+    },
+    {
+      "id": "eq-silver-scale",
+      "name": "Silver Scale",
+      "regionId": "zoras-domain",
+      "era": "child",
+      "gateTier": "tier-1-utility",
+      "requiredIds": ["era-child", "rupees-100"],
+      "howToGet": "Climb to the top waterfall ledge in Zora's Domain as Child Link, pay 20 Rupees to play the Diving Game, and collect all 5 sunken Rupees within 50 seconds."
+    },
+    {
+      "id": "eq-golden-scale",
+      "name": "Golden Scale",
+      "regionId": "lake-hylia",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "rupees-100"],
+      "howToGet": "Visit the Lake Hylia Fishing Pond as Adult Link and catch a 15+ pound fish (optional Sinking Lure hidden by the stream/lilypads/logs speeds this up!)."
+    },
+    {
+      "id": "eq-goron-tunic",
+      "name": "Goron Tunic",
+      "regionId": "goron-city",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bombs"],
+      "howToGet": "Bomb or shoot young Goron Link rolling around 2F of Goron City as Adult Link and talk to him to get the heat-proof Goron Tunic for free."
+    },
+    {
+      "id": "eq-zora-tunic",
+      "name": "Zora Tunic",
+      "regionId": "zoras-domain",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bottle", "blue-fire"],
+      "howToGet": "Scoop Blue Fire inside the Ice Cavern and pour it on frozen King Zora in Zora's Domain as Adult Link for a free Zora Tunic."
+    },
+    {
+      "id": "eq-epona",
+      "name": "Epona (Horse Unlock)",
+      "regionId": "lon-lon-ranch",
+      "era": "adult",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["era-adult", "song-epona", "rupees-100"],
+      "howToGet": "Enter Lon Lon Ranch as Adult Link with at least 60 Rupees, pay Ingo 10 Rupees to enter the corral, play Epona's Song to mount Epona, talk to Ingo while mounted to wager 50 Rupees, beat him in two consecutive laps around the track, and leap the locked ranch gate!"
+    },
+    {
+      "id": "eq-hookshot",
+      "name": "Hookshot",
+      "regionId": "graveyard",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult"],
+      "howToGet": "Pull back Dampé's flower-adorned grave on the left side of Kakariko Graveyard as Adult Link and keep pace with Dampé's ghost through the catacombs."
+    },
+    {
+      "id": "eq-lens-of-truth",
+      "name": "Lens of Truth",
+      "regionId": "bottom-of-the-well",
+      "era": "child",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["era-child", "song-storms", "song-lullaby"],
+      "howToGet": "Play Song of Storms inside Kakariko Windmill as Child Link to drain the well, climb down into Bottom of the Well, play Zelda's Lullaby on the northern Triforce tile to lower the water, crawl into the side pit, and defeat Dead Hand."
+    },
+    {
+      "id": "eq-fire-arrows",
+      "name": "Fire Arrows",
+      "regionId": "lake-hylia",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bow", "longshot"],
+      "howToGet": "After completing the Water Temple (refilling Lake Hylia), stand on the inscribed stone slab above the Water Temple island at dawn (play Sun's Song if night) and fire an arrow straight into the rising sun—swim to the twin-pillar island to pick up the Fire Arrows."
+    },
+    {
+      "id": "eq-ice-arrows",
+      "name": "Ice Arrows",
+      "regionId": "gerudo-training-ground",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "gerudo-card", "bow", "longshot", "megaton-hammer", "iron-boots", "hover-boots", "silver-gauntlets", "lens-of-truth", "song-time"],
+      "howToGet": "Pay 10 Rupees at the Gerudo Training Ground in Gerudo's Fortress. Earn 7–9 Small Keys across the trial rooms and unlock the chain of doors in the left/west key maze (skipping the false ceiling lock if using only 7 keys!) to open the central Ice Arrows chest."
+    },
+    {
+      "id": "eq-biggoron-sword",
+      "name": "Biggoron's Sword (Unbreakable 2x Damage)",
+      "regionId": "death-mountain-trail",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "epona", "blue-fire"],
+      "howToGet": "Complete the 12-step Adult Trading Sequence starting with the Pocket Egg in Kakariko Village and culminating at Biggoron on Death Mountain Summit (see songs-and-quests.json for all 12 timed steps & the Switch 2 thawed Zora's Domain shortcut!)."
+    }
+  ]
+}

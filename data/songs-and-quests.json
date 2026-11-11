@@ -1,0 +1,304 @@
+{
+  "ocarinaSongs": [
+    {
+      "id": "song-lullaby",
+      "name": "Zelda's Lullaby",
+      "type": "standard",
+      "regionId": "hyrule-castle",
+      "era": "child",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child", "ocarina"],
+      "switch2Buttons": ["Y", "X", "A", "Y", "X", "A"],
+      "effect": "Activates Royal Family Triforce symbols, summons Great Fairies, opens Darunia's door & Zora's Domain waterfall, repairs broken signs.",
+      "howToGet": "Sneak past the Hyrule Castle courtyard guards during the day as Child Link and speak to Princess Zelda and Impa."
+    },
+    {
+      "id": "song-epona",
+      "name": "Epona's Song",
+      "type": "standard",
+      "regionId": "lon-lon-ranch",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "ocarina", "weird-egg"],
+      "switch2Buttons": ["X", "Y", "A", "X", "Y", "A"],
+      "effect": "Summons Epona anywhere in overworld fields as Adult Link; makes any Cow fill an Empty Bottle with free Lon Lon Milk.",
+      "howToGet": "After waking Talon at Hyrule Castle, pull out your Ocarina directly in front of Malon in the center of Lon Lon Ranch corral during the day."
+    },
+    {
+      "id": "song-saria",
+      "name": "Saria's Song",
+      "type": "standard",
+      "regionId": "sacred-forest-meadow",
+      "era": "child",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["era-child", "ocarina", "zeldas-letter"],
+      "switch2Buttons": ["R", "A", "Y", "R", "A", "Y"],
+      "effect": "Lets you speak telepathically with Saria or Navi anytime; cheers up Darunia (Goron's Bracelet) and Lost Woods Skull Kid (Heart Piece + Skull Mask sale).",
+      "howToGet": "Navigate Lost Woods (Right, Left, Right, Left, Straight, Left, Right) through Sacred Forest Meadow to Saria after meeting Zelda."
+    },
+    {
+      "id": "song-sun",
+      "name": "Sun's Song",
+      "type": "standard",
+      "regionId": "graveyard",
+      "era": "both",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["ocarina", "song-lullaby"],
+      "switch2Buttons": ["A", "R", "X", "A", "R", "X"],
+      "effect": "Instantly toggles Day <-> Night; freezes ReDeads and Gibdos in place; spawns big fairies from certain Gossip Stones.",
+      "howToGet": "Play Zelda's Lullaby on the Triforce symbol at the far back of Kakariko Graveyard, drop into the Royal Family's Tomb, pass the Keese and ReDeads, and inspect the carved stone tablet."
+    },
+    {
+      "id": "song-time",
+      "name": "Song of Time",
+      "type": "standard",
+      "regionId": "market",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "slingshot", "bombs", "boomerang"],
+      "switch2Buttons": ["A", "L", "R", "A", "L", "R"],
+      "effect": "Opens the Door of Time in the Temple of Time; toggles blue Song of Time stone blocks across dungeons and grottos.",
+      "howToGet": "Return to the Hyrule Castle Town drawbridge moat with all 3 Spiritual Stones and dive for the Ocarina of Time thrown by Princess Zelda."
+    },
+    {
+      "id": "song-storms",
+      "name": "Song of Storms",
+      "type": "standard",
+      "regionId": "kakariko-village",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "ocarina"],
+      "switch2Buttons": ["L", "R", "X", "L", "R", "X"],
+      "effect": "Summons rainstorms, drains the Kakariko Well (when played inside the Windmill as Child), opens hidden storm grottos, grows Magic Bean sprouts for fairies, and refills the Desert Colossus oasis.",
+      "howToGet": "Enter the Kakariko Village Windmill as Adult Link and pull out the Ocarina in front of Guru-Guru."
+    },
+    {
+      "id": "song-minuet",
+      "name": "Minuet of Forest",
+      "type": "warp",
+      "regionId": "sacred-forest-meadow",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "hookshot"],
+      "switch2Buttons": ["L", "X", "Y", "A", "Y", "A"],
+      "effect": "Warps Child or Adult Link directly to the Sacred Forest Meadow pad outside the Forest Temple.",
+      "howToGet": "Reach the Forest Temple courtyard in Sacred Forest Meadow as Adult Link."
+    },
+    {
+      "id": "song-bolero",
+      "name": "Bolero of Fire",
+      "type": "warp",
+      "regionId": "death-mountain-crater",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "goron-tunic", "hookshot"],
+      "switch2Buttons": ["R", "L", "R", "L", "A", "R", "A", "R"],
+      "effect": "Warps Child or Adult Link directly to the central Death Mountain Crater pad (required for Child Link to plant the Crater Magic Bean & drop Bug!).",
+      "howToGet": "Enter Death Mountain Crater through Darunia's secret statue passage in Goron City as Adult Link and Hookshot across the broken bridge."
+    },
+    {
+      "id": "song-serenade",
+      "name": "Serenade of Water",
+      "type": "warp",
+      "regionId": "ice-cavern",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult"],
+      "switch2Buttons": ["L", "R", "A", "A", "Y"],
+      "effect": "Warps Child or Adult Link directly to the island pad above the Water Temple in Lake Hylia.",
+      "howToGet": "Open the Iron Boots chest at the end of the Ice Cavern."
+    },
+    {
+      "id": "song-requiem",
+      "name": "Requiem of Spirit",
+      "type": "warp",
+      "regionId": "desert-colossus",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "longshot", "lens-of-truth"],
+      "switch2Buttons": ["L", "R", "L", "A", "R", "L"],
+      "effect": "Warps Child or Adult Link to Desert Colossus (the ONLY way Child Link can reach Desert Colossus & Spirit Temple!).",
+      "howToGet": "Cross the Haunted Wasteland as Adult Link, enter the Spirit Temple, and walk back outside."
+    },
+    {
+      "id": "song-nocturne",
+      "name": "Nocturne of Shadow",
+      "type": "warp",
+      "regionId": "kakariko-village",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bow", "megaton-hammer", "longshot"],
+      "switch2Buttons": ["Y", "A", "A", "L", "Y", "A", "R"],
+      "effect": "Warps Child or Adult Link onto the high upper cliff of Kakariko Graveyard leading to the Shadow Temple.",
+      "howToGet": "Enter Kakariko Village as Adult Link after clearing the Forest, Fire, and Water Temples."
+    },
+    {
+      "id": "song-prelude",
+      "name": "Prelude of Light",
+      "type": "warp",
+      "regionId": "market",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bow"],
+      "switch2Buttons": ["X", "A", "X", "A", "Y", "X"],
+      "effect": "Warps Child or Adult Link directly into the Temple of Time; unlocks Pedestal of Time era-swapping.",
+      "howToGet": "Enter the Temple of Time after defeating Phantom Ganon in the Forest Temple."
+    },
+    {
+      "id": "song-scarecrow",
+      "name": "Scarecrow's Song",
+      "type": "custom",
+      "regionId": "lake-hylia",
+      "era": "cross-era",
+      "gateTier": "tier-4-cross-era",
+      "requiredIds": ["era-child", "ocarina", "era-adult"],
+      "switch2Buttons": ["Any 8 notes using >= 2 buttons (e.g. Y, X, Y, X, Y, X, Y, X)"],
+      "effect": "Summons Pierre the wandering scarecrow as a Hookshot/Longshot grapple target on hidden high ledges across Hyrule and dungeons.",
+      "howToGet": "Step 1 (Child Link): Pull out your Ocarina before Bonooru (the lower scarecrow by the Fishing Pond path at Lake Hylia) and play an easy-to-remember 8-note tune. Step 2 (Adult Link): Play that exact same 8-note tune back to Bonooru at Lake Hylia to activate Pierre permanently."
+    }
+  ],
+  "magicBeans": [
+    { "id": "bean-01", "buyCost": 10, "regionId": "zoras-river", "location": "Directly beside the Magic Bean Seller at Zora's River entrance", "adultPayoff": "Shortcut up Zora's River & alternate jump to Lower River Pillar Heart Piece (hp-22).", "hasSkulltulaBug": false },
+    { "id": "bean-02", "buyCost": 20, "regionId": "kokiri-forest", "location": "Directly behind the Kokiri Shop", "adultPayoff": "Rides along upper Kokiri canopy for continuous Blue Rupees.", "hasSkulltulaBug": true },
+    { "id": "bean-03", "buyCost": 30, "regionId": "lost-woods", "location": "Bridge area (Left, Left from Kokiri Forest entrance)", "adultPayoff": "Direct shortcut up onto the Kokiri <-> Hyrule Field bridge + Blue Rupees.", "hasSkulltulaBug": true },
+    { "id": "bean-04", "buyCost": 40, "regionId": "lost-woods", "location": "Forest Stage butterfly clearing (Right, Left, Right, Left, Straight, Left)", "adultPayoff": "Required for Gold Skulltula #6 (gs-006) on the upper ledge.", "hasSkulltulaBug": true },
+    { "id": "bean-05", "buyCost": 50, "regionId": "graveyard", "location": "Left side of Kakariko Graveyard against cliff wall", "adultPayoff": "Primary path to the Graveyard High Cliff Crate Heart Piece (hp-13).", "hasSkulltulaBug": true },
+    { "id": "bean-06", "buyCost": 60, "regionId": "death-mountain-trail", "location": "Right outside the entrance to Dodongo's Cavern", "adultPayoff": "Primary path to Dodongo's Cavern Entrance Cliff Heart Piece (hp-18) & shortcut up trail.", "hasSkulltulaBug": true },
+    { "id": "bean-07", "buyCost": 70, "regionId": "lake-hylia", "location": "Right outside the Lakeside Laboratory", "adultPayoff": "Primary path to Lakeside Laboratory Rooftop Heart Piece (hp-30).", "hasSkulltulaBug": true },
+    { "id": "bean-08", "buyCost": 80, "regionId": "gerudo-valley", "location": "Bottom canyon ledge beside the Cow (Cucco-glide down)", "adultPayoff": "Scenic ride up canyon waterfalls for Red/Blue Rupees.", "hasSkulltulaBug": true },
+    { "id": "bean-09", "buyCost": 90, "regionId": "death-mountain-crater", "location": "Beside the Bolero of Fire warp pad (requires learning Bolero as Adult first!)", "adultPayoff": "Required for Volcano Bean Spire Heart Piece (hp-20).", "hasSkulltulaBug": true },
+    { "id": "bean-10", "buyCost": 100, "regionId": "desert-colossus", "location": "Right of the Spirit Temple stairs (requires learning Requiem of Spirit as Adult first!)", "adultPayoff": "Required for Desert Colossus Stone Archway Heart Piece (hp-36) and Mesa Skulltula (gs-056).", "hasSkulltulaBug": true }
+  ],
+  "happyMaskQuest": [
+    {
+      "step": 1,
+      "mask": "Keaton Mask",
+      "regionId": "kakariko-village",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "zeldas-letter"],
+      "buyer": "Death Mountain Trail Gate Guard in Kakariko Village (daytime)",
+      "feeToShop": 10,
+      "proTip": "Opens right after you show Zelda's Letter to this exact guard!"
+    },
+    {
+      "step": 2,
+      "mask": "Skull Mask",
+      "regionId": "lost-woods",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "song-saria"],
+      "buyer": "Lone Skull Kid (Left from Lost Woods entrance)",
+      "feeToShop": 20,
+      "proTip": "BEFORE or AFTER selling, wear the Skull Mask inside the Lost Woods Forest Stage grotto to unlock Deku Stick Upgrade #2 (30 Sticks)! Note: he pays 10 Rupees so bring 10 extra Rupees to repay the 20-Rupee shop fee."
+    },
+    {
+      "step": 3,
+      "mask": "Spooky Mask",
+      "regionId": "graveyard",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "time-day"],
+      "buyer": "Graveyard Boy patrolling Kakariko Graveyard during the DAY",
+      "feeToShop": 30,
+      "proTip": "Only appears during daytime (06:00–18:00), while Dampé patrols at night."
+    },
+    {
+      "step": 4,
+      "mask": "Bunny Hood",
+      "regionId": "hyrule-field",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bombs", "boomerang"],
+      "buyer": "Running Man jogging around Hyrule Field (unlocks in shop ONLY after collecting all 3 Spiritual Stones!)",
+      "feeToShop": 50,
+      "proTip": "Wait along the Lon Lon Ranch perimeter path until he sits down to rest at night, speak to him wearing the Bunny Hood, and he completely fills your Wallet! Unlocks the Mask of Truth (+ Zora, Goron, and Gerudo Masks) at the Happy Mask Shop."
+    }
+  ],
+  "biggoronSwordQuest": [
+    { "step": 1, "item": "Pocket Egg", "regionId": "kakariko-village", "timer": null, "instructions": "Speak to the Cucco Lady (Anju) near the Graveyard entrance as Adult Link." },
+    { "step": 2, "item": "Pocket Cucco", "regionId": "kakariko-village", "timer": null, "instructions": "Play Sun's Song (or sleep until morning) to hatch the Pocket Egg, then enter the lower Kakariko house and use the Pocket Cucco to wake sleeping Talon." },
+    { "step": 3, "item": "Cojiro", "regionId": "kakariko-village", "timer": null, "instructions": "Show the woken-Talon result back to Anju outside; she trades you her blue Cucco, Cojiro." },
+    { "step": 4, "item": "Odd Mushroom", "regionId": "lost-woods", "timer": "4:00", "instructions": "Go Left from the Lost Woods entrance as Adult Link and use Cojiro to wake Grog sitting by the stump. He hands you the Odd Mushroom (starts a 4:00 timer—DO NOT play warp songs!)." },
+    { "step": 5, "item": "Odd Poultice (Odd Potion)", "regionId": "kakariko-village", "timer": null, "instructions": "Dash through Lost Woods -> Goron City shortcut (or Epona across Hyrule Field) to Kakariko Village, walk through the main Potion Shop's back door (or Hookshot the roof), and give the Odd Mushroom to Granny." },
+    { "step": 6, "item": "Poacher's Saw", "regionId": "lost-woods", "timer": null, "instructions": "Return to Grog's stump (Left from Lost Woods entrance) and give the Odd Poultice to the Kokiri girl Fado standing there. (Note: Switch 2 fixed the old N64 Forest Stage Deku Nut glitch here!)" },
+    { "step": 7, "item": "Broken Goron's Sword", "regionId": "gerudo-valley", "timer": null, "instructions": "Cross the Gerudo Valley bridge (via Epona or Longshot) and hand the Poacher's Saw to Mutoh, the boss carpenter outside the tent." },
+    { "step": 8, "item": "Prescription", "regionId": "death-mountain-trail", "timer": null, "instructions": "Climb to the summit of Death Mountain Trail (outside the Great Fairy Fountain) and show the Broken Goron's Sword to giant Biggoron." },
+    { "step": 9, "item": "Eyeball Frog", "regionId": "zoras-domain", "timer": "2:30", "instructions": "Ensure King Zora is thawed (via Blue Fire or beating the Water Temple so all of Zora's Domain thaws in Switch 2!) and show him the Prescription. Starts a strict 2:30 timer—NO warp songs!" },
+    { "step": 10, "item": "World's Finest Eye Drops", "regionId": "lake-hylia", "timer": "3:30", "instructions": "SWITCH 2 PRO SHORTCUT: If you already beat the Water Temple, Zora's Domain is thawed—simply dive straight through the Zora's Domain -> Lake Hylia underwater warp tunnel to reach the Lakeside Lab in 25 seconds! (Otherwise gallop down Zora's River -> Hyrule Field on Epona.) Hand the Eyeball Frog to the Professor to start a 3:30 timer." },
+    { "step": 11, "item": "Claim Check", "regionId": "death-mountain-trail", "timer": null, "instructions": "Race from Lake Hylia to Kakariko Village on Epona (or swim Lake Hylia -> thawed Zora's Domain -> Lost Woods -> Goron City -> Death Mountain Trail!) without playing warp songs and deliver the Eye Drops to Biggoron before 3:30 expires." },
+    { "step": 12, "item": "Biggoron's Sword", "regionId": "death-mountain-trail", "timer": null, "instructions": "Play the Sun's Song 6 times (3 full days) right in front of Biggoron and present the Claim Check to claim the unbreakable, double-damage Biggoron's Sword!" }
+  ],
+  "cowsAndKeyGrottos": [
+    {
+      "id": "cow-links-house",
+      "title": "Link's House Personal Cow",
+      "regionId": "kokiri-forest",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "epona", "song-epona"],
+      "howToGet": "After freeing Epona, talk to Malon at Lon Lon Ranch as Adult Link and beat her obstacle-course record (< 0:50). She ships a Cow directly into Link's House in Kokiri Forest—play Epona's Song anytime for free Lon Lon Milk!"
+    },
+    {
+      "id": "cow-hyrule-field",
+      "title": "Gerudo Valley Approach Cow Grotto",
+      "regionId": "hyrule-field",
+      "era": "both",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["bombs", "song-epona"],
+      "howToGet": "Bomb the ring of stones (Child) or smash the boulder (Adult w/ Hammer) before Gerudo Valley to access a Cow + Gold Skulltula #9."
+    },
+    {
+      "id": "cow-dmt",
+      "title": "Death Mountain Trail Song of Storms Cow Grotto",
+      "regionId": "death-mountain-trail",
+      "era": "both",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["bombs", "song-storms", "song-epona"],
+      "howToGet": "Play Song of Storms beside the circle of rocks near the Goron City / Summit climb to open a hidden Cow grotto for free milk before tackling Death Mountain Crater."
+    },
+    {
+      "id": "cow-lon-lon",
+      "title": "Lon Lon Ranch Stables & Shed Cows (4 Total)",
+      "regionId": "lon-lon-ranch",
+      "era": "both",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["song-epona"],
+      "howToGet": "2 Cows stand inside the Lon Lon Ranch Stables and 2 stand inside the SW Storage Shed crawlspace—play Epona's Song to fill all 5 Bottles for free."
+    },
+    {
+      "id": "grotto-oasis-fairies",
+      "title": "Desert Colossus Oasis Fairy Pond",
+      "regionId": "desert-colossus",
+      "era": "both",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["song-storms", "bottle"],
+      "howToGet": "Stand on the small stone block beside the dry oasis basin in Desert Colossus and play the Song of Storms to permanently fill the pond and spawn Bottled Fairies."
+    }
+  ],
+  "switch2Exclusives": [
+    {
+      "id": "sw2-hall-of-fallen-foes",
+      "title": "Hall of Fallen Foes (84 Statues & Boss Rush)",
+      "regionId": "hall-of-fallen-foes",
+      "era": "both",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bow", "time-travel"],
+      "description": "Unlocked after beating the Forest Temple, returning to Child Link, viewing Kaepora Gaebora's scene in Kakariko Village, and sleeping in any green-glowing bed (Link's House, Kakariko, or Lake Hylia). Automatically populates 84 enemy & boss statues as you defeat foes (no camera required!), lets you rematch any boss or mini-boss (including Dark Link and Iron Knuckles), and features timed Boss Rush Gauntlets graded Bronze / Silver / Gold / Master."
+    },
+    {
+      "id": "sw2-threads-of-time",
+      "title": "Threads of Time & Tapestry Tracker",
+      "regionId": "market",
+      "era": "both",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child"],
+      "description": "Press Minus (-) to open the new Threads of Time journal and press Y for the dual-era Tapestry view. Tracks 6 headline side quest chains ('Malon's Friend', 'Happy Mask Shopkeeper', 'To the Great Fairy', 'Stir the Scarecrow's Soul!', 'From a Pocket Egg Comes...', and 'Broken Windmill, Dry Well') with COMPLETE stamps."
+    },
+    {
+      "id": "sw2-zelda-notes",
+      "title": "Zelda Notes Companion & Gossip Quests (Patch 1.1.1)",
+      "regionId": "hyrule-field",
+      "era": "both",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child"],
+      "description": "Free companion module inside the Nintendo Switch Mobile App (no NSO subscription required). Offers live GPS-style map sync, Gossip Quests (photo-clue scavenger hunts across Hyrule), shareable custom Ocarina sheet music, daily quizzes, and global Hall of Fallen Foes leaderboards."
+    }
+  ]
+}

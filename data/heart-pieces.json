@@ -1,0 +1,548 @@
+[
+  {
+    "id": "hp-01",
+    "title": "Lon Lon Ranch Storage Shed Crawlspace",
+    "regionId": "lon-lon-ranch",
+    "era": "child",
+    "gateTier": "tier-0-immediate",
+    "requiredIds": ["era-child"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Southwest crumbling brick tower / storage shed",
+    "howToGet": "Enter the southwest storage shed as Child Link. Pull and push the milk crates to expose the hidden crawlspace hole in the back-right corner, crawl through, and collect the Piece of Heart in the nest."
+  },
+  {
+    "id": "hp-02",
+    "title": "Richard the Lost White Dog",
+    "regionId": "market",
+    "era": "child",
+    "gateTier": "tier-1-utility",
+    "requiredIds": ["era-child", "time-night"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Market Square -> Back Alley House",
+    "howToGet": "At night as Child Link, walk behind the Bazaar stall in the Market Square until the white dog (Richard) barks and follows you. Lead him into the Back Alley and enter the illuminated apartment door to return him to the Dog Lady."
+  },
+  {
+    "id": "hp-03",
+    "title": "Bombchu Bowling Alley Prize",
+    "regionId": "market",
+    "era": "child",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "bombs"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "West side of Market Square (opens after getting Bomb Bag)",
+    "howToGet": "Once you own the Bomb Bag from Dodongo's Cavern, pay 30 Rupees per round at the Bombchu Bowling Alley. Prizes cycle randomly among Biggest/Bigger Bomb Bag, Bombchus, Purple Rupee, and this Piece of Heart—re-enter until the Heart Piece is shown as the prize and clear all 3 targets."
+  },
+  {
+    "id": "hp-04",
+    "title": "Treasure Chest Shop Grand Prize",
+    "regionId": "market",
+    "era": "child",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "time-night", "lens-of-truth", "magic-meter"],
+    "altMethods": [
+      {
+        "label": "Pure Luck (1-in-32 odds without Lens of Truth, 10 Rupees per try)",
+        "requiredIds": ["era-child", "time-night", "rupees-100"]
+      }
+    ],
+    "switch2Status": "updated-switch2",
+    "locationHint": "Lower Market Square (Night only)",
+    "howToGet": "Enter the Treasure Chest Shop at night as Child Link (10 Rupees). Activate the Lens of Truth in each of the 5 rooms to peek inside the two chests, grab each Small Key to advance, and open the final room's big chest for the Piece of Heart. (Switch 2 patched old N64 door-peek exploits.)"
+  },
+  {
+    "id": "hp-05",
+    "title": "Northern Moat 'Sell somethin', will ya?' Scrub Grotto",
+    "regionId": "hyrule-field",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-adult", "time-travel", "era-child", "bombs", "rupees-100"],
+    "altMethods": [],
+    "switch2Status": "new-switch2",
+    "locationHint": "Grass bank east of Hyrule Castle Town drawbridge moat & Lonely Tree",
+    "howToGet": "NEW IN SWITCH 2 (replaces old Lake Hylia fence Scrub grotto): Step 1 (Adult Link): Examine the Fairy's Thought / note carved on the lonely tree near the ruined Castle Town moat to learn the password 'Sell somethin', will ya?'. Step 2 (Child Link): Travel back in time, bomb the cracked rocks on the grass bank beside the northern moat, drop into the grotto, defeat/corner the Business Scrub, give the password, and purchase the Piece of Heart for 100 Rupees."
+  },
+  {
+    "id": "hp-06",
+    "title": "Western Canyon Time-Locked Chest",
+    "regionId": "hyrule-field",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-adult", "time-travel", "era-child"],
+    "altMethods": [],
+    "switch2Status": "new-switch2",
+    "locationHint": "Underneath the red rock overhang in western Hyrule Field (approach to Gerudo Valley)",
+    "howToGet": "NEW IN SWITCH 2 (replaces old NW Diving Tektite grotto): Step 1 (Adult Link): Visit the red canyon overhang right before the sand path to Gerudo Valley. You'll find an already-looted chest; read the glowing 'Fairy's Thoughts' message on the adjacent rock wall where the fairy promises to unlock it for you in the past. Step 2 (Child Link): Return to the past via the Pedestal of Time, revisit the overhang, and open the now-unlocked chest!"
+  },
+  {
+    "id": "hp-07",
+    "title": "Impa's House Cow Cage",
+    "regionId": "kakariko-village",
+    "era": "both",
+    "gateTier": "tier-0-immediate",
+    "requiredIds": ["era-child"],
+    "altMethods": [
+      {
+        "label": "Ride Kaepora Gaebora the Owl from Death Mountain Summit & drop onto Impa's roof ledge",
+        "requiredIds": ["era-child"]
+      },
+      {
+        "label": "Adult Link Hookshot / Hover Boots from nearby roof",
+        "requiredIds": ["era-adult", "hookshot"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Back ledge of Impa's House (south side of Kakariko Village)",
+    "howToGet": "Carry a Cucco up the unfinished construction scaffolding in Kakariko, toss/jump from the top platform toward the slanted wooden ramp, carry the Cucco up the ramp, and glide diagonally onto the narrow wooden ledge behind Impa's House. Crawl inside to reach the Heart Piece next to the cow."
+  },
+  {
+    "id": "hp-08",
+    "title": "Man on the Kakariko Rooftop",
+    "regionId": "kakariko-village",
+    "era": "both",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult", "hookshot"],
+    "altMethods": [
+      {
+        "label": "Child / Adult precision side-jump or manual X-jump from the high watchtower fence",
+        "requiredIds": ["era-child"]
+      }
+    ],
+    "switch2Status": "updated-switch2",
+    "locationHint": "Blue roof above Dodongo's Potion Shop",
+    "howToGet": "As Adult Link, climb the tall wooden watchtower and Hookshot directly onto the man's rooftop, then speak to him. (With Switch 2's dedicated X jump button, skilled players can also leap from the watchtower railing early as Child Link!)"
+  },
+  {
+    "id": "hp-09",
+    "title": "Kakariko Windmill Upper Platform",
+    "regionId": "kakariko-village",
+    "era": "both",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "boomerang"],
+    "altMethods": [
+      {
+        "label": "Exit Dampé's Ghost Race tunnel into the Windmill as Adult Link",
+        "requiredIds": ["era-adult", "hookshot"]
+      },
+      {
+        "label": "Play Song of Time block inside Windmill as Adult Link",
+        "requiredIds": ["era-adult", "song-time"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Upper stone ledge inside the Windmill",
+    "howToGet": "Quickest as Child Link once you have the Boomerang: stand on the rotating Windmill mechanism and throw the Boomerang to snatch the Piece of Heart off the high ledge. Otherwise, finish Dampé's Ghost Race in the Graveyard as Adult Link, which exits directly onto the upper Windmill ledge."
+  },
+  {
+    "id": "hp-10",
+    "title": "House of Skulltula — 50 Tokens Reward",
+    "regionId": "kakariko-village",
+    "era": "both",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["tokens-50"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "House of Skulltula (south of village)",
+    "howToGet": "Collect 50 Gold Skulltula Tokens across Hyrule and speak to the fifth freed brother inside the House of Skulltula."
+  },
+  {
+    "id": "hp-11",
+    "title": "ReDead / Sun's Song Grave",
+    "regionId": "graveyard",
+    "era": "both",
+    "gateTier": "tier-2-song",
+    "requiredIds": ["song-sun"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "4th grave from the right in the front row",
+    "howToGet": "Pull back the 4th grave from the right in the front row of Kakariko Graveyard and drop inside. Defeat the ReDead and play the Sun's Song (A, R, X, A, R, X) to spawn a chest containing the Piece of Heart."
+  },
+  {
+    "id": "hp-12",
+    "title": "Dampé's Heart-Pounding Gravedigging Tour",
+    "regionId": "graveyard",
+    "era": "child",
+    "gateTier": "tier-1-utility",
+    "requiredIds": ["era-child", "time-night", "rupees-100"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Soft dirt patches along Dampé's patrol path (18:00–21:00)",
+    "howToGet": "Between 18:00 and 21:00 (early night) as Child Link, talk to Dampé when he stands Directly over one of the dirt patches and pay 10 Rupees for him to dig. Each patch has a random chance (~10%) to unearth this Piece of Heart."
+  },
+  {
+    "id": "hp-13",
+    "title": "Graveyard High Cliff Wooden Crate",
+    "regionId": "graveyard",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-child", "magic-beans", "era-adult"],
+    "altMethods": [
+      {
+        "label": "Longshot directly onto the wooden crate as Adult Link",
+        "requiredIds": ["era-adult", "longshot"]
+      },
+      {
+        "label": "Child Link Boomerang trick from near the fence",
+        "requiredIds": ["era-child", "boomerang"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "High cliff ledge on the left side of the Graveyard",
+    "howToGet": "Plant a Magic Bean in the soft soil patch on the left side of the Graveyard as Child Link. Return as Adult Link, ride the leaf platform up to the high ledge, and roll into the wooden crate to break it open."
+  },
+  {
+    "id": "hp-14",
+    "title": "Dampé's Ghost Race Under 1:00",
+    "regionId": "graveyard",
+    "era": "adult",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult", "hookshot"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Dampé's Grave (front-left grave with flowers)",
+    "howToGet": "After beating Dampé's Ghost Race once to earn the Hookshot, immediately re-enter Dampé's grave and race him a second time. Use rolls, corner cuts, and the dash/Longshot torch shortcut at the end to finish in 1:00 or less."
+  },
+  {
+    "id": "hp-15",
+    "title": "Lone Skull Kid — Play Saria's Song",
+    "regionId": "lost-woods",
+    "era": "child",
+    "gateTier": "tier-2-song",
+    "requiredIds": ["era-child", "ocarina", "song-saria"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Turn Left from Kokiri Forest entrance into Lost Woods",
+    "howToGet": "From the Lost Woods entrance as Child Link, go Left, stand on the short tree stump facing the Skull Kid, pull out your Ocarina, and play Saria's Song (R, A, Y, R, A, Y)."
+  },
+  {
+    "id": "hp-16",
+    "title": "Two Skull Kids Ocarina Memory Game",
+    "regionId": "lost-woods",
+    "era": "child",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "ocarina"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "From Lost Woods entrance: Right, Left, Right, Left, Left (climb down to lower clearing)",
+    "howToGet": "Stand on the stump before the two Skull Kids as Child Link and pull out your Ocarina. Repeat their randomized melodies across 3 increasingly long rounds (5, 6, and 8 notes) to win the Piece of Heart."
+  },
+  {
+    "id": "hp-17",
+    "title": "Goron City Giant Spinning Urn",
+    "regionId": "goron-city",
+    "era": "child",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "song-lullaby", "deku-sticks", "bombs"],
+    "altMethods": [
+      {
+        "label": "Use Bomb Flowers with Goron's Bracelet instead of Bomb Bag",
+        "requiredIds": ["era-child", "song-lullaby", "deku-sticks", "goron-bracelet"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Central chamber giant Goron vase",
+    "howToGet": "Play Zelda's Lullaby outside Darunia's room on 1F, light a Deku Stick from his room, and light all 4 unlit torches around the base of the giant Goron Urn so it starts spinning. Climb to 2F and toss 1–3 Bombs into the top of the spinning urn until it stops on the smiling face, spitting out the Piece of Heart and Rupees."
+  },
+  {
+    "id": "hp-18",
+    "title": "Dodongo's Cavern Entrance Cliff",
+    "regionId": "death-mountain-trail",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-child", "magic-beans", "era-adult"],
+    "altMethods": [
+      {
+        "label": "Backflip / precision jump down from the upper Death Mountain Trail switchback fence",
+        "requiredIds": ["era-child"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Rock overhang directly above the entrance to Dodongo's Cavern",
+    "howToGet": "Plant a Magic Bean in the soft soil right outside Dodongo's Cavern as Child Link, then ride the grown leaf platform up to the rock arch as Adult Link (or drop carefully onto it from the upper trail)."
+  },
+  {
+    "id": "hp-19",
+    "title": "Death Mountain Crater Wall Climb Alcove",
+    "regionId": "death-mountain-crater",
+    "era": "both",
+    "gateTier": "tier-0-immediate",
+    "requiredIds": ["era-child"],
+    "altMethods": [
+      {
+        "label": "Safe exploration with Goron Tunic as Adult Link",
+        "requiredIds": ["era-adult", "goron-tunic"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Climbable cliff face along the northern crater rim",
+    "howToGet": "Enter Death Mountain Crater from the summit trail. Head forward to the edge of the cliff and climb partway down the rock face into a hidden alcove holding the Piece of Heart (Child Link has plenty of time on the heat timer to climb down, grab it, and climb back out)."
+  },
+  {
+    "id": "hp-20",
+    "title": "Death Mountain Crater Volcano Bean Spire",
+    "regionId": "death-mountain-crater",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-adult", "song-bolero", "time-travel", "era-child", "magic-beans", "goron-tunic"],
+    "altMethods": [
+      {
+        "label": "Hover Boots leap from the broken bridge side as Adult Link",
+        "requiredIds": ["era-adult", "goron-tunic", "hover-boots"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Tall volcanic spire in the center of the crater lava lake",
+    "howToGet": "Step 1: Learn the Bolero of Fire from Sheik in Death Mountain Crater as Adult Link. Step 2: Warp to the Crater pad as Child Link using Bolero of Fire and quickly plant a Magic Bean in the soft soil beside the pad before the heat timer runs out. Step 3: Warp back as Adult Link (with Goron Tunic) and ride the leaf platform to the top of the volcanic rock spire."
+  },
+  {
+    "id": "hp-21",
+    "title": "Death Mountain Crater Left Ledge Business Scrub",
+    "regionId": "death-mountain-crater",
+    "era": "child",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "slingshot", "rupees-100"],
+    "altMethods": [
+      {
+        "label": "Deflect Deku Nut with Deku Shield instead of Slingshot",
+        "requiredIds": ["era-child", "deku-shield", "rupees-100"]
+      }
+    ],
+    "switch2Status": "new-switch2",
+    "locationHint": "Lower left ledge inside Death Mountain Crater (from summit entrance)",
+    "howToGet": "NEW IN SWITCH 2 (replaces the removed Ice Cavern Red Ice Heart Piece!): Enter Death Mountain Crater from the top summit entrance as Child Link. Immediately turn left to spot a Business Scrub on a lower rock ledge. Drop down quickly before heat drains your health, shoot or deflect its attack with the Fairy Slingshot/Shield, and buy the Piece of Heart for 100 Rupees."
+  },
+  {
+    "id": "hp-22",
+    "title": "Zora's River Lower Pillar",
+    "regionId": "zoras-river",
+    "era": "both",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "bombs"],
+    "altMethods": [
+      {
+        "label": "Adult Link Hover Boots jump across to the pillar",
+        "requiredIds": ["era-adult", "hover-boots"]
+      },
+      {
+        "label": "Ride Magic Bean leaf from Bean Seller plot as Adult Link",
+        "requiredIds": ["era-child", "magic-beans", "era-adult"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Freestanding stone pillar in the lower half of Zora's River",
+    "howToGet": "Blow up the boulders near the Zora's River entrance (or jump the fence) to grab the Cucco, carry it partway up the river to the elevated bank, and glide onto the stone pillar holding the Heart Piece."
+  },
+  {
+    "id": "hp-23",
+    "title": "Zora's River Waterfall High Ledge",
+    "regionId": "zoras-river",
+    "era": "both",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "bombs"],
+    "altMethods": [
+      {
+        "label": "Snatch with Boomerang from nearby ledge as Child Link",
+        "requiredIds": ["era-child", "boomerang"]
+      },
+      {
+        "label": "Hover Boots jump from the Zora's Domain waterfall entrance as Adult Link",
+        "requiredIds": ["era-adult", "hover-boots"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "High corner ledge directly beside the Zora's Domain waterfall",
+    "howToGet": "Carry the entrance Cucco all the way up Zora's River (tossing it onto dry ledges before swimming/climbing ladders) to the waterfall platform, then jump and glide diagonally onto the high corner ledge."
+  },
+  {
+    "id": "hp-24",
+    "title": "Choir of Frogs #1 — Song of Storms",
+    "regionId": "zoras-river",
+    "era": "child",
+    "gateTier": "tier-2-song",
+    "requiredIds": ["era-child", "ocarina", "song-storms"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Submerged log halfway up Zora's River",
+    "howToGet": "Stand on the wooden log facing the 5 frogs in Zora's River as Child Link, pull out your Ocarina, and play the Song of Storms (L, R, X, L, R, X)."
+  },
+  {
+    "id": "hp-25",
+    "title": "Choir of Frogs #2 — Bug-Eating Minigame",
+    "regionId": "zoras-river",
+    "era": "child",
+    "gateTier": "tier-2-song",
+    "requiredIds": ["era-child", "ocarina", "song-lullaby", "song-epona", "song-saria", "song-sun", "song-time"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Submerged log halfway up Zora's River",
+    "howToGet": "Stand on the frog log as Child Link and play all 5 non-warp songs (Zelda's Lullaby, Epona's Song, Saria's Song, Sun's Song, and Song of Time—each grows one frog and awards 50 Rupees). Once all 5 frogs are giant, pull out your Ocarina again to trigger the fly-eating minigame: press the corresponding Switch 2 note button (L, R, A, Y, X) right as the butterfly lands above each frog."
+  },
+  {
+    "id": "hp-26",
+    "title": "Zora's Domain Waterfall Torch Chest",
+    "regionId": "zoras-domain",
+    "era": "child",
+    "gateTier": "tier-3-child-gear",
+    "requiredIds": ["era-child", "deku-sticks"],
+    "altMethods": [
+      {
+        "label": "Use Din's Fire behind the waterfall to light the final two torches effortlessly",
+        "requiredIds": ["era-child", "deku-sticks", "dins-fire", "magic-meter"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Chamber behind the waterfall at the bottom of Zora's Domain",
+    "howToGet": "As Child Link, light a Deku Stick on the lit brazier outside the Zora Shop (or down the slope from King Zora). Quickly light: (1) the torch at the foot of the stairs, (2) the torch standing in the shallow pool, and (3 & 4) both torches inside the cave behind the waterfall before any go out to spawn the chest."
+  },
+  {
+    "id": "hp-27",
+    "title": "Zora's Fountain Floating Iceberg",
+    "regionId": "zoras-fountain",
+    "era": "adult",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Floating ice platforms in front of the Ice Cavern",
+    "howToGet": "Visit Zora's Fountain as Adult Link and hop across the spinning/floating icebergs on the frozen surface to collect the exposed Piece of Heart."
+  },
+  {
+    "id": "hp-28",
+    "title": "Bottom of Zora's Fountain",
+    "regionId": "zoras-fountain",
+    "era": "adult",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult", "iron-boots"],
+    "altMethods": [
+      {
+        "label": "Equip Zora Tunic for unlimited underwater breathing while searching",
+        "requiredIds": ["era-adult", "iron-boots", "zora-tunic"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Deepest point on the floor of Zora's Fountain",
+    "howToGet": "Equip the Iron Boots (and Zora Tunic if owned; otherwise you still have enough air with 8+ hearts!) as Adult Link in Zora's Fountain and sink all the way to the center of the lakebed to walk over the Piece of Heart."
+  },
+  {
+    "id": "hp-29",
+    "title": "Fishing Pond — 10+ Pound Catch (Child)",
+    "regionId": "lake-hylia",
+    "era": "child",
+    "gateTier": "tier-1-utility",
+    "requiredIds": ["era-child", "rupees-100"],
+    "altMethods": [],
+    "switch2Status": "updated-switch2",
+    "locationHint": "Fishing Pond (east side of Lake Hylia)",
+    "howToGet": "Pay 20 Rupees at the Lake Hylia Fishing Pond as Child Link. Cast near the submerged log in the deeper middle-right water to hook the largest lunker (10+ lbs), reel it in, and weigh it at the counter for the Piece of Heart."
+  },
+  {
+    "id": "hp-30",
+    "title": "Lakeside Laboratory Rooftop",
+    "regionId": "lake-hylia",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-child", "magic-beans", "era-adult"],
+    "altMethods": [
+      {
+        "label": "Play Scarecrow's Song inside/near Lab and Hookshot Pierre on the roof",
+        "requiredIds": ["era-adult", "song-scarecrow", "hookshot"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Watchtower ladder at the very top of the Lakeside Laboratory",
+    "howToGet": "Plant a Magic Bean in the soft soil patch beside the Lakeside Laboratory as Child Link. Return as Adult Link, ride the leaf up to the Lab roof (or summon Pierre with the Scarecrow's Song and Hookshot up), and climb the exterior ladder to the crow's nest."
+  },
+  {
+    "id": "hp-31",
+    "title": "Lakeside Laboratory Deep Dive",
+    "regionId": "lake-hylia",
+    "era": "adult",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult", "golden-scale"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Indoor water pool inside the Lakeside Laboratory",
+    "howToGet": "First win the Golden Scale by catching a 15+ lb fish at the Fishing Pond as Adult Link. Then enter the Lakeside Laboratory, dive straight down (without Iron Boots—Iron Boots don't count!) until your feet touch the 8-meter bottom grates, and speak to the Professor."
+  },
+  {
+    "id": "hp-32",
+    "title": "Gerudo Valley Waterfall Secret Alcove",
+    "regionId": "gerudo-valley",
+    "era": "both",
+    "gateTier": "tier-0-immediate",
+    "requiredIds": ["era-child"],
+    "altMethods": [
+      {
+        "label": "Jump into the river and climb behind the waterfall as Adult Link",
+        "requiredIds": ["era-adult"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Hidden ladder alcove behind the northern canyon waterfall",
+    "howToGet": "Jump off the Gerudo Valley bridge (or Cucco-glide) into the canyon river, swim north against the current right through the tall waterfall cascade, and climb the tall wooden ladder inside the hidden cave."
+  },
+  {
+    "id": "hp-33",
+    "title": "Gerudo Valley Gorge Ledge Chest",
+    "regionId": "gerudo-valley",
+    "era": "both",
+    "gateTier": "tier-0-immediate",
+    "requiredIds": ["era-child"],
+    "altMethods": [
+      {
+        "label": "Hookshot / Longshot directly onto the Treasure Chest as Adult Link (NEW in Switch 2!)",
+        "requiredIds": ["era-adult", "hookshot"]
+      }
+    ],
+    "switch2Status": "updated-switch2",
+    "locationHint": "Narrow canyon ledge across the gorge on the south/west cliff wall",
+    "howToGet": "SWITCH 2 UPDATE: What used to be a wooden crate in N64 is now a Treasure Chest! As Child Link, pick up the Cucco at the Gerudo Valley entrance and glide off the bridge/rock outcrop onto the narrow cliff ledge. Or as Adult Link, simply Hookshot straight onto the chest from across the canyon!"
+  },
+  {
+    "id": "hp-34",
+    "title": "Gerudo's Fortress Rooftop Chest",
+    "regionId": "gerudo-fortress",
+    "era": "adult",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult", "hookshot", "song-scarecrow"],
+    "altMethods": [
+      {
+        "label": "Longshot directly onto the rooftop chest without Scarecrow's Song",
+        "requiredIds": ["era-adult", "longshot"]
+      },
+      {
+        "label": "Hover Boots run-and-float from the upper fortress tier",
+        "requiredIds": ["era-adult", "hover-boots"]
+      }
+    ],
+    "switch2Status": "classic",
+    "locationHint": "Highest rooftop chest atop Thieves' Hideout",
+    "howToGet": "Navigate through the upper doors of Thieves' Hideout to reach the top roof overlooking the large wooden chest across the gap. Either play the Scarecrow's Song to summon Pierre and Hookshot across, Longshot directly onto the chest itself, or float across with the Hover Boots."
+  },
+  {
+    "id": "hp-35",
+    "title": "Horseback Archery — 1,000+ Points",
+    "regionId": "gerudo-fortress",
+    "era": "adult",
+    "gateTier": "tier-5-adult-gear",
+    "requiredIds": ["era-adult", "gerudo-card", "epona", "bow"],
+    "altMethods": [],
+    "switch2Status": "updated-switch2",
+    "locationHint": "Horseback Archery Range (east of Gerudo's Fortress)",
+    "howToGet": "Ride Epona up to the Gerudo's Fortress Archery Range after earning the Gerudo Membership Card and pay 20 Rupees. Score 1,000 or more points shooting pots and bullseyes (Switch 2 gyro aiming makes bullseyes easy; scoring 1,500+ on a second run awards the Biggest Quiver!)."
+  },
+  {
+    "id": "hp-36",
+    "title": "Desert Colossus Stone Archway",
+    "regionId": "desert-colossus",
+    "era": "cross-era",
+    "gateTier": "tier-4-cross-era",
+    "requiredIds": ["era-adult", "song-requiem", "time-travel", "era-child", "magic-beans"],
+    "altMethods": [],
+    "switch2Status": "classic",
+    "locationHint": "Top of the natural rock arch in central Desert Colossus",
+    "howToGet": "Step 1: Reach Desert Colossus as Adult Link and step in/out of the Spirit Temple to learn the Requiem of Spirit. Step 2: Travel back to Child Link, warp to Desert Colossus via Requiem of Spirit, and plant a Magic Bean in the soft soil beside the Spirit Temple stairs. Step 3: Warp back as Adult Link, ride the flying leaf platform, and hop onto the stone archway when it glides past."
+  }
+]

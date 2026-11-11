@@ -1,0 +1,490 @@
+[
+  {
+    "id": "era-child",
+    "name": "Child Link",
+    "category": "era",
+    "icon": "child",
+    "howToGet": "Starting state of the game; returnable later by placing the Master Sword back into the Pedestal of Time after clearing the Forest Temple.",
+    "switch2Notes": "Manual jump (X) allows slightly cleaner platforming across ledges in Kakariko and Zora's River."
+  },
+  {
+    "id": "era-adult",
+    "name": "Adult Link",
+    "category": "era",
+    "icon": "sword",
+    "howToGet": "Collect all 3 Spiritual Stones, get the Ocarina of Time, open the Door of Time, and pull the Master Sword.",
+    "switch2Notes": "Required before you can read Adult-era 'Fairy's Thoughts' clues in Hyrule Field."
+  },
+  {
+    "id": "time-travel",
+    "name": "Time Travel (Pedestal of Time)",
+    "category": "era",
+    "icon": "hourglass",
+    "howToGet": "Clear the Forest Temple as Adult Link and learn the Prelude of Light from Sheik inside the Temple of Time so you can freely swap between Child and Adult eras.",
+    "switch2Notes": "Essential for the new Switch 2 cross-era Hyrule Field Heart Pieces and SE Wetland Gold Skulltula."
+  },
+  {
+    "id": "time-night",
+    "name": "Nighttime (18:00–06:00)",
+    "category": "time",
+    "icon": "moon",
+    "howToGet": "Wait in overworld areas, sleep until night in any bed (new in Switch 2!), or play the Sun's Song.",
+    "switch2Notes": "Day/night cycle is slightly longer in Switch 2, and you can sleep in beds to pass time. Nighttime Skulltula spots show a faint golden web during the day."
+  },
+  {
+    "id": "time-day",
+    "name": "Daytime (06:00–18:00)",
+    "category": "time",
+    "icon": "sun",
+    "howToGet": "Sleep until morning in any bed or play the Sun's Song.",
+    "switch2Notes": "Sleeping in any bed across Hyrule also restores hearts and passes time."
+  },
+  {
+    "id": "zora-thawed",
+    "name": "Zora's Domain Unfrozen",
+    "category": "story",
+    "icon": "droplet",
+    "howToGet": "Defeat Morpha and complete the Water Temple as Adult Link.",
+    "switch2Notes": "NEW IN SWITCH 2 REMAKE: Unlike N64/3DS where Zora's Domain remained frozen forever, clearing the Water Temple fully thaws Zora's Domain and reopens the Lake Hylia <-> Zora's Domain <-> Lost Woods diving shortcuts!"
+  },
+  {
+    "id": "kokiri-sword",
+    "name": "Kokiri Sword",
+    "category": "gear",
+    "icon": "dagger",
+    "howToGet": "Crawl through the training hole in SW Kokiri Forest and dodge the rolling boulder to open the chest."
+  },
+  {
+    "id": "deku-shield",
+    "name": "Deku Shield",
+    "category": "gear",
+    "icon": "shield",
+    "howToGet": "Buy at the Kokiri Forest Shop for 40 Rupees."
+  },
+  {
+    "id": "deku-sticks",
+    "name": "Deku Sticks",
+    "category": "item",
+    "icon": "branch",
+    "howToGet": "Defeat Deku Babas in Kokiri Forest / Lost Woods or buy from shops."
+  },
+  {
+    "id": "slingshot",
+    "name": "Fairy Slingshot",
+    "category": "item",
+    "icon": "target",
+    "howToGet": "Found inside the Great Deku Tree (2F side room).",
+    "switch2Notes": "Features modern third-person over-the-shoulder aiming + optional gyro."
+  },
+  {
+    "id": "ocarina",
+    "name": "Ocarina (Fairy / Time)",
+    "category": "item",
+    "icon": "music",
+    "howToGet": "Received from Saria on the Kokiri Forest -> Hyrule Field bridge after clearing the Great Deku Tree; upgraded to Ocarina of Time in Castle Town moat.",
+    "switch2Notes": "Play with Y/X/A/L/R buttons or hum/play into the Switch 2 microphone."
+  },
+  {
+    "id": "weird-egg",
+    "name": "Weird Egg / Wake Talon",
+    "category": "quest",
+    "icon": "egg",
+    "howToGet": "Talk to Malon outside Hyrule Castle, wait until morning (or sleep) for the Weird Egg to hatch into a Cucco, and wake Talon outside the castle moat."
+  },
+  {
+    "id": "zeldas-letter",
+    "name": "Zelda's Letter",
+    "category": "quest",
+    "icon": "scroll",
+    "howToGet": "Sneak past the Hyrule Castle guards as Child Link and speak to Princess Zelda in the courtyard; show to the Kakariko Death Mountain gate guard."
+  },
+  {
+    "id": "goron-bracelet",
+    "name": "Goron's Bracelet",
+    "category": "gear",
+    "icon": "arm",
+    "howToGet": "Play Saria's Song for Darunia inside Goron City (after lighting his door torches) so Child Link can pick Bomb Flowers."
+  },
+  {
+    "id": "bombs",
+    "name": "Bomb Bag (Bombs)",
+    "category": "item",
+    "icon": "bomb",
+    "howToGet": "Found inside Dodongo's Cavern (Bombchus can occasionally substitute for blowing rocks/walls)."
+  },
+  {
+    "id": "boomerang",
+    "name": "Boomerang",
+    "category": "item",
+    "icon": "boomerang",
+    "howToGet": "Found inside Jabu-Jabu's Belly as Child Link. Essential for grabbing out-of-reach Gold Skulltula tokens as a child."
+  },
+  {
+    "id": "magic-beans",
+    "name": "Magic Beans",
+    "category": "item",
+    "icon": "sprout",
+    "howToGet": "Sold by the Bean Seller at the entrance to Zora's River as Child Link (10 beans total: 10, 20, 30... 100 Rupees = 550 Rupees total). Plant in Soft Soil as Child to create flying leaf platforms as Adult."
+  },
+  {
+    "id": "magic-meter",
+    "name": "Magic Meter",
+    "category": "upgrade",
+    "icon": "sparkles",
+    "howToGet": "Death Mountain Summit Great Fairy Fountain (requires Bombs + Zelda's Lullaby + 25 Rupees in Switch 2)."
+  },
+  {
+    "id": "dins-fire",
+    "name": "Din's Fire",
+    "category": "item",
+    "icon": "flame",
+    "howToGet": "Death Mountain Summit Great Fairy Fountain (granted alongside Magic Meter for 25 Rupees in Switch 2 Remake; swapped from Hyrule Castle in N64!).",
+    "switch2Notes": "Swapped with Charged Spin Attack in Switch 2: Summit grants Din's Fire (25 Rupees), Hyrule Castle grants Spin Attack (50 Rupees)."
+  },
+  {
+    "id": "silver-scale",
+    "name": "Silver Scale",
+    "category": "gear",
+    "icon": "waves",
+    "howToGet": "Win the Diving Minigame at the top of Zora's Domain waterfall as Child Link (20 Rupees per attempt; dives up to 6 seconds)."
+  },
+  {
+    "id": "lens-of-truth",
+    "name": "Lens of Truth",
+    "category": "item",
+    "icon": "eye",
+    "howToGet": "Defeat Dead Hand inside the Bottom of the Well in Kakariko Village (Child Link after playing Song of Storms in the Windmill; requires Magic Meter to use)."
+  },
+  {
+    "id": "skull-mask",
+    "name": "Skull Mask",
+    "category": "quest",
+    "icon": "mask",
+    "howToGet": "2nd mask borrowed from the Happy Mask Shop in Market (after selling Keaton Mask to the Kakariko gate guard)."
+  },
+  {
+    "id": "mask-of-truth",
+    "name": "Mask of Truth",
+    "category": "quest",
+    "icon": "mask-eye",
+    "howToGet": "Complete all 4 Happy Mask deliveries (Keaton -> Guard, Skull -> Skull Kid, Spooky -> Graveyard Boy, Bunny Hood -> Running Man) as Child Link."
+  },
+  {
+    "id": "bottle",
+    "name": "Empty Bottle",
+    "category": "item",
+    "icon": "flask",
+    "howToGet": "Up to 5 obtainable in Switch 2: Market Potion Shop Golden Bug (NEW!), Lon Lon Ranch Super Cuccos, Kakariko 7 Cuccos, Lake Hylia Ruto's Letter, and Castle Town Poe Collector (500 pts)."
+  },
+  {
+    "id": "bottled-bug",
+    "name": "Bottled Bugs",
+    "category": "item",
+    "icon": "bug",
+    "howToGet": "Scoop bugs found under small rocks or bushes (e.g., Kakariko Graveyard or Kokiri Forest) into an Empty Bottle; 1 jar releases 3 bugs onto Soft Soil patches."
+  },
+  {
+    "id": "blue-fire",
+    "name": "Blue Fire (in Bottle)",
+    "category": "item",
+    "icon": "flame-blue",
+    "howToGet": "Scoop from Blue Fire pedestals inside the Ice Cavern for free (or buy at Kakariko Potion Shop for 300 Rupees)."
+  },
+  {
+    "id": "rupees-100",
+    "name": "Rupees (Up to 200)",
+    "category": "economy",
+    "icon": "gem-green",
+    "howToGet": "Starting Kokiri Wallet in Switch 2 holds up to 200 Rupees (doubled from 99 in N64)."
+  },
+  {
+    "id": "adults-wallet",
+    "name": "Adult's Wallet (500 Rupees)",
+    "category": "economy",
+    "icon": "wallet",
+    "howToGet": "Turn in 10 Gold Skulltula Tokens at the House of Skulltula in Kakariko Village.",
+    "switch2Notes": "Capacity boosted to 500 Rupees (from 200 in N64). Mandatory for 300-Rupee Desert Colossus & 500-Rupee Ganon's Castle Great Fairies!"
+  },
+  {
+    "id": "giants-wallet",
+    "name": "Giant's Wallet (1,000 Rupees)",
+    "category": "economy",
+    "icon": "wallet-gold",
+    "howToGet": "Turn in 30 Gold Skulltula Tokens at the House of Skulltula in Kakariko Village.",
+    "switch2Notes": "Capacity boosted to 1,000 Rupees (from 500 in N64)."
+  },
+  {
+    "id": "echo-gem",
+    "name": "Echo Gem",
+    "category": "upgrade",
+    "icon": "radar",
+    "howToGet": "Turn in 20 Gold Skulltula Tokens at the House of Skulltula in Kakariko Village.",
+    "switch2Notes": "NEW IN SWITCH 2 REMAKE: Replaces Stone of Agony; glows and pulses via HD Rumble 2 + audio cues when Gold Skulltulas are nearby."
+  },
+  {
+    "id": "tokens-10",
+    "name": "10 Gold Skulltula Tokens",
+    "category": "milestone",
+    "icon": "spider",
+    "howToGet": "Defeat 10 Gold Skulltulas and collect their tokens."
+  },
+  {
+    "id": "tokens-20",
+    "name": "20 Gold Skulltula Tokens",
+    "category": "milestone",
+    "icon": "spider",
+    "howToGet": "Defeat 20 Gold Skulltulas and collect their tokens."
+  },
+  {
+    "id": "tokens-30",
+    "name": "30 Gold Skulltula Tokens",
+    "category": "milestone",
+    "icon": "spider",
+    "howToGet": "Defeat 30 Gold Skulltulas and collect their tokens."
+  },
+  {
+    "id": "tokens-40",
+    "name": "40 Gold Skulltula Tokens",
+    "category": "milestone",
+    "icon": "spider",
+    "howToGet": "Defeat 40 Gold Skulltulas and collect their tokens."
+  },
+  {
+    "id": "tokens-50",
+    "name": "50 Gold Skulltula Tokens",
+    "category": "milestone",
+    "icon": "spider",
+    "howToGet": "Defeat 50 Gold Skulltulas and collect their tokens."
+  },
+  {
+    "id": "tokens-100",
+    "name": "100 Gold Skulltula Tokens",
+    "category": "milestone",
+    "icon": "spider-gold",
+    "howToGet": "Defeat all 100 Gold Skulltulas across Hyrule and its dungeons."
+  },
+  {
+    "id": "epona",
+    "name": "Epona",
+    "category": "gear",
+    "icon": "horse",
+    "howToGet": "Learn Epona's Song from Malon as Child Link, then as Adult Link pay Ingo 10 Rupees to ride, play Epona's Song, and beat Ingo in two consecutive races (50 Rupee wager) at Lon Lon Ranch."
+  },
+  {
+    "id": "hookshot",
+    "name": "Hookshot",
+    "category": "item",
+    "icon": "anchor",
+    "howToGet": "Pull back Dampé's grave (left side with flowers) in Kakariko Graveyard as Adult Link and follow his ghost to the finish."
+  },
+  {
+    "id": "bow",
+    "name": "Fairy Bow",
+    "category": "item",
+    "icon": "bow",
+    "howToGet": "Defeat the 3 Stalfos in the upper gallery of the Forest Temple as Adult Link."
+  },
+  {
+    "id": "megaton-hammer",
+    "name": "Megaton Hammer",
+    "category": "item",
+    "icon": "hammer",
+    "howToGet": "Found on 5F of the Fire Temple after running the curved narrow fire ledge timer."
+  },
+  {
+    "id": "goron-tunic",
+    "name": "Goron Tunic",
+    "category": "gear",
+    "icon": "shirt-red",
+    "howToGet": "Stop rolling Goron Link on 2F of Goron City as Adult Link using a Bomb/Bow and talk to him (or purchase from Goron Shop for 200 Rupees)."
+  },
+  {
+    "id": "iron-boots",
+    "name": "Iron Boots",
+    "category": "gear",
+    "icon": "boot-iron",
+    "howToGet": "Defeat the White Wolfos mini-boss at the end of the Ice Cavern (Sheik also teaches Serenade of Water).",
+    "switch2Notes": "Mapped cleanly as a quick-equip item/d-pad toggle like 3DS, no pause-menu slog!"
+  },
+  {
+    "id": "zora-tunic",
+    "name": "Zora Tunic",
+    "category": "gear",
+    "icon": "shirt-blue",
+    "howToGet": "Melt the red ice around King Zora in Zora's Domain as Adult Link using Blue Fire (or purchase from Zora Shop for 300 Rupees after thawing)."
+  },
+  {
+    "id": "longshot",
+    "name": "Longshot",
+    "category": "item",
+    "icon": "anchor-long",
+    "howToGet": "Defeat Dark Link inside the Water Temple (doubles Hookshot range)."
+  },
+  {
+    "id": "golden-scale",
+    "name": "Golden Scale",
+    "category": "gear",
+    "icon": "waves-gold",
+    "howToGet": "Catch a 15+ pound fish at the Lake Hylia Fishing Pond as Adult Link (dives up to 9 seconds)."
+  },
+  {
+    "id": "fire-arrows",
+    "name": "Fire Arrows",
+    "category": "item",
+    "icon": "flame-arrow",
+    "howToGet": "After clearing the Water Temple (lake refilled), stand on the stone slab above the Water Temple gate in Lake Hylia at dawn and shoot an arrow directly into the rising sun."
+  },
+  {
+    "id": "hover-boots",
+    "name": "Hover Boots",
+    "category": "gear",
+    "icon": "boot-wing",
+    "howToGet": "Defeat Dead Hand inside the Shadow Temple (Adult Link)."
+  },
+  {
+    "id": "gerudo-card",
+    "name": "Gerudo Membership Card",
+    "category": "quest",
+    "icon": "id-card",
+    "howToGet": "Rescue all 4 imprisoned Carpenters inside Thieves' Hideout at Gerudo's Fortress and defeat the 4 Gerudo Thieves."
+  },
+  {
+    "id": "silver-gauntlets",
+    "name": "Silver Gauntlets",
+    "category": "gear",
+    "icon": "hand-silver",
+    "howToGet": "Complete the Child Link wing of the Spirit Temple and open the exterior Desert Colossus chest."
+  },
+  {
+    "id": "mirror-shield",
+    "name": "Mirror Shield",
+    "category": "gear",
+    "icon": "shield-sun",
+    "howToGet": "Complete the Adult Link wing Iron Knuckle battle in the Spirit Temple and open the exterior right-hand statue chest."
+  },
+  {
+    "id": "ice-arrows",
+    "name": "Ice Arrows",
+    "category": "item",
+    "icon": "snowflake",
+    "howToGet": "Collect at least 7–9 Small Keys in the Gerudo Training Ground mini-dungeon to unlock the central vault."
+  },
+  {
+    "id": "light-arrows",
+    "name": "Light Arrows",
+    "category": "item",
+    "icon": "sun-arrow",
+    "howToGet": "Return to the Temple of Time with all 6 Medallions (after clearing Shadow & Spirit Temples) to receive them from Princess Zelda."
+  },
+  {
+    "id": "golden-gauntlets",
+    "name": "Golden Gauntlets",
+    "category": "gear",
+    "icon": "hand-gold",
+    "howToGet": "Found inside the Shadow Trial of Ganon's Castle; allows lifting massive black obelisks."
+  },
+  {
+    "id": "song-lullaby",
+    "name": "Zelda's Lullaby",
+    "category": "song",
+    "icon": "music",
+    "notes": ["Y", "X", "A", "Y", "X", "A"],
+    "howToGet": "Taught by Impa in the Hyrule Castle Courtyard after speaking with Princess Zelda as Child Link."
+  },
+  {
+    "id": "song-epona",
+    "name": "Epona's Song",
+    "category": "song",
+    "icon": "music",
+    "notes": ["X", "Y", "A", "X", "Y", "A"],
+    "howToGet": "Show out your Ocarina to Malon inside the Lon Lon Ranch corral during the day as Child Link (after waking Talon at Hyrule Castle)."
+  },
+  {
+    "id": "song-saria",
+    "name": "Saria's Song",
+    "category": "song",
+    "icon": "music",
+    "notes": ["R", "A", "Y", "R", "A", "Y"],
+    "howToGet": "Navigate the Sacred Forest Meadow maze as Child Link after obtaining Zelda's Lullaby."
+  },
+  {
+    "id": "song-sun",
+    "name": "Sun's Song",
+    "category": "song",
+    "icon": "music",
+    "notes": ["A", "R", "X", "A", "R", "X"],
+    "howToGet": "Play Zelda's Lullaby on the Triforce symbol at the back of Kakariko Graveyard to enter the Royal Family's Tomb and read the back inscription."
+  },
+  {
+    "id": "song-time",
+    "name": "Song of Time",
+    "category": "song",
+    "icon": "music",
+    "notes": ["A", "L", "R", "A", "L", "R"],
+    "howToGet": "Taught telepathically by Princess Zelda when retrieving the Ocarina of Time from the Hyrule Castle Town moat after collecting all 3 Spiritual Stones."
+  },
+  {
+    "id": "song-storms",
+    "name": "Song of Storms",
+    "category": "song",
+    "icon": "music",
+    "notes": ["L", "R", "X", "L", "R", "X"],
+    "howToGet": "Pull out the Ocarina in front of Guru-Guru inside the Kakariko Village Windmill as Adult Link."
+  },
+  {
+    "id": "song-minuet",
+    "name": "Minuet of Forest",
+    "category": "song",
+    "icon": "music-warp",
+    "notes": ["L", "X", "Y", "A", "Y", "A"],
+    "howToGet": "Taught by Sheik outside the Forest Temple in Sacred Forest Meadow as Adult Link."
+  },
+  {
+    "id": "song-bolero",
+    "name": "Bolero of Fire",
+    "category": "song",
+    "icon": "music-warp",
+    "notes": ["R", "L", "R", "L", "A", "R", "A", "R"],
+    "howToGet": "Taught by Sheik at the warp pad inside Death Mountain Crater (requires Hookshot or Hover Boots across broken bridge + Goron Tunic)."
+  },
+  {
+    "id": "song-serenade",
+    "name": "Serenade of Water",
+    "category": "song",
+    "icon": "music-warp",
+    "notes": ["L", "R", "A", "A", "Y"],
+    "howToGet": "Taught by Sheik in the Iron Boots chamber at the end of the Ice Cavern."
+  },
+  {
+    "id": "song-requiem",
+    "name": "Requiem of Spirit",
+    "category": "song",
+    "icon": "music-warp",
+    "notes": ["L", "R", "L", "A", "R", "L"],
+    "howToGet": "Enter the Spirit Temple at Desert Colossus as Adult Link and step back outside."
+  },
+  {
+    "id": "song-nocturne",
+    "name": "Nocturne of Shadow",
+    "category": "song",
+    "icon": "music-warp",
+    "notes": ["Y", "A", "A", "L", "Y", "A", "R"],
+    "howToGet": "Enter Kakariko Village as Adult Link after clearing Forest, Fire, and Water Temples."
+  },
+  {
+    "id": "song-prelude",
+    "name": "Prelude of Light",
+    "category": "song",
+    "icon": "music-warp",
+    "notes": ["X", "A", "X", "A", "Y", "X"],
+    "howToGet": "Return to the Temple of Time as Adult Link after clearing the Forest Temple."
+  },
+  {
+    "id": "song-scarecrow",
+    "name": "Scarecrow's Song",
+    "category": "song",
+    "icon": "music",
+    "notes": ["Custom 8-Note Melody (Must use >= 2 distinct notes)"],
+    "howToGet": "Play any custom 8-note melody (not matching an existing song) to Bonooru the lower scarecrow at Lake Hylia as Child Link, then play that exact same 8-note melody back to Bonooru as Adult Link to summon Pierre on high ledges."
+  }
+]
