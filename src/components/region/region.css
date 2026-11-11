@@ -1,0 +1,1379 @@
+/* ==========================================================================
+   Region Dossier, Secret Cards, Requirement Pills & Switch 2 Popover
+   Compliant with modern-web-guidance:
+   - light-dismiss-a-dialog & platform-controls-dismiss-dialog
+   - prevent-page-scroll-under-modal-dialog
+   - size-aware-styling (named @container dossier)
+   - form-factor-adaptation (touch targets, safe-area insets, text-wrap)
+   - search-hidden-content (native <details> disclosures)
+   - animate-element-entry-exit (@starting-style + separate allow-discrete)
+   ========================================================================== */
+
+.region-dossier {
+  --dossier-target-min: 28px;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  font-family: var(--font-sans);
+}
+
+@media (pointer: coarse) {
+  .region-dossier {
+    --dossier-target-min: 44px;
+  }
+}
+
+/* Desktop Right Split-Pane (<aside>) */
+.region-dossier-aside {
+  width: var(--drawer-width-desktop, 460px);
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: var(--z-drawer, 20);
+  overflow: hidden;
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity var(--duration-normal, 220ms) var(--ease-out),
+    translate var(--duration-normal, 220ms) var(--ease-out);
+}
+
+@starting-style {
+  .region-dossier-aside {
+    opacity: 0;
+    translate: 18px 0;
+  }
+}
+
+/* Mobile Bottom-Sheet Modal (<dialog>) */
+.region-dossier-dialog {
+  width: 100%;
+  max-width: 100vw;
+  height: 86vh;
+  height: 86dvh;
+  max-height: 90vh;
+  max-height: 90dvh;
+  margin: auto 0 0 0;
+  padding: 0;
+  border: none;
+  border-top: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl, 22px) var(--radius-xl, 22px) 0 0;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  transition:
+    display var(--duration-normal, 220ms),
+    overlay var(--duration-normal, 220ms),
+    opacity var(--duration-normal, 220ms) var(--ease-out),
+    translate var(--duration-normal, 220ms) var(--ease-out);
+  transition-behavior: allow-discrete;
+}
+
+.region-dossier-dialog:modal {
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+}
+
+.region-dossier-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  translate: 0 0;
+}
+
+@starting-style {
+  .region-dossier-dialog[open] {
+    opacity: 0;
+    translate: 0 28px;
+  }
+}
+
+.region-dossier-dialog::backdrop {
+  /* overflow: hidden makes ::backdrop a non-scrollable scroll container so overscroll-behavior traps background scroll */
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: var(--bg-backdrop);
+  backdrop-filter: blur(4px);
+}
+
+/* Inner Container Query Root */
+.region-dossier-surface {
+  container: dossier / inline-size;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-inline-size: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.dossier-drag-pill {
+  width: 42px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--border-strong);
+  margin: var(--space-2) auto 0;
+  flex-shrink: 0;
+}
+
+/* Typography Hygiene (form-factor-adaptation) */
+.region-dossier :is(h2, h3, h4) {
+  margin: 0;
+  text-wrap: balance;
+}
+
+.region-dossier :is(p, li) {
+  margin: 0;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   Sticky Header, Map Counter Match Pills & Dungeon Sub-Tabs
+   ========================================================================== */
+
+.region-dossier-header {
+  flex-shrink: 0;
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(
+    180deg,
+    var(--bg-surface-elevated) 0%,
+    var(--bg-surface) 100%
+  );
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dossier-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.dossier-meta-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.dossier-kind-badge,
+.dossier-biome-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+}
+
+.dossier-kind-badge.kind-dungeon,
+.dossier-kind-badge.kind-mini-dungeon {
+  background: var(--color-locked-crimson-bg);
+  border-color: var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+}
+
+.dossier-kind-badge.kind-special {
+  background: var(--color-triforce-bg);
+  border-color: var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.dossier-biome-badge.biome-forest {
+  background: var(--biome-forest-soft);
+  color: var(--biome-forest);
+}
+.dossier-biome-badge.biome-field {
+  background: var(--biome-field-soft);
+  color: var(--biome-field);
+}
+.dossier-biome-badge.biome-town {
+  background: var(--biome-town-soft);
+  color: var(--biome-town);
+}
+.dossier-biome-badge.biome-castle {
+  background: var(--biome-castle-soft);
+  color: var(--biome-castle);
+}
+.dossier-biome-badge.biome-shadow {
+  background: var(--biome-shadow-soft);
+  color: var(--biome-shadow);
+}
+.dossier-biome-badge.biome-mountain {
+  background: var(--biome-mountain-soft);
+  color: var(--biome-mountain);
+}
+.dossier-biome-badge.biome-water {
+  background: var(--biome-water-soft);
+  color: var(--biome-water);
+}
+.dossier-biome-badge.biome-desert {
+  background: var(--biome-desert-soft);
+  color: var(--biome-desert);
+}
+.dossier-biome-badge.biome-dream {
+  background: var(--biome-dream-soft);
+  color: var(--biome-dream);
+}
+
+.dossier-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: max(34px, var(--dossier-target-min));
+  min-block-size: max(34px, var(--dossier-target-min));
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.dossier-close-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.dossier-region-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.dossier-progress-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dossier-progress-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.dossier-progress-fraction strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.dossier-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+}
+
+.dossier-status-pill.is-ready {
+  background: var(--color-ready-bg);
+  border: 1px solid var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.dossier-status-pill.is-complete {
+  background: var(--color-triforce-bg);
+  border: 1px solid var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.dossier-progress-track {
+  width: 100%;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-subtle);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.dossier-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-ready-strong), var(--color-ready));
+  border-radius: var(--radius-full);
+  transition: width var(--duration-normal) var(--ease-out);
+}
+
+.dossier-progress-fill.is-complete {
+  background: linear-gradient(90deg, var(--color-triforce), var(--color-triforce-strong));
+}
+
+/* Switch 2 In-Game Map Counters Grid (adapts via @container dossier) */
+.dossier-map-counters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+@container dossier (min-width: 420px) {
+  .dossier-map-counters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.map-counter-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  min-inline-size: 0;
+}
+
+.map-counter-pill .counter-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 1.15;
+}
+
+.map-counter-pill .counter-value {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.counter-icon.is-heart {
+  color: var(--color-locked-crimson);
+}
+.counter-icon.is-skull-child {
+  color: var(--color-sapphire);
+}
+.counter-icon.is-skull-adult {
+  color: var(--color-amber);
+}
+.counter-icon.is-skull-total {
+  color: var(--color-triforce);
+}
+
+/* Parent <-> Attached Dungeon Sub-Tabs */
+.dossier-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.dossier-subtab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: var(--dossier-target-min);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  transition: all var(--duration-fast);
+}
+
+.dossier-subtab:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.dossier-subtab.is-selected {
+  background: var(--color-triforce-bg);
+  border-color: var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.subtab-badge {
+  font-size: var(--text-2xs);
+  opacity: 0.88;
+}
+
+/* ==========================================================================
+   Scrollable Dossier Body, Switch 2 Callout & Grouping Switcher
+   ========================================================================== */
+
+.region-dossier-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-inline-size: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: max(var(--space-6), env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.dossier-highlights-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dossier-region-summary {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.dossier-switch2-callout {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-switch2-bg);
+  border: 1px solid var(--color-switch2-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.switch2-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-switch2-text);
+}
+
+.switch2-callout-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+}
+
+/* Grouping Mode Bar */
+.dossier-grouping-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.grouping-bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dossier-group-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.group-mode-pill {
+  flex: 1 1 auto;
+  min-block-size: var(--dossier-target-min);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: center;
+  transition: all var(--duration-fast);
+}
+
+.group-mode-pill:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.group-mode-pill.is-active {
+  background: var(--color-sapphire-bg);
+  border-color: var(--color-sapphire-border);
+  color: var(--color-sapphire-text);
+}
+
+/* ==========================================================================
+   Categorized Sections & <details> Disclosures
+   ========================================================================== */
+
+.dossier-sections-stack,
+.dossier-buckets-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dossier-ready-section,
+.dossier-locked-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.section-banner-header h3 {
+  font-size: var(--text-sm);
+  font-weight: 800;
+}
+
+.section-banner-header.is-ready {
+  background: var(--color-ready-bg);
+  border: 1px solid var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.section-banner-header.is-locked {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+}
+
+.status-dot.is-ready {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-ready);
+  box-shadow: var(--shadow-glow-emerald);
+  flex-shrink: 0;
+}
+
+.dossier-empty-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-default);
+  background: var(--bg-surface-elevated);
+}
+
+/* Native <details> Disclosures (search-hidden-content compliant) */
+.dossier-disclosure {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-elevated);
+  overflow: hidden;
+}
+
+.dossier-disclosure.cat-cross-era,
+.dossier-disclosure.cat-song {
+  border-color: var(--color-locked-violet-border);
+}
+
+.dossier-disclosure.cat-gear {
+  border-color: var(--color-locked-crimson-border);
+}
+
+.dossier-disclosure.cat-wallet-milestone {
+  border-color: var(--color-amber-border);
+}
+
+.dossier-disclosure.cat-time-bug {
+  border-color: var(--color-sapphire-border);
+}
+
+.dossier-disclosure-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-block-size: var(--dossier-target-min);
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-surface-subtle);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dossier-disclosure-summary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+}
+
+.disclosure-cat-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-locked-crimson-text);
+  flex-shrink: 0;
+}
+
+.cat-cross-era .disclosure-cat-icon,
+.cat-song .disclosure-cat-icon {
+  color: var(--color-locked-violet-text);
+}
+
+.cat-wallet-milestone .disclosure-cat-icon {
+  color: var(--color-amber-text);
+}
+
+.cat-time-bug .disclosure-cat-icon {
+  color: var(--color-sapphire-text);
+}
+
+.completed-summary-icon {
+  color: var(--color-triforce);
+  flex-shrink: 0;
+}
+
+.disclosure-count {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.disclosure-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform var(--duration-fast);
+}
+
+.dossier-disclosure[open] > .dossier-disclosure-summary .disclosure-chevron {
+  transform: rotate(180deg);
+}
+
+.dossier-disclosure-content {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tier-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.tier-bucket-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.dossier-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ==========================================================================
+   SecretCard & Cross-Era / Early Trick / Switch 2 Badges
+   ========================================================================== */
+
+.secret-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-elevated);
+  box-shadow: var(--shadow-xs);
+  min-inline-size: 0;
+}
+
+.secret-card.is-available-now {
+  border-color: var(--color-ready-border);
+}
+
+.secret-card.is-available-via-alt {
+  border-color: var(--color-amber-border);
+}
+
+.secret-card.is-completed {
+  opacity: 0.76;
+  background: var(--bg-surface);
+}
+
+.secret-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-inline-size: 0;
+}
+
+.secret-check-btn {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  min-inline-size: 26px;
+  min-block-size: 26px;
+  margin-top: 2px;
+  border-radius: var(--radius-xs);
+  border: 2px solid var(--border-strong);
+  background: var(--bg-surface-subtle);
+  color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--duration-fast);
+}
+
+@media (pointer: coarse) {
+  .secret-check-btn::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
+  }
+}
+
+.secret-check-btn:hover {
+  border-color: var(--color-ready);
+}
+
+.secret-check-btn.is-checked {
+  background: var(--color-triforce);
+  border-color: var(--color-triforce);
+  color: var(--text-inverse);
+}
+
+.secret-card-heading {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.secret-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.secret-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.675rem;
+  font-weight: 700;
+  line-height: 1.3;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+}
+
+.badge-cat.cat-heart-piece {
+  background: var(--color-locked-crimson-bg);
+  border-color: var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+}
+
+.badge-cat.cat-gold-skulltula,
+.badge-cat.cat-skulltula-reward {
+  background: var(--color-triforce-bg);
+  border-color: var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.badge-era.era-child {
+  background: var(--color-sapphire-bg);
+  border-color: var(--color-sapphire-border);
+  color: var(--color-sapphire-text);
+}
+
+.badge-era.era-adult {
+  background: var(--color-amber-bg);
+  border-color: var(--color-amber-border);
+  color: var(--color-amber-text);
+}
+
+.badge-era.era-cross-era {
+  background: var(--color-locked-violet-bg);
+  border-color: var(--color-locked-violet-border);
+  color: var(--color-locked-violet-text);
+}
+
+.badge-switch2.is-new {
+  background: var(--color-switch2-bg);
+  border-color: var(--color-switch2-border);
+  color: var(--color-switch2-text);
+}
+
+.badge-switch2.is-updated {
+  background: var(--color-amber-bg);
+  border-color: var(--color-amber-border);
+  color: var(--color-amber-text);
+}
+
+.badge-rupee {
+  background: var(--color-ready-bg);
+  border-color: var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.badge-timer {
+  background: var(--color-locked-crimson-bg);
+  border-color: var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+}
+
+.secret-card-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.secret-card.is-completed .secret-card-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.secret-card-reward {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-triforce);
+}
+
+/* Early Trick Ready Now Banner */
+.secret-early-trick-banner {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-amber-bg);
+  border: 1px solid var(--color-amber-border);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.early-trick-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--color-amber-text);
+}
+
+.early-trick-text {
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+}
+
+.early-trick-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.secret-location-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-sapphire-text);
+}
+
+.secret-location-hint svg {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.secret-how-to-get {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Cross-Era Step 1 / Step 2 Timeline */
+.secret-cross-era-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-locked-violet-bg);
+  border: 1px solid var(--color-locked-violet-border);
+}
+
+.cross-era-intro {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--color-switch2-text);
+}
+
+.cross-era-step-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@container dossier (min-width: 390px) {
+  .cross-era-step-row {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.cross-era-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--color-locked-violet-border);
+  color: var(--color-locked-violet-text);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: fit-content;
+}
+
+.cross-era-step-desc {
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+/* Inline Song Row */
+.secret-inline-song-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.secret-songbook-link {
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-elevated);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--color-sapphire-text);
+}
+
+/* Requirement Pills Footer */
+.secret-reqs-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.secret-reqs-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.secret-reqs-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.secret-locked-alt-hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: var(--text-2xs);
+  color: var(--text-muted);
+}
+
+.secret-alt-hint-label {
+  font-weight: 700;
+  color: var(--color-amber-text);
+}
+
+/* ==========================================================================
+   Interactive RequirementPill
+   ========================================================================== */
+
+.req-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: max(24px, calc(var(--dossier-target-min) - 10px));
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition: transform var(--duration-fast), filter var(--duration-fast);
+}
+
+.req-pill:hover {
+  filter: brightness(1.08);
+}
+
+.req-pill.is-satisfied {
+  background: var(--color-ready-bg);
+  border-color: var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.req-pill.is-missing {
+  background: var(--color-locked-crimson-bg);
+  border-color: var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+}
+
+.req-pill.is-active {
+  box-shadow: var(--focus-ring);
+}
+
+.req-pill-status-icon,
+.req-pill-music-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Switch 2 Ocarina Button Badges (Y / X / A / R / L)
+   ========================================================================== */
+
+.sw2-song-notes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sw2-notes-caption {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.sw2-note-sequence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.sw2-note-arrow {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.sw2-note-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: #090e1a;
+  box-shadow: var(--shadow-xs);
+}
+
+.sw2-note-y {
+  background: var(--note-y);
+}
+.sw2-note-x {
+  background: var(--note-x);
+}
+.sw2-note-a {
+  background: var(--note-a);
+}
+.sw2-note-r {
+  background: var(--note-r);
+}
+.sw2-note-l {
+  background: var(--note-l);
+}
+
+.sw2-custom-melody-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-amber-text);
+}
+
+.sw2-scarecrow-saved {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* ==========================================================================
+   RequirementPopover (How-To-Get, Switch 2 Notes & Region Jump)
+   ========================================================================== */
+
+.req-popover-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-popover, 40);
+  background: var(--bg-backdrop);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+@container dossier (min-width: 400px) {
+  .req-popover-backdrop {
+    align-items: center;
+  }
+}
+
+.req-popover-card {
+  width: 100%;
+  max-width: 400px;
+  max-height: 90%;
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    translate var(--duration-fast) var(--ease-out);
+}
+
+@starting-style {
+  .req-popover-card {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+.req-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.req-popover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.req-popover-category {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.req-popover-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+}
+
+.req-popover-status.is-owned {
+  background: var(--color-ready-bg);
+  border: 1px solid var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.req-popover-status.is-missing {
+  background: var(--color-locked-crimson-bg);
+  border: 1px solid var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+}
+
+.req-popover-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 32px;
+  min-block-size: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+}
+
+.req-popover-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.req-popover-song-box {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--color-locked-violet-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.req-popover-song-effect {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.req-popover-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.req-popover-section-label {
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.req-popover-body {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.req-popover-switch2-note {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-switch2-bg);
+  border: 1px solid var(--color-switch2-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--text-xs);
+}
+
+.req-popover-switch2-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 800;
+  color: var(--color-switch2-text);
+}
+
+.req-popover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: var(--space-1);
+}
+
+.req-popover-action-btn {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: max(36px, var(--dossier-target-min));
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-primary);
+  transition: filter var(--duration-fast);
+}
+
+.req-popover-action-btn:hover {
+  filter: brightness(1.08);
+}
+
+.req-popover-action-btn.is-toggle-owned {
+  background: var(--color-ready-bg);
+  border-color: var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.req-popover-action-btn.is-toggle-unowned {
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+}
+
+.req-popover-action-btn.is-jump-region {
+  background: var(--color-triforce-bg);
+  border-color: var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.req-popover-action-btn.is-songbook {
+  background: var(--color-sapphire-bg);
+  border-color: var(--color-sapphire-border);
+  color: var(--color-sapphire-text);
+}

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="42%" r="58%">
+      <stop offset="0%" stop-color="#1b2c4d" />
+      <stop offset="100%" stop-color="#090e1a" />
+    </radialGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe58f" />
+      <stop offset="55%" stop-color="#f5c451" />
+      <stop offset="100%" stop-color="#c68a18" />
+    </linearGradient>
+    <linearGradient id="ocarinaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bgGlow)" />
+  <rect x="2" y="2" width="60" height="60" rx="12" stroke="#f5c451" stroke-opacity="0.38" stroke-width="1.5" />
+  <!-- Triforce Crest -->
+  <polygon points="32,9 22,26 42,26" fill="url(#goldGrad)" />
+  <polygon points="22,26 12,43 32,43" fill="url(#goldGrad)" />
+  <polygon points="42,26 32,43 52,43" fill="url(#goldGrad)" />
+  <!-- Ocarina of Time Silhouette Accent -->
+  <ellipse cx="32" cy="50.5" rx="14" ry="6.2" fill="url(#ocarinaGrad)" stroke="#93c5fd" stroke-width="1.2" />
+  <circle cx="25.5" cy="50.5" r="1.5" fill="#090e1a" />
+  <circle cx="30" cy="49.5" r="1.5" fill="#090e1a" />
+  <circle cx="34.5" cy="50" r="1.5" fill="#090e1a" />
+  <circle cx="39" cy="51" r="1.5" fill="#090e1a" />
+</svg>

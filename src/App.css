@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Zelda: Ocarina of Time (Switch 2 Remake) — App Shell & Workspace Layout
+   Applies modern-web-guidance:
+   - responsive-design (100dvh with 100vh fallback, zero horizontal overflow)
+   - size-aware-styling (named @container workspace / inline-size)
+   - form-factor-adaptation (min-inline-size: 0, safe-area-inset-*, touch ergonomics)
+   - dark-mode-toggle (color-scheme & theme synchronization)
+   ========================================================================== */
+
+#root {
+  min-block-size: 100vh;
+  min-block-size: 100dvh;
+  max-inline-size: 100%;
+  overflow-x: clip;
+}
+
+.zelda-skip-link {
+  position: fixed;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  z-index: calc(var(--z-toast, 60) + 10);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-elevated);
+  border: 2px solid var(--color-triforce);
+  color: var(--color-triforce);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  translate: 0 -200%;
+  transition: translate var(--duration-fast) var(--ease-out);
+}
+
+.zelda-skip-link:focus-visible {
+  translate: 0 0;
+}
+
+.zelda-app-shell {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-block-size: 100vh;
+  min-block-size: 100dvh;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  overflow-x: clip;
+}
+
+.zelda-workspace {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  min-inline-size: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+  container: workspace / inline-size;
+}
+
+:where(.zelda-workspace > *, .zelda-map-stage > *) {
+  min-inline-size: 0;
+}
+
+.zelda-map-stage {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-block-size: 0;
+  min-inline-size: 0;
+  padding-block: var(--space-3);
+  padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
+}
+
+.zelda-map-stage .hyrule-map-shell {
+  flex: 1 1 auto;
+}
+
+/* Desktop Split-Pane Shell (>= 900px, matching RegionDrawer's 899px mobile threshold) */
+@media (min-width: 900px) {
+  .zelda-app-shell {
+    block-size: 100vh;
+    block-size: 100dvh;
+    max-block-size: 100vh;
+    max-block-size: 100dvh;
+    overflow: hidden;
+  }
+
+  .zelda-workspace--with-drawer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--drawer-width-desktop, 460px));
+  }
+
+  .zelda-workspace--with-drawer .zelda-map-stage {
+    padding-inline-end: var(--space-3);
+  }
+
+  .zelda-map-stage .hyrule-map-shell,
+  .zelda-map-stage .hyrule-map-viewport {
+    min-block-size: 0;
+  }
+
+  /* Keep both the SVG map and expanded Loadout dock balanced inside 900px desktop viewports */
+  .zelda-app-shell .zelda-loadout-dock__body {
+    max-block-size: min(38vh, 336px);
+    max-block-size: min(38dvh, 336px);
+  }
+}
+
+/* Container-aware split-pane proportion tuning on compact desktop windows (900px - 1119px) */
+@container workspace (inline-size < 1120px) {
+  .region-dossier-aside {
+    --drawer-width-desktop: 396px;
+  }
+}
+
+/* Mobile & Tablet Portrait (< 900px): full-bleed map + bottom-sheet modal <dialog> */
+@media (max-width: 899px) {
+  .zelda-map-stage {
+    padding-block: var(--space-2);
+    padding-inline-start: max(var(--space-2), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--space-2), env(safe-area-inset-right, 0px));
+  }
+
+  .zelda-map-stage .hyrule-map-shell {
+    min-block-size: 250px;
+  }
+
+  .zelda-map-stage .hyrule-map-viewport {
+    min-block-size: 230px;
+  }
+
+  .zelda-app-shell .zelda-loadout-dock {
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+  }
+
+  .zelda-app-shell .zelda-loadout-dock__body {
+    max-block-size: min(54vh, 456px);
+    max-block-size: min(54dvh, 456px);
+  }
+}

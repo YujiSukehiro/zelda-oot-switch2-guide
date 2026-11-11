@@ -3,15 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#0b111e" />
     <meta
       name="description"
       content="Offline interactive Hyrule map, requirement-gated secret tracker, Ocarina songbook, and 100% companion guide for The Legend of Zelda: Ocarina of Time (Nintendo Switch 2 Remake, 2026)."
     />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <title>Zelda: Ocarina of Time (Switch 2 Remake) — Interactive Map &amp; Secrets Guide</title>
+    <script>
+      try {
+        var raw = window.localStorage && window.localStorage.getItem('zelda-oot-sw2-progress-v1');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          var state = parsed && parsed.state ? parsed.state : parsed;
+          var theme = state && state.theme === 'parchment' ? 'parchment' : 'dark';
+          document.documentElement.dataset.theme = theme;
+          var cs = document.querySelector('meta[name="color-scheme"]');
+          if (cs) cs.setAttribute('content', theme === 'parchment' ? 'light' : 'dark');
+          var tc = document.querySelector('meta[name="theme-color"]');
+          if (tc) tc.setAttribute('content', theme === 'parchment' ? '#f5efe0' : '#0b111e');
+        }
+      } catch (_err) {
+        /* ignore restricted storage errors */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
