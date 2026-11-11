@@ -14,6 +14,7 @@ import {
 import {
   computeNodeLayout,
   HyruleMapCanvas,
+  ILLUSTRATED_COORDS,
   type BoundingRect,
 } from './index';
 
@@ -385,5 +386,86 @@ describe('HyruleMapCanvas & Map Nodes', () => {
     const focusBtn = screen.getByTestId('map-focus-selected');
     fireEvent.click(focusBtn);
     expect(zoomReset).not.toHaveTextContent('100%');
+  });
+
+  it('calibrates all 34 regions in ILLUSTRATED_COORDS, hides brown road edges in illustrated mode, and supports Hide Completed, unreachable lock state, and Enter Area Map CTA', () => {
+    // Every region has calibrated illustrated coordinates within the 1000x700 viewBox
+    for (const region of REGIONS) {
+      const pt = ILLUSTRATED_COORDS[region.id];
+      expect(pt, `Missing ILLUSTRATED_COORDS for ${region.id}`).toBeDefined();
+      expect(pt.x).toBeGreaterThanOrEqual(40);
+      expect(pt.x).toBeLessThanOrEqual(965);
+      expect(pt.y).toBeGreaterThanOrEqual(50);
+      expect(pt.y).toBeLessThanOrEqual(665);
+    }
+
+    const state = createDefaultProgressState();
+    const summaries = computeAllRegionSummaries(state) as Record<
+      string,
+      ReturnType<typeof computeAllRegionSummaries>[string] & {
+        isReachable?: boolean;
+        reachabilityBlocker?: string;
+      }
+    >;
+    summaries['ganons-castle'] = {
+      ...summaries['ganons-castle'],
+      isReachable: false,
+      reachabilityBlocker: 'Awaken all 6 Sages',
+    };
+    summaries['kokiri-forest'] = {
+      ...summaries['kokiri-forest'],
+      completedCount: summaries['kokiri-forest'].totalCount,
+      isComplete: true,
+      percent: 100,
+    };
+
+    const onEnterAreaMap = vi.fn();
+    const { container, rerender } = render(
+      <HyruleMapCanvas
+        state={state}
+        regionSummaries={summaries}
+        selectedRegionId="goron-city"
+        onSelectRegion={vi.fn()}
+        onEnterAreaMap={onEnterAreaMap}
+        mapLayerMode="illustrated"
+      />,
+    );
+
+    // Road edges are hidden in illustrated mode so painted roads aren't double-drawn
+    expect(container.querySelectorAll('[data-edge-kind="road"]')).toHaveLength(0);
+
+    // Unreachable region displays lock crest and data-reachable="false"
+    expect(screen.getByTestId('map-node-ganons-castle')).toHaveAttribute(
+      'data-reachable',
+      'false',
+    );
+    expect(screen.getByTestId('map-lock-ganons-castle')).toBeInTheDocument();
+
+    // Hide Completed toggle pill hides 100% completed areas
+    const hideCompletedBtn = screen.getByTestId('map-hide-completed-toggle');
+    expect(hideCompletedBtn).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(hideCompletedBtn);
+    expect(hideCompletedBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('map-node-kokiri-forest')).toHaveAttribute(
+      'data-completed-hidden',
+      'true',
+    );
+
+    // Prominent "Enter Area / Floor Map ->" action triggers onEnterAreaMap
+    fireEvent.click(screen.getByTestId('map-enter-area-btn'));
+    expect(onEnterAreaMap).toHaveBeenCalledWith('goron-city');
+
+    // Switching to schematic mode restores vector road edges
+    rerender(
+      <HyruleMapCanvas
+        state={state}
+        regionSummaries={summaries}
+        selectedRegionId="goron-city"
+        onSelectRegion={vi.fn()}
+        onEnterAreaMap={onEnterAreaMap}
+        mapLayerMode="schematic"
+      />,
+    );
+    expect(container.querySelectorAll('[data-edge-kind="road"]').length).toBeGreaterThan(0);
   });
 });

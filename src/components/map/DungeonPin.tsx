@@ -4,6 +4,8 @@ import {
   BIOME_ACCENT_VAR,
   buildRegionAriaLabel,
   computeNodeLayout,
+  type ExtendedMapRegionSummary,
+  type NodeLabelSpec,
 } from './RegionNode';
 
 function buildOctagonPoints(cx: number, cy: number, r: number): string {
@@ -35,6 +37,9 @@ export interface DungeonPinProps {
   isSelected: boolean;
   isDimmed: boolean;
   isSpotlightHighlighted: boolean;
+  coords?: { x: number; y: number };
+  labelOverride?: Partial<NodeLabelSpec>;
+  isHiddenByCompleteFilter?: boolean;
   onSelect: (regionId: string) => void;
   onHoverChange?: (regionId: string | null) => void;
 }
@@ -45,11 +50,16 @@ export function DungeonPin({
   isSelected,
   isDimmed,
   isSpotlightHighlighted,
+  coords,
+  labelOverride,
+  isHiddenByCompleteFilter = false,
   onSelect,
   onHoverChange,
 }: DungeonPinProps) {
-  const { x, y } = region.mapCoords;
-  const layout = computeNodeLayout(region, summary.readyNowCount);
+  const { x, y } = coords ?? region.mapCoords;
+  const layout = computeNodeLayout(region, summary.readyNowCount, { coords, labelOverride });
+  const extSummary = summary as RegionProgressSummary & ExtendedMapRegionSummary;
+  const isUnreachable = extSummary.isReachable === false && !summary.isComplete;
 
   const kindStroke =
     region.kind === 'special'
@@ -65,9 +75,11 @@ export function DungeonPin({
 
   const progressStroke = summary.isComplete
     ? 'var(--color-triforce)'
-    : summary.readyNowCount > 0
-      ? 'var(--color-ready)'
-      : kindStroke;
+    : isUnreachable
+      ? 'var(--color-locked-crimson)'
+      : summary.readyNowCount > 0
+        ? 'var(--color-ready)'
+        : kindStroke;
 
   const ariaLabel = buildRegionAriaLabel(region, summary);
 
@@ -85,11 +97,15 @@ export function DungeonPin({
     <g
       className={`map-node map-node--pin map-node--${region.kind}${
         isDimmed ? ' is-filter-dimmed' : ''
-      }${isSpotlightHighlighted ? ' is-spotlight-highlighted' : ''}`}
+      }${isSpotlightHighlighted ? ' is-spotlight-highlighted' : ''}${
+        isUnreachable ? ' is-unreachable' : ''
+      }${isHiddenByCompleteFilter ? ' is-completed-hidden' : ''}`}
       data-testid={`map-node-${region.id}`}
       data-region-kind={region.kind}
       data-filtered-out={isDimmed ? 'true' : undefined}
       data-spotlight-match={isSpotlightHighlighted ? 'true' : undefined}
+      data-reachable={isUnreachable ? 'false' : 'true'}
+      data-completed-hidden={isHiddenByCompleteFilter ? 'true' : undefined}
       role="button"
       tabIndex={0}
       aria-pressed={isSelected}
@@ -204,6 +220,39 @@ export function DungeonPin({
         </g>
       )}
 
+      {/* Unreachable Pin Lock Crest */}
+      {isUnreachable && (
+        <g
+          className="map-node__lock-crest"
+          data-testid={`map-lock-${region.id}`}
+          transform={`translate(${x + 7.8} ${y - 7.8})`}
+          aria-hidden="true"
+        >
+          <circle
+            cx="0"
+            cy="0"
+            r="4.8"
+            fill="var(--bg-surface-elevated)"
+            stroke="var(--color-locked-crimson-border)"
+            strokeWidth="1.2"
+          />
+          <rect
+            x="-2.1"
+            y="-0.4"
+            width="4.2"
+            height="3.1"
+            rx="0.8"
+            fill="var(--color-locked-crimson-text)"
+          />
+          <path
+            d="M-1.2 -0.4 V-1.5 A1.2 1.2 0 0 1 1.2 -1.5 V-0.4"
+            fill="none"
+            stroke="var(--color-locked-crimson-text)"
+            strokeWidth="1.05"
+          />
+        </g>
+      )}
+
       {/* Dungeon / Pin Name Pill */}
       <g className="map-node__pill" aria-hidden="true">
         <rect
@@ -227,7 +276,7 @@ export function DungeonPin({
       </g>
 
       {/* Emerald `+N Ready` Action Badge */}
-      {summary.readyNowCount > 0 && (
+      {summary.readyNowCount > 0 && !isUnreachable && (
         <g
           className="map-node__ready-badge"
           data-testid={`map-ready-${region.id}`}

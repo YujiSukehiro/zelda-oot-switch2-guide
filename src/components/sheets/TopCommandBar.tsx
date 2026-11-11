@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   Backpack,
+  BookOpen,
+  ChevronDown,
   Compass,
   DatabaseBackup,
-  Heart,
+  Flag,
+  Layers,
   Map as MapIcon,
   Moon,
   Music,
   ScrollText,
   Search,
-  Sparkles,
   Sun,
   Zap,
 } from 'lucide-react';
@@ -23,41 +25,71 @@ import type {
 } from '../../types/zelda';
 import './sheets.css';
 
+export type ExtendedWorkspaceViewMode = WorkspaceViewMode | 'area';
+
+export interface ExtendedGlobalProgressFields {
+  bossHeartsCompleted?: number;
+  bossHeartsTotal?: number;
+  currentHeartContainers?: number;
+  heartPieceQuarterRemainder?: number;
+}
+
 export interface TopCommandBarProps {
   state: PlayerProgressState;
   globalProgress: GlobalProgressSummary;
   activeSheet: CompanionSheetId | null;
   onOpenSheet: (sheet: CompanionSheetId) => void;
-  onEraFilterChange: (era: EraFilter) => void;
-  onSpotlightChange: (enabled: boolean) => void;
+  /** Kept optional for pre-integration caller compatibility; Era filters live in HyruleMapCanvas. */
+  onEraFilterChange?: (era: EraFilter) => void;
+  /** Kept optional for pre-integration caller compatibility; Switch 2 Spotlight lives in HyruleMapCanvas. */
+  onSpotlightChange?: (enabled: boolean) => void;
   onToggleTheme: (nextTheme: ThemeMode) => void;
-  onToggleLoadoutDock: (nextOpen: boolean) => void;
-  isLoadoutDockOpen: boolean;
-  activeView?: WorkspaceViewMode;
-  onViewModeChange?: (view: WorkspaceViewMode) => void;
+  onToggleLoadoutDock?: (nextOpen: boolean) => void;
+  isLoadoutDockOpen?: boolean;
+  onOpenInventory?: () => void;
+  isInventoryOpen?: boolean;
+  onOpenCatchUp?: () => void;
+  isCatchUpOpen?: boolean;
+  activeView?: ExtendedWorkspaceViewMode | string;
+  onViewModeChange?:
+    | ((view: WorkspaceViewMode) => void)
+    | ((view: ExtendedWorkspaceViewMode) => void);
+  showAreaViewOption?: boolean;
 }
 
-const ERA_OPTIONS: ReadonlyArray<{ id: EraFilter; label: string }> = [
-  { id: 'all', label: 'All' },
-  { id: 'child', label: 'Child' },
-  { id: 'adult', label: 'Adult' },
-];
+export function deriveHeartMeterStats(globalProgress: GlobalProgressSummary): {
+  containers: number;
+  quarterRemainder: number;
+} {
+  const ext = globalProgress as GlobalProgressSummary & ExtendedGlobalProgressFields;
+  const fallbackContainers =
+    3 + (ext.bossHeartsCompleted ?? 0) + Math.floor(globalProgress.heartPiecesCompleted / 4);
+  const rawContainers = ext.currentHeartContainers ?? fallbackContainers;
+  const containers = Math.min(20, Math.max(3, rawContainers));
+  const quarterRemainder =
+    ext.heartPieceQuarterRemainder ?? globalProgress.heartPiecesCompleted % 4;
+  return { containers, quarterRemainder };
+}
 
 export function TopCommandBar({
   state,
   globalProgress,
   activeSheet,
   onOpenSheet,
-  onEraFilterChange,
-  onSpotlightChange,
   onToggleTheme,
   onToggleLoadoutDock,
-  isLoadoutDockOpen,
+  isLoadoutDockOpen = false,
+  onOpenInventory,
+  isInventoryOpen = false,
+  onOpenCatchUp,
+  isCatchUpOpen = false,
   activeView = 'map',
   onViewModeChange,
+  showAreaViewOption = false,
 }: TopCommandBarProps) {
   const isParchment = state.theme === 'parchment';
-  const spotlightActive = Boolean(state.switch2SpotlightOnly);
+  const refMenuDetailsRef = useRef<HTMLDetailsElement | null>(null);
+  const { containers: heartContainers, quarterRemainder } = deriveHeartMeterStats(globalProgress);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -81,10 +113,26 @@ export function TopCommandBar({
         event.preventDefault();
         onOpenSheet('search');
       }
+
+      if (event.key === 'Escape' && refMenuDetailsRef.current?.open) {
+        refMenuDetailsRef.current.open = false;
+      }
+    };
+
+    const handlePointerDownOutside = (event: PointerEvent) => {
+      const menu = refMenuDetailsRef.current;
+      if (!menu?.open) return;
+      if (event.target instanceof Node && !menu.contains(event.target)) {
+        menu.open = false;
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('pointerdown', handlePointerDownOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('pointerdown', handlePointerDownOutside);
+    };
   }, [onOpenSheet]);
 
   const handleThemeToggle = () => {
@@ -98,10 +146,42 @@ export function TopCommandBar({
     onToggleTheme(nextTheme);
   };
 
+  const handleOpenSheetFromMenu = (sheet: CompanionSheetId) => {
+    if (refMenuDetailsRef.current) {
+      refMenuDetailsRef.current.open = false;
+    }
+    onOpenSheet(sheet);
+  };
+
+  const handleInventoryClick = () => {
+    if (onOpenInventory) {
+      onOpenInventory();
+      return;
+    }
+    onToggleLoadoutDock?.(!isLoadoutDockOpen);
+  };
+
+  const handleCatchUpClick = () => {
+    if (onOpenCatchUp) {
+      onOpenCatchUp();
+      return;
+    }
+    onToggleLoadoutDock?.(true);
+  };
+
+  const hasActiveRefSheet =
+    activeSheet === 'ocarina' ||
+    activeSheet === 'quests' ||
+    activeSheet === 'diff' ||
+    activeSheet === 'backup';
+
+  // Render up to 10 visible crimson ♥ glyphs inline so compact viewports never wrap
+  const displayedHeartGlyphs = '♥'.repeat(Math.min(heartContainers, 10));
+
   return (
     <header className="zelda-topbar" role="banner" data-testid="top-command-bar">
       <div className="zelda-topbar__inner">
-        {/* Brand Crest + Live 100% Global Progress Pill */}
+        {/* Brand Crest + Live Heart Meter + Skulltula & Global Completion Pill */}
         <div className="zelda-topbar__brand-cluster">
           <div className="zelda-brand">
             <span className="zelda-brand__crest" aria-hidden="true">
@@ -122,33 +202,58 @@ export function TopCommandBar({
               globalProgress.isComplete ? 'zelda-progress-pill--complete' : ''
             }`.trim()}
             data-testid="global-progress-pill"
-            aria-label={`Global completion: ${globalProgress.completedCount} of ${globalProgress.totalCount} (${globalProgress.percent}%), Heart Pieces ${globalProgress.heartPiecesCompleted} of ${globalProgress.heartPiecesTotal}, Gold Skulltulas ${globalProgress.skulltulasCompleted} of ${globalProgress.skulltulasTotal}`}
+            aria-label={`Live life & completion: ${heartContainers} Heart Containers${
+              quarterRemainder > 0 ? ` plus ${quarterRemainder}/4 Piece of Heart` : ''
+            }, Gold Skulltulas ${globalProgress.skulltulasCompleted} of ${
+              globalProgress.skulltulasTotal
+            }, ${globalProgress.completedCount} of ${globalProgress.totalCount} secrets (${
+              globalProgress.percent
+            }%)`}
           >
-            <span className="zelda-progress-pill__main">
-              {globalProgress.completedCount}/{globalProgress.totalCount} ({globalProgress.percent}%)
+            <span
+              className="zelda-heart-meter"
+              data-testid="heart-meter-pill"
+              title={`${heartContainers} Heart Containers (${globalProgress.heartPiecesCompleted}/${globalProgress.heartPiecesTotal} Pieces of Heart)`}
+            >
+              <span className="zelda-heart-meter__hearts" aria-hidden="true">
+                {displayedHeartGlyphs}
+              </span>
+              <span className="zelda-heart-meter__count">{heartContainers}</span>
+              {quarterRemainder > 0 && (
+                <span
+                  className="zelda-heart-meter__quarter"
+                  data-testid="heart-quarter-indicator"
+                  title={`${quarterRemainder}/4 toward next Heart Container`}
+                >
+                  +{quarterRemainder}/4
+                </span>
+              )}
             </span>
+
             <span className="zelda-progress-pill__sep" aria-hidden="true">
               ·
             </span>
-            <span className="zelda-progress-pill__stat" title="Pieces of Heart">
-              <Heart size={12} aria-hidden="true" />
-              {globalProgress.heartPiecesCompleted}/{globalProgress.heartPiecesTotal}
-            </span>
-            <span className="zelda-progress-pill__sep zelda-progress-pill__sub" aria-hidden="true">
-              ·
-            </span>
+
             <span className="zelda-progress-pill__stat" title="Gold Skulltulas">
               <span aria-hidden="true">🕷</span>
               {globalProgress.skulltulasCompleted}/{globalProgress.skulltulasTotal}
             </span>
+
+            <span className="zelda-progress-pill__sep zelda-progress-pill__sub" aria-hidden="true">
+              ·
+            </span>
+
+            <span className="zelda-progress-pill__main">
+              {globalProgress.completedCount}/{globalProgress.totalCount} ({globalProgress.percent}%)
+            </span>
           </div>
         </div>
 
-        {/* Workspace View Switcher, Era Lens, Switch 2 Spotlight, Search, Sheets, Loadout & Theme */}
+        {/* De-duplicated Controls: View Switcher, My Inventory, Catch Up, Consolidated Reference, Search, Theme */}
         <div
           className="zelda-topbar__controls"
           role="toolbar"
-          aria-label="Map filters and companion sheets"
+          aria-label="Guide workspace, inventory, and reference tools"
         >
           {onViewModeChange && (
             <div
@@ -167,6 +272,22 @@ export function TopCommandBar({
                 <MapIcon size={13} aria-hidden="true" />
                 <span>World Map</span>
               </button>
+
+              {(showAreaViewOption || activeView === 'area') && (
+                <button
+                  type="button"
+                  className="zelda-view-segmented__btn"
+                  data-testid="view-mode-area"
+                  aria-pressed={activeView === 'area'}
+                  onClick={() =>
+                    (onViewModeChange as (view: ExtendedWorkspaceViewMode) => void)('area')
+                  }
+                >
+                  <Layers size={13} aria-hidden="true" />
+                  <span>Area Co-Pilot</span>
+                </button>
+              )}
+
               <button
                 type="button"
                 className="zelda-view-segmented__btn"
@@ -180,32 +301,112 @@ export function TopCommandBar({
             </div>
           )}
 
-          <div className="zelda-era-segmented" role="group" aria-label="Era filter">
-            {ERA_OPTIONS.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className="zelda-era-segmented__btn"
-                data-testid={`era-filter-${opt.id}`}
-                aria-pressed={state.activeEraFilter === opt.id}
-                onClick={() => onEraFilterChange(opt.id)}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+          <button
+            type="button"
+            className="zelda-cmd-btn zelda-cmd-btn--loadout"
+            data-testid="open-inventory-btn"
+            aria-pressed={isInventoryOpen || (!onOpenInventory && isLoadoutDockOpen)}
+            aria-label="Open My Inventory Pause Subscreen (Items, Equipment, Songs & Medallions)"
+            title="My Inventory — Items, Equipment, Songs & Medallions"
+            onClick={handleInventoryClick}
+          >
+            <Backpack size={14} aria-hidden="true" />
+            <span className="zelda-cmd-btn__label">My Inventory</span>
+          </button>
 
           <button
             type="button"
-            className="zelda-cmd-btn zelda-cmd-btn--spotlight"
-            data-testid="spotlight-toggle-btn"
-            aria-pressed={spotlightActive}
-            title="Show only New & Updated Switch 2 Remake secrets"
-            onClick={() => onSpotlightChange(!spotlightActive)}
+            className="zelda-cmd-btn zelda-cmd-btn--catchup"
+            data-testid="open-catchup-btn"
+            aria-pressed={isCatchUpOpen}
+            aria-label="Sync playthrough or jump to a story checkpoint"
+            title="Catch Up / Story Checkpoint Sync"
+            onClick={handleCatchUpClick}
           >
-            <Sparkles size={14} aria-hidden="true" />
-            <span className="zelda-cmd-btn__label">Switch 2</span>
+            <Flag size={14} aria-hidden="true" />
+            <span className="zelda-cmd-btn__label">Catch Up</span>
           </button>
+
+          {/* Consolidated Reference Menu (Ocarina, Quests, Switch 2 Changes, Backup) */}
+          <details
+            ref={refMenuDetailsRef}
+            className="zelda-ref-menu"
+            data-testid="reference-menu"
+          >
+            <summary
+              className={`zelda-cmd-btn zelda-ref-menu__summary${
+                hasActiveRefSheet ? ' is-active-sheet' : ''
+              }`}
+              data-testid="open-reference-menu-btn"
+              aria-label="Reference sheets: Ocarina Songbook, Quests, Switch 2 Changes, and Backup"
+            >
+              <BookOpen size={14} aria-hidden="true" />
+              <span className="zelda-cmd-btn__label">Reference</span>
+              <ChevronDown size={13} className="zelda-ref-menu__chevron" aria-hidden="true" />
+            </summary>
+
+            <div
+              className="zelda-ref-menu__panel"
+              role="group"
+              aria-label="Companion reference sheets"
+            >
+              <button
+                type="button"
+                className="zelda-ref-menu__item"
+                data-testid="open-ocarina-btn"
+                aria-pressed={activeSheet === 'ocarina'}
+                onClick={() => handleOpenSheetFromMenu('ocarina')}
+              >
+                <Music size={14} aria-hidden="true" />
+                <div>
+                  <strong>Ocarina Songbook</strong>
+                  <span>All 13 Switch 2 button melodies &amp; Scarecrow notepad</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="zelda-ref-menu__item"
+                data-testid="open-quests-btn"
+                aria-pressed={activeSheet === 'quests'}
+                onClick={() => handleOpenSheetFromMenu('quests')}
+              >
+                <ScrollText size={14} aria-hidden="true" />
+                <div>
+                  <strong>Side Quests</strong>
+                  <span>Biggoron&apos;s Sword &amp; Happy Mask Shop chains</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="zelda-ref-menu__item"
+                data-testid="open-diff-btn"
+                aria-pressed={activeSheet === 'diff'}
+                onClick={() => handleOpenSheetFromMenu('diff')}
+              >
+                <Zap size={14} aria-hidden="true" />
+                <div>
+                  <strong>Switch 2 Changes</strong>
+                  <span>Remake differences, Bottles, Great Fairies &amp; Hall of Fallen Foes</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="zelda-ref-menu__item"
+                data-testid="open-backup-btn"
+                aria-pressed={activeSheet === 'backup'}
+                onClick={() => handleOpenSheetFromMenu('backup')}
+              >
+                <DatabaseBackup size={14} aria-hidden="true" />
+                <div>
+                  <strong>Backup &amp; Save Data</strong>
+                  <span>Export JSON save, import backup, or reset playthrough</span>
+                </div>
+              </button>
+            </div>
+          </details>
 
           <button
             type="button"
@@ -221,77 +422,6 @@ export function TopCommandBar({
             <kbd className="zelda-cmd-btn__kbd" aria-hidden="true">
               ⌘K
             </kbd>
-          </button>
-
-          <div className="zelda-topbar__sheets-group" role="group" aria-label="Companion sheets">
-            <button
-              type="button"
-              className="zelda-cmd-btn"
-              data-testid="open-ocarina-btn"
-              aria-pressed={activeSheet === 'ocarina'}
-              aria-label="Open Ocarina Songbook and Scarecrow Notepad"
-              title="Ocarina Songbook (Y/X/A/R/L)"
-              onClick={() => onOpenSheet('ocarina')}
-            >
-              <Music size={14} aria-hidden="true" />
-              <span className="zelda-cmd-btn__label">Songs</span>
-            </button>
-
-            <button
-              type="button"
-              className="zelda-cmd-btn"
-              data-testid="open-quests-btn"
-              aria-pressed={activeSheet === 'quests'}
-              aria-label="Open Biggoron's Sword and Happy Mask Quest Trackers"
-              title="Quest Chains (Biggoron & Happy Masks)"
-              onClick={() => onOpenSheet('quests')}
-            >
-              <ScrollText size={14} aria-hidden="true" />
-              <span className="zelda-cmd-btn__label">Quests</span>
-            </button>
-
-            <button
-              type="button"
-              className="zelda-cmd-btn"
-              data-testid="open-diff-btn"
-              aria-pressed={activeSheet === 'diff'}
-              aria-label="Open Switch 2 Remake Changes and Economy Sheet"
-              title="Switch 2 Diff, Bottles, Fairies & Hall of Fallen Foes"
-              onClick={() => onOpenSheet('diff')}
-            >
-              <Zap size={14} aria-hidden="true" />
-              <span className="zelda-cmd-btn__label zelda-cmd-btn__label--hide-tablet">
-                SW2 Diff
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className="zelda-cmd-btn"
-              data-testid="open-backup-btn"
-              aria-pressed={activeSheet === 'backup'}
-              aria-label="Open Backup Export, Import, and Reset"
-              title="Backup, Restore & Reset Progress"
-              onClick={() => onOpenSheet('backup')}
-            >
-              <DatabaseBackup size={14} aria-hidden="true" />
-              <span className="zelda-cmd-btn__label zelda-cmd-btn__label--hide-tablet">
-                Backup
-              </span>
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className="zelda-cmd-btn zelda-cmd-btn--loadout"
-            data-testid="toggle-loadout-btn"
-            aria-expanded={isLoadoutDockOpen}
-            aria-label="Toggle My Loadout and Story Presets dock"
-            title="My Loadout & Story Checkpoint Presets"
-            onClick={() => onToggleLoadoutDock(!isLoadoutDockOpen)}
-          >
-            <Backpack size={14} aria-hidden="true" />
-            <span className="zelda-cmd-btn__label">Loadout</span>
           </button>
 
           <button

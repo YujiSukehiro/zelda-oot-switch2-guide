@@ -1,5 +1,11 @@
 import { ChevronDown, ChevronUp, Check, RotateCcw, Sparkles, X } from 'lucide-react';
-import { REGION_BY_ID, REQUIREMENT_BY_ID, SONGS_AND_QUESTS, STORY_PRESETS } from '../../data';
+import {
+  REGION_BY_ID,
+  REQUIREMENTS,
+  REQUIREMENT_BY_ID,
+  SONGS_AND_QUESTS,
+  STORY_PRESETS,
+} from '../../data';
 import type { PlayerProgressState, UnlockDelta } from '../../types/zelda';
 import './sheets.css';
 
@@ -46,6 +52,9 @@ const CHILD_GEAR_IDS: readonly string[] = [
   'mask-of-truth',
   'bottle',
   'bottled-bug',
+  'stone-emerald',
+  'stone-ruby',
+  'stone-sapphire',
 ];
 
 const ADULT_GEAR_IDS: readonly string[] = [
@@ -99,6 +108,15 @@ export function LoadoutDock({
   onSelectRegion,
 }: LoadoutDockProps) {
   const songIds = SONGS_AND_QUESTS.ocarinaSongs.map((s) => s.id);
+  const categorizedIdSet = new Set<string>([
+    ...ERA_WORLD_STATE_IDS,
+    ...CHILD_GEAR_IDS,
+    ...ADULT_GEAR_IDS,
+    ...WALLET_UPGRADE_IDS,
+    ...SKULLTULA_MILESTONES.map((m) => m.id),
+    ...songIds,
+  ]);
+  const extraWorldIds = REQUIREMENTS.map((r) => r.id).filter((id) => !categorizedIdSet.has(id));
   const isRequirementActive = (reqId: string): boolean =>
     state.loadoutModeEnabled
       ? effectiveRequirements.has(reqId)
@@ -166,12 +184,12 @@ export function LoadoutDock({
             ) : (
               <ChevronUp size={15} aria-hidden="true" />
             )}
-            <span>My Loadout &amp; Story Checkpoints</span>
+            <span>My Inventory &amp; Story Checkpoints</span>
           </button>
 
           <span className="zelda-loadout-dock__meta-pill" data-testid="loadout-owned-summary">
             <Check size={12} aria-hidden="true" />
-            {effectiveRequirements.size} Active Gates
+            {effectiveRequirements.size} Gear &amp; Songs Owned
           </span>
 
           <span className="zelda-loadout-dock__meta-pill" data-testid="loadout-skulltula-pill">
@@ -186,11 +204,15 @@ export function LoadoutDock({
           aria-checked={state.loadoutModeEnabled}
           className="zelda-loadout-dock__mode-btn"
           data-testid="loadout-mode-switch"
-          title="When enabled, map & dossier categorize secrets against your checked gear, songs, and milestones"
+          title="Progressive Mode hides unreachable items until you own the required gear & songs; Checklist Mode shows all items unlocked."
           onClick={() => onToggleLoadoutMode(!state.loadoutModeEnabled)}
         >
           <Sparkles size={13} aria-hidden="true" />
-          <span>Loadout Gating: {state.loadoutModeEnabled ? 'ON' : 'Baseline Only'}</span>
+          <span>
+            {state.loadoutModeEnabled
+              ? 'World Lock: Progressive (Hide Unreachable)'
+              : 'Checklist Mode (Show All Unlocked)'}
+          </span>
         </button>
       </div>
 
@@ -262,6 +284,7 @@ export function LoadoutDock({
               <h3 className="zelda-section-eyebrow">Era &amp; World State</h3>
               <div className="zelda-req-pills">
                 {ERA_WORLD_STATE_IDS.map(renderRequirementPill)}
+                {extraWorldIds.map(renderRequirementPill)}
               </div>
             </div>
 

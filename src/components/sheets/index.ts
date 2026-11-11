@@ -10,7 +10,13 @@ export {
   type Switch2NoteButton,
 } from './NoteBadge';
 
-export { TopCommandBar, type TopCommandBarProps } from './TopCommandBar';
+export {
+  TopCommandBar,
+  deriveHeartMeterStats,
+  type TopCommandBarProps,
+  type ExtendedWorkspaceViewMode,
+  type ExtendedGlobalProgressFields,
+} from './TopCommandBar';
 export { LoadoutDock, type LoadoutDockProps } from './LoadoutDock';
 export { UnlockToast, type UnlockToastProps } from './UnlockToast';
 export { OcarinaModal, type OcarinaModalProps } from './OcarinaModal';

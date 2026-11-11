@@ -10,6 +10,7 @@ import {
   Layers,
   ListChecks,
   Lock,
+  Map as MapIcon,
   Moon,
   Music,
   Shield,
@@ -30,9 +31,15 @@ import type {
   RegionKind,
   RegionProgressSummary,
 } from '../../types/zelda';
+import { FormattedGuideText } from './FormattedGuideText';
 import { RequirementPopover } from './RequirementPopover';
 import { SecretCard } from './SecretCard';
 import './region.css';
+
+interface ExtendedRegionProgressSummary {
+  isReachable?: boolean;
+  reachabilityBlocker?: string;
+}
 
 export interface RegionDrawerProps {
   regionId: string | null;
@@ -46,6 +53,7 @@ export interface RegionDrawerProps {
   onToggleRequirement?: (requirementId: string, owned?: boolean) => void;
   onOpenSongbook?: (songId?: string) => void;
   onOpenOptimalRouteForRegion?: (regionId: string) => void;
+  onOpenAreaWorkspace?: (regionId: string) => void;
 }
 
 const MOBILE_MEDIA_QUERY = '(max-width: 899px)';
@@ -131,6 +139,7 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
   onToggleRequirement,
   onOpenSongbook,
   onOpenOptimalRouteForRegion,
+  onOpenAreaWorkspace,
 }) => {
   const [activeDossierTab, setActiveDossierTab] = useState<'checklist' | 'guide'>('checklist');
   const [groupMode, setGroupMode] = useState<DrawerGroupMode>('blocker');
@@ -296,22 +305,29 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
     onClose();
   };
 
-  const renderSecretList = (items: typeof categorized.readyNow) => (
-    <div className="dossier-card-stack">
-      {items.map((ev) => (
-        <SecretCard
-          key={ev.secret.id}
-          evaluated={ev}
-          effectiveRequirements={effectiveRequirements}
-          customScarecrowNotes={state.customScarecrowNotes}
-          activePopoverReqId={activePopoverReqId}
-          onToggleSecret={onToggleSecret}
-          onSelectRequirementPill={handleOpenRequirementPopover}
-          onOpenSongbook={onOpenSongbook}
-        />
-      ))}
-    </div>
-  );
+  const renderSecretList = (items: typeof categorized.readyNow, forceCompact = false) => {
+    const shouldCompact = forceCompact || items.length > 6;
+    return (
+      <div className="dossier-card-stack">
+        {items.map((ev) => (
+          <SecretCard
+            key={ev.secret.id}
+            evaluated={ev}
+            effectiveRequirements={effectiveRequirements}
+            customScarecrowNotes={state.customScarecrowNotes}
+            activePopoverReqId={activePopoverReqId}
+            compact={shouldCompact}
+            onToggleSecret={onToggleSecret}
+            onSelectRequirementPill={handleOpenRequirementPopover}
+            onOpenSongbook={onOpenSongbook}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const extSummary = summary as RegionProgressSummary & ExtendedRegionProgressSummary;
+  const isRegionUnreachable = extSummary.isReachable === false;
 
   const dossierInner = (
     <div className="region-dossier-surface">
@@ -340,6 +356,37 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
         </div>
 
         <h2 className="dossier-region-title">{region.name}</h2>
+
+        {onOpenAreaWorkspace && (
+          <button
+            type="button"
+            className="dossier-enter-area-btn"
+            data-testid="dossier-open-area-map-btn"
+            onClick={() => onOpenAreaWorkspace(region.id)}
+          >
+            <MapIcon size={15} aria-hidden="true" />
+            <span>Enter Area / Floor Map →</span>
+          </button>
+        )}
+
+        {isRegionUnreachable && (
+          <div
+            className="dossier-reachability-banner"
+            data-testid="dossier-reachability-banner"
+            role="status"
+          >
+            <Lock size={14} aria-hidden="true" />
+            <span>
+              <strong>Area Currently Unreachable:</strong>{' '}
+              <FormattedGuideText
+                text={
+                  extSummary.reachabilityBlocker ??
+                  'Requires story progression or prerequisite gear to enter.'
+                }
+              />
+            </span>
+          </div>
+        )}
 
         <div className="dossier-progress-block">
           <div className="dossier-progress-stats">
@@ -464,7 +511,9 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
           aria-label="Region overview and Switch 2 Remake highlights"
           className="dossier-highlights-section"
         >
-          <p className="dossier-region-summary">{region.summary}</p>
+          <p className="dossier-region-summary">
+            <FormattedGuideText text={region.summary} />
+          </p>
 
           {region.switch2Highlights.length > 0 && (
             <div className="dossier-switch2-callout">
@@ -474,7 +523,9 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
               </div>
               <ul className="switch2-callout-list">
                 {region.switch2Highlights.map((bullet, idx) => (
-                  <li key={idx}>{bullet}</li>
+                  <li key={idx}>
+                    <FormattedGuideText text={bullet} />
+                  </li>
                 ))}
               </ul>
             </div>
@@ -781,11 +832,14 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
             {areaGuide ? (
               <>
                 <div className="area-guide-banner">
-                  <p className="area-guide-tagline">{areaGuide.tagline}</p>
+                  <p className="area-guide-tagline">
+                    <FormattedGuideText text={areaGuide.tagline} />
+                  </p>
                   <div className="area-guide-visit-order">
                     <Compass size={13} aria-hidden="true" />
                     <span>
-                      <strong>Optimal Timing:</strong> {areaGuide.recommendedVisitOrder}
+                      <strong>Optimal Timing:</strong>{' '}
+                      <FormattedGuideText text={areaGuide.recommendedVisitOrder} />
                     </span>
                   </div>
                   {onOpenOptimalRouteForRegion && (
@@ -806,7 +860,9 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
                     <h3 className="area-guide-card__title">Entrances, Warps &amp; Shortcuts</h3>
                     <ul className="area-guide-bullets">
                       {areaGuide.entrancesAndShortcuts.map((line, i) => (
-                        <li key={i}>{line}</li>
+                        <li key={i}>
+                          <FormattedGuideText text={line} />
+                        </li>
                       ))}
                     </ul>
                   </section>
@@ -839,7 +895,9 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
 
                       <ol className="area-guide-steps">
                         {phase.steps.map((stepText, idx) => (
-                          <li key={idx}>{stepText}</li>
+                          <li key={idx}>
+                            <FormattedGuideText text={stepText} />
+                          </li>
                         ))}
                       </ol>
 
@@ -884,9 +942,12 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
                       </h3>
                     </div>
                     <p className="area-guide-boss-weakness">
-                      <strong>Weakness:</strong> {areaGuide.bossStrategy.weakness}
+                      <strong>Weakness:</strong>{' '}
+                      <FormattedGuideText text={areaGuide.bossStrategy.weakness} />
                     </p>
-                    <p className="area-guide-boss-text">{areaGuide.bossStrategy.strategy}</p>
+                    <p className="area-guide-boss-text">
+                      <FormattedGuideText text={areaGuide.bossStrategy.strategy} />
+                    </p>
                   </section>
                 )}
 
@@ -895,7 +956,9 @@ export const RegionDrawer: React.FC<RegionDrawerProps> = ({
                     <h3 className="area-guide-card__title">Switch 2 &amp; Optimization Pro Tips</h3>
                     <ul className="area-guide-bullets">
                       {areaGuide.proTips.map((tip, i) => (
-                        <li key={i}>{tip}</li>
+                        <li key={i}>
+                          <FormattedGuideText text={tip} />
+                        </li>
                       ))}
                     </ul>
                   </section>

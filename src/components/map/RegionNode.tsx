@@ -296,13 +296,23 @@ export function formatRegionKindLabel(kind: RegionKind): string {
   }
 }
 
+export interface ExtendedMapRegionSummary {
+  isReachable?: boolean;
+  reachabilityBlocker?: string;
+}
+
 export function buildRegionAriaLabel(region: Region, summary: RegionProgressSummary): string {
+  const ext = summary as RegionProgressSummary & ExtendedMapRegionSummary;
   const kindLabel = formatRegionKindLabel(region.kind);
   const progressPart = summary.isComplete
     ? `${summary.completedCount} of ${summary.totalCount} completed (100% complete)`
     : `${summary.completedCount} of ${summary.totalCount} completed`;
   const readyPart = summary.readyNowCount > 0 ? `, ${summary.readyNowCount} ready now` : ', 0 ready now';
-  return `${region.name} (${kindLabel}): ${progressPart}${readyPart}`;
+  const lockPart =
+    ext.isReachable === false && !summary.isComplete
+      ? `, locked (${ext.reachabilityBlocker ?? 'prerequisite required'})`
+      : '';
+  return `${region.name} (${kindLabel}): ${progressPart}${readyPart}${lockPart}`;
 }
 
 function makeRect(cx: number, cy: number, width: number, height: number): BoundingRect {
@@ -318,16 +328,28 @@ function makeRect(cx: number, cy: number, width: number, height: number): Boundi
   };
 }
 
-export function computeNodeLayout(region: Region, readyNowCount: number): ComputedNodeLayout {
-  const spec = NODE_LABEL_LAYOUT[region.id] ?? {
+export interface ComputeNodeLayoutOptions {
+  coords?: { x: number; y: number };
+  labelOverride?: Partial<NodeLabelSpec>;
+}
+
+export function computeNodeLayout(
+  region: Region,
+  readyNowCount: number,
+  options?: ComputeNodeLayoutOptions,
+): ComputedNodeLayout {
+  const baseSpec = NODE_LABEL_LAYOUT[region.id] ?? {
     shortName: region.name,
     side: 'bottom' as const,
     badge: 'below-pill' as const,
   };
+  const spec: NodeLabelSpec = options?.labelOverride
+    ? { ...baseSpec, ...options.labelOverride }
+    : baseSpec;
 
   const isOverworld = region.kind === 'overworld';
   const nodeRadius = isOverworld ? 12 : 11;
-  const { x, y } = region.mapCoords;
+  const { x, y } = options?.coords ?? region.mapCoords;
 
   const charAdvance = isOverworld ? 5.55 : 5.3;
   const pillWidth = Math.round(spec.shortName.length * charAdvance + 14);
@@ -447,6 +469,9 @@ export interface RegionNodeProps {
   isSelected: boolean;
   isDimmed: boolean;
   isSpotlightHighlighted: boolean;
+  coords?: { x: number; y: number };
+  labelOverride?: Partial<NodeLabelSpec>;
+  isHiddenByCompleteFilter?: boolean;
   onSelect: (regionId: string) => void;
   onHoverChange?: (regionId: string | null) => void;
 }
@@ -457,12 +482,17 @@ export function RegionNode({
   isSelected,
   isDimmed,
   isSpotlightHighlighted,
+  coords,
+  labelOverride,
+  isHiddenByCompleteFilter = false,
   onSelect,
   onHoverChange,
 }: RegionNodeProps) {
-  const { x, y } = region.mapCoords;
-  const layout = computeNodeLayout(region, summary.readyNowCount);
+  const { x, y } = coords ?? region.mapCoords;
+  const layout = computeNodeLayout(region, summary.readyNowCount, { coords, labelOverride });
   const accentColor = BIOME_ACCENT_VAR[region.biome];
+  const extSummary = summary as RegionProgressSummary & ExtendedMapRegionSummary;
+  const isUnreachable = extSummary.isReachable === false && !summary.isComplete;
 
   const ringRadius = layout.nodeRadius;
   const circumference = 2 * Math.PI * ringRadius;
@@ -471,9 +501,11 @@ export function RegionNode({
 
   const progressStroke = summary.isComplete
     ? 'var(--color-triforce)'
-    : summary.readyNowCount > 0
-      ? 'var(--color-ready)'
-      : accentColor;
+    : isUnreachable
+      ? 'var(--color-locked-crimson)'
+      : summary.readyNowCount > 0
+        ? 'var(--color-ready)'
+        : accentColor;
 
   const ariaLabel = buildRegionAriaLabel(region, summary);
 
@@ -489,11 +521,15 @@ export function RegionNode({
     <g
       className={`map-node map-node--overworld${isDimmed ? ' is-filter-dimmed' : ''}${
         isSpotlightHighlighted ? ' is-spotlight-highlighted' : ''
+      }${isUnreachable ? ' is-unreachable' : ''}${
+        isHiddenByCompleteFilter ? ' is-completed-hidden' : ''
       }`}
       data-testid={`map-node-${region.id}`}
       data-region-kind={region.kind}
       data-filtered-out={isDimmed ? 'true' : undefined}
       data-spotlight-match={isSpotlightHighlighted ? 'true' : undefined}
+      data-reachable={isUnreachable ? 'false' : 'true'}
+      data-completed-hidden={isHiddenByCompleteFilter ? 'true' : undefined}
       role="button"
       tabIndex={0}
       aria-pressed={isSelected}
@@ -578,6 +614,39 @@ export function RegionNode({
         </g>
       )}
 
+      {/* Unreachable Area Lock Crest */}
+      {isUnreachable && (
+        <g
+          className="map-node__lock-crest"
+          data-testid={`map-lock-${region.id}`}
+          transform={`translate(${x + 8.5} ${y - 8.5})`}
+          aria-hidden="true"
+        >
+          <circle
+            cx="0"
+            cy="0"
+            r="5.1"
+            fill="var(--bg-surface-elevated)"
+            stroke="var(--color-locked-crimson-border)"
+            strokeWidth="1.2"
+          />
+          <rect
+            x="-2.2"
+            y="-0.4"
+            width="4.4"
+            height="3.3"
+            rx="0.8"
+            fill="var(--color-locked-crimson-text)"
+          />
+          <path
+            d="M-1.3 -0.4 V-1.6 A1.3 1.3 0 0 1 1.3 -1.6 V-0.4"
+            fill="none"
+            stroke="var(--color-locked-crimson-text)"
+            strokeWidth="1.1"
+          />
+        </g>
+      )}
+
       {/* Region Name Pill */}
       <g className="map-node__pill" aria-hidden="true">
         <rect
@@ -601,7 +670,7 @@ export function RegionNode({
       </g>
 
       {/* Emerald `+N Ready` Action Badge */}
-      {summary.readyNowCount > 0 && (
+      {summary.readyNowCount > 0 && !isUnreachable && (
         <g
           className="map-node__ready-badge"
           data-testid={`map-ready-${region.id}`}

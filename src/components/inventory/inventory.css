@@ -1,0 +1,394 @@
+/* ==========================================================================
+   Game-Authentic Pause Subscreen InventoryModal (`src/components/inventory/`)
+   ========================================================================== */
+
+.oot-inventory {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.oot-inventory__mode-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+
+.oot-inventory__mode-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.oot-inventory__mode-title {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.oot-inventory__mode-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.oot-inventory__mode-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.oot-world-lock-segmented {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  gap: 3px;
+}
+
+.oot-world-lock-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-block-size: 30px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.oot-world-lock-btn[aria-pressed='true'] {
+  background: var(--color-triforce-bg);
+  border-color: var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.oot-catchup-shortcut-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-block-size: 30px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-sapphire-border);
+  background: var(--color-sapphire-bg);
+  color: var(--color-sapphire-text);
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+/* Subscreen Tablist (modern-web-guidance: single row, border-block-end indicator) */
+.oot-subscreen-tablist {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  overflow-x: auto;
+  border-block-end: 1px solid var(--border-default);
+  scrollbar-width: thin;
+}
+
+.oot-subscreen-tab {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-block-size: 40px;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.oot-subscreen-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-hover);
+}
+
+.oot-subscreen-tab[aria-selected='true'] {
+  color: var(--color-triforce);
+}
+
+.oot-subscreen-tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset-inline: 8px;
+  inset-block-end: 0;
+  border-block-end: 3px solid var(--color-triforce);
+  border-radius: 3px 3px 0 0;
+}
+
+.oot-subscreen-panel-inner {
+  padding-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Pause Subscreen Select Item Grid */
+.oot-item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(134px, 1fr));
+  gap: 8px;
+}
+
+.oot-item-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  min-block-size: 74px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duration-fast), background var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.oot-item-slot:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-surface-hover);
+}
+
+.oot-item-slot[aria-pressed='true'] {
+  border-color: var(--color-triforce-border);
+  background: color-mix(in oklab, var(--color-triforce-bg) 75%, var(--bg-surface));
+  color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-triforce) 28%, transparent);
+}
+
+.oot-item-slot__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+}
+
+.oot-item-slot__glyph {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.oot-item-slot__state {
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-subtle);
+  color: var(--text-muted);
+}
+
+.oot-item-slot[aria-pressed='true'] .oot-item-slot__state {
+  background: var(--color-ready-bg);
+  border-color: var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.oot-item-slot__name {
+  font-size: var(--text-xs);
+  font-weight: 750;
+  line-height: 1.25;
+  color: inherit;
+}
+
+.oot-item-slot__era {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* Equipment Matrix */
+.oot-equip-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oot-equip-row {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+@media (max-width: 640px) {
+  .oot-equip-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.oot-equip-row__label {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-triforce);
+}
+
+.oot-equip-row__slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.oot-equip-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 34px;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.oot-equip-chip[aria-pressed='true'] {
+  border-color: var(--color-ready-border);
+  background: var(--color-ready-bg);
+  color: var(--color-ready-text);
+}
+
+/* Quest Status Subscreen: Stones, Medallions, Melodies & World State */
+.oot-quest-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .oot-quest-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.oot-quest-card {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oot-quest-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-triforce);
+}
+
+.oot-crest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.oot-crest-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-block-size: 76px;
+  padding: 8px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-align: center;
+  cursor: pointer;
+}
+
+.oot-crest-btn[aria-pressed='true'] {
+  border-color: var(--color-triforce-border);
+  background: var(--color-triforce-bg);
+  color: var(--text-primary);
+}
+
+.oot-songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 8px;
+}
+
+.oot-song-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.oot-song-row[aria-pressed='true'] {
+  border-color: var(--color-triforce-border);
+  background: color-mix(in oklab, var(--color-triforce-bg) 60%, var(--bg-surface));
+  color: var(--text-primary);
+}
+
+.oot-song-row__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 750;
+}
+
+.oot-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-subtle);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
