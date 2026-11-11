@@ -829,6 +829,17 @@ export const OVERWORLD_CHILD_B_SUBMAPS: RegionSubmapDefinition[] = [
         era: 'adult',
         note: 'Adult at night — stand at the frozen waterfall crest and Hookshot the left stone wall.',
       },
+      {
+        id: 'zd-pin-thread-ruto',
+        floorId: 'overworld',
+        roomId: 'zd-king-throne',
+        x: 360,
+        y: 78,
+        secretId: 'sw2-thread-ruto',
+        kind: 'secret',
+        label: 'Threads of Time: Ruto & the Unfrozen Domain',
+        era: 'adult',
+      },
     ],
   },
 

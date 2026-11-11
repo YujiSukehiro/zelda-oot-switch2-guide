@@ -1,4 +1,7 @@
 import type { EvaluatedSecret, Region } from '../../types/zelda';
+import { ADULT_OVERWORLD_SUBMAPS } from './adultOverworld';
+import { ADULT_TEMPLE_SUBMAPS_A } from './adultTemplesA';
+import { ADULT_TEMPLE_SUBMAPS_B } from './adultTemplesB';
 import { BLUEPRINT_SUBMAPS } from './blueprints';
 import { OVERWORLD_CHILD_A_SUBMAPS } from './overworldChildA';
 import { OVERWORLD_CHILD_B_SUBMAPS } from './overworldChildB';
@@ -17,8 +20,11 @@ export interface SubmapSecretRoomAssignment {
 
 const ALL_BESPOKE_SUBMAPS: RegionSubmapDefinition[] = [
   ...BLUEPRINT_SUBMAPS,
+  ...ADULT_TEMPLE_SUBMAPS_A,
+  ...ADULT_TEMPLE_SUBMAPS_B,
   ...OVERWORLD_CHILD_A_SUBMAPS,
   ...OVERWORLD_CHILD_B_SUBMAPS,
+  ...ADULT_OVERWORLD_SUBMAPS,
 ];
 
 export const SUBMAP_BY_REGION_ID: Record<string, RegionSubmapDefinition> = Object.fromEntries(

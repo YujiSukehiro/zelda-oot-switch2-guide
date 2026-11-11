@@ -567,7 +567,7 @@ describe('World-Reachability Graph, Progression Fixes & Environmental Tags (src/
     expect(routeEff.has('zeldas-letter')).toBe(true);
     expect(evaluateRegionReachability('goron-city', routeEff).isReachable).toBe(true);
 
-    // Turning Loadout Gating OFF ("Checklist Mode") unlocks all 69 requirements, all 34 regions, and all 271 secrets!
+    // Turning Loadout Gating OFF ("Checklist Mode") unlocks all 69 requirements, all 34 regions, and all 276 secrets!
     const checklistModeState = {
       ...fresh,
       loadoutModeEnabled: false,
@@ -1031,7 +1031,7 @@ describe('Storage, Backup JSON Export/Import & URL Hash Routing (src/lib/storage
 });
 
 describe('Area Walkthrough Guides & Optimal 100% Route Integrity', () => {
-  it('validates all 34 AreaWalkthroughGuides and 271 regional secret mappings', () => {
+  it('validates all 34 AreaWalkthroughGuides and 276 regional secret mappings', () => {
     expect(AREA_GUIDES).toHaveLength(34);
     const seenSecrets = new Set<string>();
 
@@ -1063,7 +1063,7 @@ describe('Area Walkthrough Guides & Optimal 100% Route Integrity', () => {
     expect(seenSecrets.size).toBe(ALL_SECRETS.length);
   });
 
-  it('validates all 18 Optimal Route chapters and 270/270 100% countable secret coverage', () => {
+  it('validates all 18 Optimal Route chapters and 275/275 100% countable secret coverage', () => {
     expect(OPTIMAL_ROUTE_CHAPTERS).toHaveLength(18);
     expect(ALL_ROUTE_STEPS.length).toBeGreaterThanOrEqual(100);
 

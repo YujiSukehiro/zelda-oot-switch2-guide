@@ -24,3 +24,12 @@ export { QuestsModal, type QuestsModalProps } from './QuestsModal';
 export { Switch2DiffModal, type Switch2DiffModalProps } from './Switch2DiffModal';
 export { SearchModal, type SearchModalProps } from './SearchModal';
 export { BackupModal, type BackupModalProps } from './BackupModal';
+export {
+  HallOfFallenFoesModal,
+  type HallOfFallenFoesModalProps,
+} from './HallOfFallenFoesModal';
+export {
+  ReferenceGuideModal,
+  type ReferenceGuideModalProps,
+  type ReferenceGuideTab,
+} from './ReferenceGuideModal';

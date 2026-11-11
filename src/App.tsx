@@ -7,13 +7,16 @@ import { RegionDrawer } from './components/region';
 import { isRouteStepComplete, OptimalRouteView, ResumeBanner } from './components/route';
 import {
   BackupModal,
+  HallOfFallenFoesModal,
   LoadoutDock,
   OcarinaModal,
   QuestsModal,
+  ReferenceGuideModal,
   SearchModal,
   Switch2DiffModal,
   TopCommandBar,
   UnlockToast,
+  type ReferenceGuideTab,
 } from './components/sheets';
 import { AreaSubmapView } from './components/submap';
 import {
@@ -48,6 +51,8 @@ const VALID_COMPANION_SHEETS = new Set<CompanionSheetId>([
   'diff',
   'search',
   'backup',
+  'foes',
+  'reference',
 ]);
 
 const VALID_GUIDED_LENSES = new Set<GuidedLensId>(['copilot', 'rooms', 'quests']);
@@ -83,6 +88,8 @@ export function App() {
     setBookmarkedRouteStep,
     setMapLayerMode,
     toggleRequirement,
+    toggleFoeStatue,
+    setBossRushMedal,
     selectPreset,
     completeOnboarding,
     setEraFilter,
@@ -103,6 +110,9 @@ export function App() {
   );
   const [hideCompletedOnMap, setHideCompletedOnMap] = useState<boolean>(false);
   const [initialSongId, setInitialSongId] = useState<string | null>(null);
+  const [initialReferenceTab, setInitialReferenceTab] = useState<
+    ReferenceGuideTab | undefined
+  >(undefined);
   const [highlightedStepId, setHighlightedStepId] = useState<string | null>(null);
 
   const didBootstrapHashSyncRef = useRef<boolean>(false);
@@ -430,6 +440,7 @@ export function App() {
   const handleOpenSheet = useCallback(
     (sheet: CompanionSheetId) => {
       setInitialSongId(null);
+      setInitialReferenceTab(undefined);
       setIsInventoryOpen(false);
       setIsCatchUpOpen(false);
       updateHashState({ sheet });
@@ -439,7 +450,14 @@ export function App() {
 
   const handleCloseSheet = useCallback(() => {
     setInitialSongId(null);
+    setInitialReferenceTab(undefined);
     updateHashState({ sheet: null });
+  }, [updateHashState]);
+
+  const handleOpenPierreDirectory = useCallback(() => {
+    setInitialSongId(null);
+    setInitialReferenceTab('pierre');
+    updateHashState({ sheet: 'reference' });
   }, [updateHashState]);
 
   const handleOpenSongbook = useCallback(
@@ -767,7 +785,25 @@ export function App() {
         onToggleRequirement={toggleRequirement}
         onSaveScarecrowNotes={setScarecrowNotes}
         onSelectRegion={handleSelectRegionOnMap}
+        onOpenPierreDirectory={handleOpenPierreDirectory}
         initialSongId={initialSongId}
+      />
+
+      <HallOfFallenFoesModal
+        isOpen={activeSheet === 'foes'}
+        onClose={handleCloseSheet}
+        state={state}
+        onToggleFoeStatue={toggleFoeStatue}
+        onSetBossRushMedal={setBossRushMedal}
+        onSelectRegion={handleSelectRegionFromToast}
+        onToggleSecret={toggleSecret}
+      />
+
+      <ReferenceGuideModal
+        isOpen={activeSheet === 'reference'}
+        onClose={handleCloseSheet}
+        onSelectRegion={handleSelectRegionFromToast}
+        initialTab={initialReferenceTab}
       />
 
       <QuestsModal

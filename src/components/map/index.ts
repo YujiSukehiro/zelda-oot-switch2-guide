@@ -8,6 +8,8 @@ export {
   RegionNode,
   NODE_LABEL_LAYOUT,
   computeNodeLayout,
+  buildNodeHitBridgePoints,
+  buildReadyBadgeHitBridgePoints,
   buildRegionAriaLabel,
   formatRegionKindLabel,
   type RegionNodeProps,

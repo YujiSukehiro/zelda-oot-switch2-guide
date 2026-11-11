@@ -39,19 +39,35 @@ const CHILD_HYRULE_BESPOKE_REGION_IDS = [
   'gerudo-valley',
 ] as const;
 
-describe('Sub-Map Registry & Phase 1 Child Hyrule Coverage', () => {
-  it('provides bespoke submaps for all 21 Child-accessible regions', () => {
+describe('Sub-Map Registry — Full 34/34 Bespoke Child & Adult Hyrule Coverage', () => {
+  it('provides dedicated bespoke submaps for all 34/34 regions (16 multi-floor blueprints + 18 illustrated overworld maps)', () => {
+    expect(REGIONS).toHaveLength(34);
+    expect(Object.keys(SUBMAP_BY_REGION_ID)).toHaveLength(34);
+
     for (const regionId of CHILD_HYRULE_BESPOKE_REGION_IDS) {
       expect(hasDedicatedSubmap(regionId), `Missing submap for ${regionId}`).toBe(true);
-      const submap = getSubmapForRegion(regionId);
+    }
+
+    for (const region of REGIONS) {
+      expect(hasDedicatedSubmap(region.id), `Missing dedicated submap for ${region.id}`).toBe(true);
+      const submap = getSubmapForRegion(region.id);
       expect(submap).not.toBeNull();
-      expect(submap?.regionId).toBe(regionId);
+      expect(submap?.regionId).toBe(region.id);
       expect(submap?.viewBox).toBe('0 0 800 560');
       expect(submap!.floors.length).toBeGreaterThanOrEqual(1);
     }
+
+    const blueprintSubmaps = Object.values(SUBMAP_BY_REGION_ID).filter(
+      (s) => s.mode === 'blueprint',
+    );
+    const illustratedSubmaps = Object.values(SUBMAP_BY_REGION_ID).filter(
+      (s) => s.mode === 'illustrated',
+    );
+    expect(blueprintSubmaps).toHaveLength(16);
+    expect(illustratedSubmaps).toHaveLength(18);
   });
 
-  it('models exact multi-floor dungeon & hub blueprints (Goron City, Deku Tree, Dodongo, Jabu, Well)', () => {
+  it('models exact multi-floor dungeon & hub blueprints (Goron City, Deku Tree, Dodongo, Jabu, Well, Water Temple & Adult Temples) and pins all 6 Threads of Time quests', () => {
     const goron = getSubmapForRegion('goron-city')!;
     expect(goron.mode).toBe('blueprint');
     expect(goron.floors.map((f) => f.label)).toEqual(['4F', '3F', '2F', '1F']);
@@ -64,7 +80,36 @@ describe('Sub-Map Registry & Phase 1 Child Hyrule Coverage', () => {
         'hp-17',
         'eq-goron-bracelet',
         'eq-goron-tunic',
+        'sw2-thread-darunia',
       ]),
+    );
+
+    const water = getSubmapForRegion('water-temple')!;
+    expect(water.mode).toBe('blueprint');
+    expect(water.floors.map((f) => f.label)).toEqual(['3F', '2F', '1F', 'B1']);
+    expect(water.dungeonMeta?.smallKeysCount).toBe(6);
+    expect(water.pins.map((p) => p.secretId)).toEqual(
+      expect.arrayContaining(['eq-longshot', 'boss-hc-water', 'medallion-water']),
+    );
+
+    // Verify all 6 Threads of Time quests are pinned on their respective submaps
+    expect(getSubmapForRegion('lon-lon-ranch')!.pins.map((p) => p.secretId)).toContain(
+      'sw2-thread-malon',
+    );
+    expect(getSubmapForRegion('goron-city')!.pins.map((p) => p.secretId)).toContain(
+      'sw2-thread-darunia',
+    );
+    expect(getSubmapForRegion('zoras-domain')!.pins.map((p) => p.secretId)).toContain(
+      'sw2-thread-ruto',
+    );
+    expect(getSubmapForRegion('gerudo-fortress')!.pins.map((p) => p.secretId)).toContain(
+      'sw2-thread-nabooru',
+    );
+    expect(getSubmapForRegion('kakariko-village')!.pins.map((p) => p.secretId)).toContain(
+      'sw2-thread-impa',
+    );
+    expect(getSubmapForRegion('sacred-forest-meadow')!.pins.map((p) => p.secretId)).toContain(
+      'sw2-thread-saria',
     );
 
     const deku = getSubmapForRegion('deku-tree')!;
@@ -160,12 +205,12 @@ describe('Sub-Map Registry & Phase 1 Child Hyrule Coverage', () => {
     }
   });
 
-  it('ships crisp illustrated cartographic JPEGs on disk for all 14 illustrated overworld submaps', () => {
+  it('ships crisp illustrated cartographic JPEGs on disk for all 18 illustrated overworld submaps', () => {
     const publicDir = path.resolve(process.cwd(), 'public');
     const illustratedSubmaps = Object.values(SUBMAP_BY_REGION_ID).filter(
       (s) => s.mode === 'illustrated',
     );
-    expect(illustratedSubmaps).toHaveLength(14);
+    expect(illustratedSubmaps).toHaveLength(18);
 
     for (const submap of illustratedSubmaps) {
       for (const floor of submap.floors) {

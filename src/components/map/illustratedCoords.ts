@@ -63,7 +63,8 @@ export const ILLUSTRATED_COORDS: Readonly<Record<string, { x: number; y: number 
  */
 export const ILLUSTRATED_LABEL_OVERRIDES: Readonly<Record<string, Partial<NodeLabelSpec>>> = {
   'spirit-temple': { side: 'right', offsetX: 0, badge: 'above-pill' },
-  'desert-colossus': { side: 'right', offsetX: 0, badge: 'below-pill' },
+  'desert-colossus': { side: 'bottom', offsetX: 0, badge: 'below-pill' },
+  'gerudo-training-ground': { side: 'right', offsetX: 0, badge: 'above-pill' },
   'outside-ganons-castle': { side: 'left', offsetX: 0, offsetY: 0, badge: 'below-pill' },
   'hyrule-castle': { side: 'right', offsetX: 0, badge: 'above-pill' },
   market: { side: 'right', offsetX: 0, badge: 'below-pill' },
@@ -73,6 +74,7 @@ export const ILLUSTRATED_LABEL_OVERRIDES: Readonly<Record<string, Partial<NodeLa
   'death-mountain-trail': { side: 'left', offsetX: 0, offsetY: -4, badge: 'above-pill' },
   'zoras-fountain': { side: 'left', offsetX: 0, offsetY: 0, badge: 'above-pill' },
   'jabu-jabus-belly': { side: 'left', offsetX: 0, offsetY: 0, badge: 'below-pill' },
+  'zoras-domain': { side: 'right', offsetX: 0, offsetY: 0, badge: 'below-pill' },
   'sacred-forest-meadow': { side: 'left', offsetX: 0, offsetY: 0, badge: 'above-pill' },
   'forest-temple': { side: 'left', offsetX: 0, offsetY: 0, badge: 'below-pill' },
   'deku-tree': { side: 'right', offsetX: 0, offsetY: -4, badge: 'above-pill' },

@@ -169,7 +169,7 @@ describe('<AreaSubmapView />', () => {
     expect(screen.getByText(/0 Keys needed for Lens of Truth/i)).toBeDefined();
     unmount();
 
-    // Verify Phase 2 Adult dungeon fallback ('forest-temple') renders smoothly
+    // Verify Phase 2 bespoke Adult dungeon blueprints ('forest-temple' & 'water-temple') render multi-floor tabs & keys
     const forestTemple = REGION_BY_ID['forest-temple'];
     const forestSecrets: EvaluatedSecret[] = (SECRETS_BY_REGION['forest-temple'] ?? []).map(
       (secret) => toMockEvaluated(secret, true),
@@ -177,9 +177,23 @@ describe('<AreaSubmapView />', () => {
     const { unmount: unmountForest } = render(
       <AreaSubmapView region={forestTemple} evaluatedSecrets={forestSecrets} />,
     );
-    expect(screen.getByText(/Forest Temple — Schematic Sub-Map/i)).toBeDefined();
+    expect(screen.getByText(/Forest Temple — 4-Floor Haunted Courtyard Blueprint/i)).toBeDefined();
     expect(screen.getByTestId('dungeon-meta-strip').textContent).toContain('Small Keys: 5');
     unmountForest();
+
+    const waterTemple = REGION_BY_ID['water-temple'];
+    const waterSecrets: EvaluatedSecret[] = (SECRETS_BY_REGION['water-temple'] ?? []).map(
+      (secret) => toMockEvaluated(secret, true),
+    );
+    const { unmount: unmountWater } = render(
+      <AreaSubmapView region={waterTemple} evaluatedSecrets={waterSecrets} />,
+    );
+    expect(screen.getByRole('tab', { name: /3F/i })).toBeDefined();
+    expect(screen.getByRole('tab', { name: /2F/i })).toBeDefined();
+    expect(screen.getByRole('tab', { name: /1F/i })).toBeDefined();
+    expect(screen.getByRole('tab', { name: /B1/i })).toBeDefined();
+    expect(screen.getByTestId('dungeon-meta-strip').textContent).toContain('Small Keys: 6');
+    unmountWater();
 
     // Verify room summaries with inline backticks render via FormattedGuideText without raw backticks
     const dmtRegion = REGION_BY_ID['death-mountain-trail'];

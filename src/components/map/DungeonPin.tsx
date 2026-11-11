@@ -2,6 +2,8 @@ import type { KeyboardEvent } from 'react';
 import type { Region, RegionProgressSummary } from '../../types/zelda';
 import {
   BIOME_ACCENT_VAR,
+  buildNodeHitBridgePoints,
+  buildReadyBadgeHitBridgePoints,
   buildRegionAriaLabel,
   computeNodeLayout,
   type ExtendedMapRegionSummary,
@@ -120,6 +122,14 @@ export function DungeonPin({
       onFocus={() => onHoverChange?.(region.id)}
       onBlur={() => onHoverChange?.(null)}
     >
+      {/* Tight transparent hit bridge eliminating the 3px-5px dead gap between pin & offset pill */}
+      <polygon
+        className="map-node__hit-bridge"
+        points={buildNodeHitBridgePoints(x, y, layout)}
+        fill="transparent"
+        aria-hidden="true"
+      />
+
       {/* Keyboard focus halo */}
       <circle className="map-node__focus-ring" cx={x} cy={y} r={ringRadius + 4.4} />
 
@@ -282,6 +292,11 @@ export function DungeonPin({
           data-testid={`map-ready-${region.id}`}
           aria-hidden="true"
         >
+          <polygon
+            className="map-node__hit-bridge"
+            points={buildReadyBadgeHitBridgePoints(layout)}
+            fill="transparent"
+          />
           <rect
             className="map-node__ready-bg"
             x={layout.readyBox.left}

@@ -391,6 +391,15 @@
   pointer-events: none;
 }
 
+.map-node__hit-bridge {
+  fill: transparent;
+  pointer-events: visibleFill;
+}
+
+.map-node.is-completed-hidden .map-node__hit-bridge {
+  pointer-events: none;
+}
+
 .map-node__pill-bg {
   fill: var(--map-pill-bg);
   stroke: var(--map-pill-border);

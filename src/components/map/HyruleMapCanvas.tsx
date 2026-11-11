@@ -803,7 +803,7 @@ export function HyruleMapCanvas({
             <rect x="0" y="0" width="1000" height="700" fill="var(--bg-map-ocean)" />
 
             {effectiveLayerMode === 'illustrated' ? (
-              <g className="hyrule-illustrated-layer" aria-hidden="true">
+              <g className="hyrule-illustrated-layer" aria-hidden="true" pointerEvents="none">
                 <image
                   className="hyrule-illustrated-image"
                   data-testid="hyrule-illustrated-backdrop"

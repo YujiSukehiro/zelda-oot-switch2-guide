@@ -103,7 +103,13 @@ async function ensureLoadoutOpen(page: Page, shouldBeOpen: boolean): Promise<voi
 
 async function openReferenceSheet(
   page: Page,
-  btnTestId: 'open-ocarina-btn' | 'open-quests-btn' | 'open-diff-btn' | 'open-backup-btn',
+  btnTestId:
+    | 'open-ocarina-btn'
+    | 'open-quests-btn'
+    | 'open-foes-btn'
+    | 'open-reference-btn'
+    | 'open-diff-btn'
+    | 'open-backup-btn',
 ): Promise<void> {
   const refMenu = page.getByTestId('reference-menu');
   const isOpen = await refMenu.evaluate((el) => (el as HTMLDetailsElement).open);
@@ -166,6 +172,7 @@ test.describe('Static Build Artifacts & Strict Subpath Server Guard', () => {
     expect(swContent).toContain('icons/icon-192.png');
     expect(swContent).toContain('maps/hyrule-illustrated.jpg');
     expect(swContent).toContain('maps/regions/kokiri-forest.jpg');
+    expect(swContent).toContain('maps/regions/desert-colossus.jpg');
     expect(swContent).not.toContain('"/assets/');
 
     // Confirm port 4174 strictly returns HTTP 404 for root-escaped paths outside /Zelda/*
@@ -195,7 +202,7 @@ for (const target of DEPLOY_TARGETS) {
 
       await expect(page.getByTestId('hyrule-map-canvas')).toBeVisible();
 
-      const allNodes = page.locator('[data-testid^="map-node-"]');
+      const allNodes = page.locator('[data-testid^="map-node-"][data-region-kind]');
       const overworldNodes = page.locator('[data-testid^="map-node-"][data-region-kind="overworld"]');
       const dungeonAndSpecialPins = page.locator(
         '[data-testid^="map-node-"][data-region-kind="dungeon"], ' +
@@ -515,7 +522,7 @@ for (const target of DEPLOY_TARGETS) {
       await ensureLoadoutOpen(page, false);
 
       const globalPill = page.getByTestId('global-progress-pill');
-      await expect(globalPill).toContainText('0/270 (0%)');
+      await expect(globalPill).toContainText('0/275 (0%)');
       await expect(globalPill).toContainText('0/100');
       await expect(page.getByTestId('heart-meter-pill')).toContainText('3');
 
@@ -527,7 +534,7 @@ for (const target of DEPLOY_TARGETS) {
       await page.getByTestId('secret-check-hp-07').click();
       await page.getByTestId('secret-check-gs-018').click();
 
-      await expect(globalPill).toContainText('2/270 (1%)');
+      await expect(globalPill).toContainText('2/275 (1%)');
       await expect(globalPill).toContainText('1/100');
       await expect(page.getByTestId('heart-quarter-indicator')).toContainText('+1/4');
       await expect(page.getByTestId('counter-heart-pieces')).toContainText('1 / 4');
@@ -537,7 +544,7 @@ for (const target of DEPLOY_TARGETS) {
       // Reload and confirm full persistence of both localStorage progress and hash deep-link
       await page.reload({ waitUntil: 'networkidle' });
       expect(new URL(page.url()).pathname).toBe(target.expectedPathname);
-      await expect(globalPill).toContainText('2/270 (1%)');
+      await expect(globalPill).toContainText('2/275 (1%)');
       await expect(globalPill).toContainText('1/100');
       await expect(page.getByTestId('heart-quarter-indicator')).toContainText('+1/4');
       await expect(page.getByTestId('counter-heart-pieces')).toContainText('1 / 4');
@@ -626,9 +633,9 @@ for (const target of DEPLOY_TARGETS) {
 
       // Also test Zelda's Lullaby pill (Y / X / A) in Kakariko Graveyard -> Jump to Hyrule Castle Grounds (Child)
       await page.getByTestId('map-node-graveyard').click();
-      const hp11Card = page.getByTestId('secret-card-hp-11');
-      await ensureCardExpanded(hp11Card, 'hp-11');
-      await hp11Card.getByTestId('req-pill-song-lullaby').click();
+      const sunSongCard = page.getByTestId('secret-card-song-sun');
+      await ensureCardExpanded(sunSongCard, 'song-sun');
+      await sunSongCard.getByTestId('req-pill-song-lullaby').click();
       await expect(popover).toBeVisible();
       await expect(popover).toContainText("Zelda's Lullaby");
       await expect(popover.getByTestId('song-note-badge-0')).toHaveText('Y');
@@ -797,7 +804,7 @@ for (const target of DEPLOY_TARGETS) {
       await expect(guidePanel).toBeVisible();
       await expect(guidePanel).toContainText('Gohma');
       await guidePanel.getByTestId('guide-secret-check-gs-057').check();
-      await expect(page.getByTestId('global-progress-pill')).toContainText('1/270');
+      await expect(page.getByTestId('global-progress-pill')).toContainText('1/275');
 
       // 3. Jump directly from the Area Guide into the Horizontal Optimal Route
       await guidePanel.getByTestId('dossier-jump-to-route-btn').click();
@@ -821,11 +828,33 @@ for (const target of DEPLOY_TARGETS) {
 
       await page.reload({ waitUntil: 'networkidle' });
       await expect(page.getByTestId('resume-banner')).toBeVisible();
-      await expect(page.getByTestId('global-progress-pill')).toContainText('1/270');
+      await expect(page.getByTestId('global-progress-pill')).toContainText('1/275');
 
       // Check Mobile 390×844 zero horizontal overflow in Optimal Route view
       await page.setViewportSize({ width: 390, height: 844 });
       await assertZeroHorizontalOverflow(page, 'Mobile 390×844 Optimal Route view');
+
+      // 4. Phase 2 Water Temple 4-floor blueprint, Hall of Fallen Foes (84 statues), Field Reference & 6 Threads of Time
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(`${target.baseUrl}#view=area&region=water-temple&lens=copilot`, {
+        waitUntil: 'networkidle',
+      });
+      await expect(page.getByTestId('dungeon-meta-strip')).toContainText('Small Keys: 6');
+      await expect(page.getByRole('tab', { name: /3F/i })).toBeVisible();
+      await expect(page.getByRole('tab', { name: /B1/i })).toBeVisible();
+
+      await openReferenceSheet(page, 'open-foes-btn');
+      await expect(page.getByTestId('hall-of-fallen-foes-modal')).toBeVisible();
+      await expect(page.getByTestId('foes-progress-counter')).toContainText('0 / 84');
+      await page.getByTestId('foe-check-foe-01').click();
+      await expect(page.getByTestId('foes-progress-counter')).toContainText('1 / 84');
+      await page.getByTestId('hall-of-fallen-foes-modal-close-btn').click();
+
+      await openReferenceSheet(page, 'open-reference-btn');
+      await expect(page.getByTestId('reference-guide-modal')).toBeVisible();
+      await page.getByTestId('ref-tab-fishing').click();
+      await expect(page.getByTestId('sinking-lure-section')).toBeVisible();
+      await page.getByTestId('reference-guide-modal-close-btn').click();
 
       telemetry.assertClean();
     });

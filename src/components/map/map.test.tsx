@@ -12,9 +12,13 @@ import {
   createDefaultProgressState,
 } from '../../lib/gating';
 import {
+  buildNodeHitBridgePoints,
+  buildReadyBadgeHitBridgePoints,
   computeNodeLayout,
   HyruleMapCanvas,
   ILLUSTRATED_COORDS,
+  ILLUSTRATED_LABEL_OVERRIDES,
+  resolveRegionMapCoords,
   type BoundingRect,
 } from './index';
 
@@ -467,5 +471,102 @@ describe('HyruleMapCanvas & Map Nodes', () => {
       />,
     );
     expect(container.querySelectorAll('[data-edge-kind="road"]').length).toBeGreaterThan(0);
+  });
+
+  it('guarantees every node <g> bbox center lands inside its own painted hit geometry (and never inside a neighbor) across illustrated & schematic modes', () => {
+    const parsePolygon = (pts: string) =>
+      pts.split(' ').map((pair) => {
+        const [px, py] = pair.split(',').map(Number);
+        return { x: px, y: py };
+      });
+
+    const pointInConvexQuad = (px: number, py: number, poly: Array<{ x: number; y: number }>) => {
+      // Ray-casting point-in-polygon with tiny boundary tolerance
+      let inside = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const xi = poly[i].x;
+        const yi = poly[i].y;
+        const xj = poly[j].x;
+        const yj = poly[j].y;
+        // Check exact segment proximity (<= 0.05px)
+        const dx = xj - xi;
+        const dy = yj - yi;
+        const lenSq = dx * dx + dy * dy;
+        const t = lenSq > 0 ? Math.max(0, Math.min(1, ((px - xi) * dx + (py - yi) * dy) / lenSq)) : 0;
+        if (Math.hypot(px - (xi + t * dx), py - (yi + t * dy)) <= 0.05) {
+          return true;
+        }
+        const intersect =
+          yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    };
+
+    const pointInRect = (px: number, py: number, r: BoundingRect) =>
+      px >= r.left - 0.05 && px <= r.right + 0.05 && py >= r.top - 0.05 && py <= r.bottom + 0.05;
+
+    const failures: string[] = [];
+
+    for (const mode of ['illustrated', 'schematic'] as const) {
+      for (const withReadyBadge of [false, true]) {
+        const orderedRegions = [...OVERWORLD_REGIONS, ...DUNGEON_AND_SPECIAL_REGIONS];
+        const geometries = orderedRegions.map((region) => {
+          const coords = resolveRegionMapCoords(region, mode);
+          const labelOverride =
+            mode === 'illustrated' ? ILLUSTRATED_LABEL_OVERRIDES[region.id] : undefined;
+          const layout = computeNodeLayout(region, withReadyBadge ? 3 : 0, {
+            coords,
+            labelOverride,
+          });
+          const focusHaloR = layout.nodeRadius + (region.kind === 'overworld' ? 4.5 : 4.4);
+          let left = Math.min(coords.x - focusHaloR, layout.pillBox.left);
+          let right = Math.max(coords.x + focusHaloR, layout.pillBox.right);
+          let top = Math.min(coords.y - focusHaloR, layout.pillBox.top);
+          let bottom = Math.max(coords.y + focusHaloR, layout.pillBox.bottom);
+          if (withReadyBadge) {
+            left = Math.min(left, layout.readyBox.left);
+            right = Math.max(right, layout.readyBox.right);
+            top = Math.min(top, layout.readyBox.top);
+            bottom = Math.max(bottom, layout.readyBox.bottom);
+          }
+          const bboxCx = (left + right) / 2;
+          const bboxCy = (top + bottom) / 2;
+          const bridgePoly = parsePolygon(buildNodeHitBridgePoints(coords.x, coords.y, layout));
+          const readyBridgePoly = parsePolygon(buildReadyBadgeHitBridgePoints(layout));
+
+          const hitsNode = (px: number, py: number) =>
+            Math.hypot(px - coords.x, py - coords.y) <= layout.nodeRadius + 0.05 ||
+            pointInRect(px, py, layout.pillBox) ||
+            pointInConvexQuad(px, py, bridgePoly) ||
+            (withReadyBadge &&
+              (pointInRect(px, py, layout.readyBox) ||
+                pointInConvexQuad(px, py, readyBridgePoly)));
+
+          return { region, coords, layout, bboxCx, bboxCy, hitsNode };
+        });
+
+        for (let i = 0; i < geometries.length; i += 1) {
+          const g = geometries[i];
+          if (!g.hitsNode(g.bboxCx, g.bboxCy)) {
+            failures.push(
+              `${mode} (ready=${withReadyBadge}): ${g.region.id} <g> bbox center (${g.bboxCx.toFixed(1)}, ${g.bboxCy.toFixed(1)}) missed its own hit target`,
+            );
+          }
+
+          // Ensure no node rendered later in SVG order intercepts this node's bbox center
+          for (let j = i + 1; j < geometries.length; j += 1) {
+            const later = geometries[j];
+            if (later.hitsNode(g.bboxCx, g.bboxCy)) {
+              failures.push(
+                `${mode} (ready=${withReadyBadge}): ${later.region.id} intercepts ${g.region.id} <g> bbox center (${g.bboxCx.toFixed(1)}, ${g.bboxCy.toFixed(1)})`,
+              );
+            }
+          }
+        }
+      }
+    }
+
+    expect(failures).toEqual([]);
   });
 });

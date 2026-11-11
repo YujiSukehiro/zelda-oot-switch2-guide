@@ -40,7 +40,7 @@ dialog.zelda-modal-dialog::backdrop {
 .zelda-topbar {
   position: sticky;
   top: 0;
-  z-index: var(--z-hud);
+  z-index: calc(var(--z-popover, 40) + 5);
   width: 100%;
   max-width: 100%;
   background: var(--bg-surface);
@@ -1000,6 +1000,7 @@ dialog.zelda-modal-dialog::backdrop {
 
 .zelda-tablist {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.35rem;
   flex-wrap: wrap;
@@ -1554,8 +1555,10 @@ dialog.zelda-modal-dialog::backdrop {
 /* Single-row scrollable tablist with shape underline indicator
    (modern-web-guidance: tab-nav-active-state & tab-nav-overflow) */
 .zelda-tablist--underline {
+  flex-shrink: 0;
   flex-wrap: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
   gap: 0.25rem;
   padding-bottom: 0;
@@ -1916,6 +1919,7 @@ dialog.zelda-modal-dialog::backdrop {
 /* Responsive Free-Gear Comparison Table
    (modern-web-guidance: responsive-table @container stacked mobile cards) */
 .zelda-table-wrapper {
+  flex-shrink: 0;
   container-type: inline-size;
   overflow-x: auto;
   border-radius: var(--radius-md);

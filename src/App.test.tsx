@@ -38,7 +38,7 @@ describe('App Phase 1 Integration', () => {
     expect(window.location.hash).not.toContain('spotlight=1');
 
     fireEvent.click(screen.getByTestId('secret-check-hp-07'));
-    expect(screen.getByTestId('global-progress-pill')).toHaveTextContent('1/270');
+    expect(screen.getByTestId('global-progress-pill')).toHaveTextContent('1/275');
     expect(window.localStorage.getItem(STORAGE_KEY)).toContain('"hp-07":true');
   });
 
@@ -137,7 +137,7 @@ describe('App Phase 1 Integration', () => {
     // Check off the first collectible in Ch. 1 (Kokiri Sword eq-kokiri-sword) directly from Optimal Route
     const swordCheckbox = screen.getByTestId('route-secret-check-eq-kokiri-sword');
     fireEvent.click(swordCheckbox);
-    expect(screen.getByTestId('global-progress-pill')).toHaveTextContent('1/270');
+    expect(screen.getByTestId('global-progress-pill')).toHaveTextContent('1/275');
 
     // Resume banner now appears with Pick Up Where You Left Off
     const resumeBanner = screen.getByTestId('resume-banner');
@@ -279,5 +279,53 @@ describe('App Phase 1 Integration', () => {
 
     fireEvent.click(screen.getByTestId('open-ocarina-btn'));
     expect(screen.getByTestId('ocarina-modal')).toHaveTextContent('(0/13 Learned)');
+  });
+
+  it('wires Phase 2 Water Temple 4-floor blueprint, 84-statue HallOfFallenFoesModal, Ocarina -> Pierre ReferenceGuideModal jump, and 6 Threads of Time quests', () => {
+    window.history.replaceState(null, '', '/#view=area&region=water-temple&lens=copilot');
+    render(<App />);
+
+    // 1. Water Temple 4-floor blueprint (3F, 2F, 1F, B1 + 6 Small Keys) inside GuidedAreaWorkspace
+    const workspace = screen.getByTestId('guided-area-workspace');
+    expect(within(workspace).getByRole('tab', { name: /3F/i })).toBeInTheDocument();
+    expect(within(workspace).getByRole('tab', { name: /2F/i })).toBeInTheDocument();
+    expect(within(workspace).getByRole('tab', { name: /1F/i })).toBeInTheDocument();
+    expect(within(workspace).getByRole('tab', { name: /B1/i })).toBeInTheDocument();
+    expect(within(workspace).getByTestId('dungeon-meta-strip')).toHaveTextContent('Small Keys: 6');
+
+    // 2. Open Hall of Fallen Foes (84 statues) from TopCommandBar Reference menu & log statue #1
+    fireEvent.click(screen.getByTestId('open-foes-btn'));
+    expect(window.location.hash).toContain('sheet=foes');
+    const foesModal = screen.getByTestId('hall-of-fallen-foes-modal');
+    expect(foesModal).toBeInTheDocument();
+    expect(screen.getByTestId('foes-progress-counter')).toHaveTextContent('0 / 84');
+    fireEvent.click(screen.getByTestId('foe-check-foe-01'));
+    expect(screen.getByTestId('foes-progress-counter')).toHaveTextContent('1 / 84');
+    expect(screen.getByTestId('open-foes-btn')).toHaveTextContent('1/84');
+    fireEvent.click(screen.getByTestId('hall-of-fallen-foes-modal-close-btn'));
+
+    // 3. Open Ocarina Songbook -> click Scarecrow's Song "Pierre Spots" button -> opens ReferenceGuideModal on 'pierre' tab
+    fireEvent.click(screen.getByTestId('open-ocarina-btn'));
+    expect(screen.getByTestId('ocarina-modal')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('open-pierre-directory-btn'));
+    expect(window.location.hash).toContain('sheet=reference');
+    const refModal = screen.getByTestId('reference-guide-modal');
+    expect(refModal).toBeInTheDocument();
+    expect(screen.getByTestId('ref-panel-pierre')).not.toHaveAttribute('hidden');
+
+    // Switch across Hidden Grottos, Lake Hylia Fishing, and Smart Rupee / Free Gear tabs
+    fireEvent.click(screen.getByTestId('ref-tab-grottos'));
+    expect(screen.getByTestId('echo-gem-callout')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('ref-tab-fishing'));
+    expect(screen.getByTestId('sinking-lure-section')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('ref-tab-gear'));
+    expect(screen.getByTestId('free-gear-table')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('reference-guide-modal-close-btn'));
+
+    // 4. Open Side Quests -> check off Malon's Threads of Time quest (sw2-thread-malon) -> increments global 100% counter
+    fireEvent.click(screen.getByTestId('open-quests-btn'));
+    expect(screen.getByTestId('threads-of-time-section')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('quest-check-sw2-thread-malon'));
+    expect(screen.getByTestId('global-progress-pill')).toHaveTextContent('1/275');
   });
 });

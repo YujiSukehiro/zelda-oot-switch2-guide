@@ -342,6 +342,17 @@ export const ADULT_OVERWORLD_SUBMAPS: RegionSubmapDefinition[] = [
         era: 'adult',
         note: 'Play a second Horseback Archery round and pre-draw arrows during the turnarounds to rapid-fire the 100-point center bullseye!',
       },
+      {
+        id: 'gf-pin-thread-nabooru',
+        floorId: 'overworld',
+        roomId: 'gf-central-courtyard',
+        x: 245,
+        y: 398,
+        secretId: 'sw2-thread-nabooru',
+        kind: 'secret',
+        label: "Threads of Time: Nabooru's Desert Accord",
+        era: 'adult',
+      },
     ],
   },
 

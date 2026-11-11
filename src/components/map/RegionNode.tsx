@@ -30,6 +30,8 @@ export interface BoundingRect {
 
 export interface ComputedNodeLayout {
   nodeRadius: number;
+  side: LabelPlacementSide;
+  badge: BadgePlacementSide;
   nodeBox: BoundingRect;
   pillBox: BoundingRect;
   readyBox: BoundingRect;
@@ -391,11 +393,32 @@ export function computeNodeLayout(
 
   return {
     nodeRadius,
+    side: spec.side,
+    badge: spec.badge,
     nodeBox: makeRect(x, y, nodeRadius * 2, nodeRadius * 2),
     pillBox: makeRect(pillCx, pillCy, pillWidth, pillHeight),
     readyBox: makeRect(readyCx, readyCy, readyWidth, readyHeight),
     shortName: spec.shortName,
   };
+}
+
+export function buildNodeHitBridgePoints(
+  x: number,
+  y: number,
+  layout: ComputedNodeLayout,
+): string {
+  const r = layout.nodeRadius;
+  if (layout.side === 'top' || layout.side === 'bottom') {
+    return `${x - r},${y} ${x + r},${y} ${layout.pillBox.right},${layout.pillBox.cy} ${layout.pillBox.left},${layout.pillBox.cy}`;
+  }
+  return `${x},${y - r} ${x},${y + r} ${layout.pillBox.cx},${layout.pillBox.bottom} ${layout.pillBox.cx},${layout.pillBox.top}`;
+}
+
+export function buildReadyBadgeHitBridgePoints(layout: ComputedNodeLayout): string {
+  if (layout.badge === 'above-pill' || layout.badge === 'below-pill') {
+    return `${layout.pillBox.left},${layout.pillBox.cy} ${layout.pillBox.right},${layout.pillBox.cy} ${layout.readyBox.right},${layout.readyBox.cy} ${layout.readyBox.left},${layout.readyBox.cy}`;
+  }
+  return `${layout.pillBox.cx},${layout.pillBox.top} ${layout.pillBox.cx},${layout.pillBox.bottom} ${layout.readyBox.cx},${layout.readyBox.bottom} ${layout.readyBox.cx},${layout.readyBox.top}`;
 }
 
 export function BiomeSvgGlyph({ biome }: { biome: RegionBiome }) {
@@ -544,6 +567,14 @@ export function RegionNode({
       onFocus={() => onHoverChange?.(region.id)}
       onBlur={() => onHoverChange?.(null)}
     >
+      {/* Tight transparent hit bridge eliminating the 3px-5px dead gap between pin & offset pill */}
+      <polygon
+        className="map-node__hit-bridge"
+        points={buildNodeHitBridgePoints(x, y, layout)}
+        fill="transparent"
+        aria-hidden="true"
+      />
+
       {/* Keyboard focus halo */}
       <circle className="map-node__focus-ring" cx={x} cy={y} r={ringRadius + 4.5} />
 
@@ -676,6 +707,11 @@ export function RegionNode({
           data-testid={`map-ready-${region.id}`}
           aria-hidden="true"
         >
+          <polygon
+            className="map-node__hit-bridge"
+            points={buildReadyBadgeHitBridgePoints(layout)}
+            fill="transparent"
+          />
           <rect
             className="map-node__ready-bg"
             x={layout.readyBox.left}
