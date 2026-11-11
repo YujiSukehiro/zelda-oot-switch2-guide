@@ -9,8 +9,10 @@ import rawQuests from '../../data/songs-and-quests.json';
 import type {
   AltMethod,
   BiggoronStep,
+  BossHeartContainerEntry,
   CrossEraSteps,
   GameMetadata,
+  GanonTrialEntry,
   GateTierId,
   GateTierInfo,
   GoldSkulltulaEntry,
@@ -20,6 +22,7 @@ import type {
   Requirement,
   SongsAndQuestsData,
   StoryPreset,
+  StoryTokenEntry,
   Switch2Status,
   UnifiedSecret,
   UpgradesAndBottlesData,
@@ -32,6 +35,10 @@ export const HEART_PIECES = rawHeartPieces as unknown as HeartPieceEntry[];
 export const GOLD_SKULLTULAS = rawGoldSkulltulas as unknown as GoldSkulltulaEntry[];
 export const UPGRADES_AND_BOTTLES = rawUpgrades as unknown as UpgradesAndBottlesData;
 export const SONGS_AND_QUESTS = rawQuests as unknown as SongsAndQuestsData;
+export const BOSS_HEART_CONTAINERS: BossHeartContainerEntry[] =
+  UPGRADES_AND_BOTTLES.bossHeartContainers;
+export const STORY_TOKENS: StoryTokenEntry[] = UPGRADES_AND_BOTTLES.storyTokens;
+export const GANON_TRIALS: GanonTrialEntry[] = UPGRADES_AND_BOTTLES.ganonTrials;
 
 export const OVERWORLD_REGIONS: Region[] = REGIONS.filter((r) => r.kind === 'overworld');
 export const DUNGEON_AND_SPECIAL_REGIONS: Region[] = REGIONS.filter((r) => r.kind !== 'overworld');
@@ -291,11 +298,33 @@ const normalizedCapacityUpgrades: UnifiedSecret[] = UPGRADES_AND_BOTTLES.capacit
   }),
 );
 
+const DUNGEON_AND_PROGRESSION_EQUIPMENT_IDS = new Set([
+  'eq-deku-shield',
+  'eq-ocarina',
+  'eq-slingshot',
+  'eq-goron-bracelet',
+  'eq-bomb-bag',
+  'eq-boomerang',
+  'eq-bow',
+  'eq-megaton-hammer',
+  'eq-iron-boots',
+  'eq-longshot',
+  'eq-hover-boots',
+  'eq-gerudo-card',
+  'eq-silver-gauntlets',
+  'eq-mirror-shield',
+  'eq-light-arrows',
+  'eq-golden-gauntlets',
+]);
+
 const normalizedEquipment: UnifiedSecret[] = UPGRADES_AND_BOTTLES.gearAndEquipment.map((eq) => ({
   id: eq.id,
   title: eq.name,
-  subtitle: 'Equipment & Gear',
+  subtitle: DUNGEON_AND_PROGRESSION_EQUIPMENT_IDS.has(eq.id)
+    ? 'Dungeon & Progression Gear'
+    : 'Equipment & Gear',
   category: 'equipment',
+  ...(DUNGEON_AND_PROGRESSION_EQUIPMENT_IDS.has(eq.id) ? { subCategory: 'dungeon-item' } : {}),
   regionId: eq.regionId,
   era: eq.era,
   gateTier: eq.gateTier,
@@ -304,6 +333,57 @@ const normalizedEquipment: UnifiedSecret[] = UPGRADES_AND_BOTTLES.gearAndEquipme
   switch2Status: eq.switch2Status ?? (eq.id === 'eq-biggoron-sword' ? 'updated-switch2' : 'classic'),
   rewardText: eq.name,
   howToGet: eq.howToGet,
+  countsToward100Percent: true,
+}));
+
+const normalizedBossHeartContainers: UnifiedSecret[] = BOSS_HEART_CONTAINERS.map((bhc) => ({
+  id: bhc.id,
+  title: bhc.title,
+  subtitle: 'Boss Heart Container',
+  category: 'capacity-upgrade',
+  subCategory: 'boss-heart',
+  regionId: bhc.regionId,
+  era: bhc.era,
+  gateTier: bhc.gateTier,
+  requiredIds: bhc.requiredIds,
+  altMethods: [],
+  switch2Status: bhc.switch2Status,
+  rewardText: 'Full Heart Container (+1 Max Heart)',
+  howToGet: bhc.howToGet,
+  countsToward100Percent: true,
+}));
+
+const normalizedStoryTokens: UnifiedSecret[] = STORY_TOKENS.map((token) => ({
+  id: token.id,
+  title: token.title,
+  subtitle: token.tokenKind === 'spiritual-stone' ? 'Spiritual Stone' : 'Sage Medallion',
+  category: 'equipment',
+  subCategory: token.tokenKind,
+  regionId: token.regionId,
+  era: token.era,
+  gateTier: token.gateTier,
+  requiredIds: token.requiredIds,
+  altMethods: [],
+  switch2Status: token.switch2Status,
+  rewardText: token.title,
+  howToGet: token.howToGet,
+  countsToward100Percent: true,
+}));
+
+const normalizedGanonTrials: UnifiedSecret[] = GANON_TRIALS.map((trial) => ({
+  id: trial.id,
+  title: trial.title,
+  subtitle: "Ganon's Castle Barrier Trial",
+  category: 'equipment',
+  subCategory: 'ganon-trial',
+  regionId: trial.regionId,
+  era: trial.era,
+  gateTier: trial.gateTier,
+  requiredIds: trial.requiredIds,
+  altMethods: [],
+  switch2Status: trial.switch2Status,
+  rewardText: trial.title,
+  howToGet: trial.howToGet,
   countsToward100Percent: true,
 }));
 
@@ -454,6 +534,9 @@ export const ALL_SECRETS: UnifiedSecret[] = [
   ...normalizedSkulltulaRewards,
   ...normalizedCapacityUpgrades,
   ...normalizedEquipment,
+  ...normalizedBossHeartContainers,
+  ...normalizedStoryTokens,
+  ...normalizedGanonTrials,
   ...normalizedOcarinaSongs,
   ...normalizedMagicBeans,
   ...normalizedMaskTrades,
@@ -514,7 +597,7 @@ export const SONG_BY_ID: Record<string, OcarinaSong> = Object.fromEntries(
 );
 
 /**
- * Maps every canonical `requirementId` (all 66 in `data/requirements.json`)
+ * Maps every canonical `requirementId` (all 69 in `data/requirements.json`)
  * to the primary `regionId` on the Hyrule map where the player obtains it.
  */
 export const REQUIREMENT_SOURCE_REGION: Record<string, string> = {
@@ -524,6 +607,9 @@ export const REQUIREMENT_SOURCE_REGION: Record<string, string> = {
   'time-night': 'graveyard',
   'time-day': 'kokiri-forest',
   'zora-thawed': 'water-temple',
+  'stone-emerald': 'deku-tree',
+  'stone-ruby': 'dodongos-cavern',
+  'stone-sapphire': 'jabu-jabus-belly',
   'kokiri-sword': 'kokiri-forest',
   'deku-shield': 'kokiri-forest',
   'deku-sticks': 'kokiri-forest',
@@ -587,7 +673,7 @@ export const REQUIREMENT_SOURCE_REGION: Record<string, string> = {
 };
 
 // ============================================================================
-// Story Checkpoint Presets (7 Canonical Checkpoints)
+// Story Checkpoint Presets (8 Canonical Checkpoints)
 // ============================================================================
 
 export const STORY_PRESETS: StoryPreset[] = [
@@ -599,6 +685,31 @@ export const STORY_PRESETS: StoryPreset[] = [
       'Brand-new adventure as Child Link with daytime & starting 200-Rupee Kokiri Wallet.',
     eraFilter: 'all',
     ownedRequirementIds: ['era-child', 'time-day', 'rupees-100'],
+  },
+  {
+    id: 'goron-city-visit-1',
+    label: "Goron City — 1st Visit (Before Dodongo's Cavern)",
+    shortLabel: 'Goron City 1st Visit',
+    description:
+      "Arrived in Goron City for the first time with Kokiri's Emerald, Ocarina, Zelda's Letter, Lullaby, Saria's & Sun's Songs, and 1st Bottle.",
+    eraFilter: 'all',
+    ownedRequirementIds: [
+      'era-child',
+      'kokiri-sword',
+      'deku-shield',
+      'deku-sticks',
+      'slingshot',
+      'stone-emerald',
+      'ocarina',
+      'weird-egg',
+      'zeldas-letter',
+      'song-lullaby',
+      'song-epona',
+      'song-saria',
+      'song-sun',
+      'bottle',
+      'rupees-100',
+    ],
   },
   {
     id: 'post-dodongo',
@@ -616,6 +727,8 @@ export const STORY_PRESETS: StoryPreset[] = [
       'deku-shield',
       'deku-sticks',
       'slingshot',
+      'stone-emerald',
+      'stone-ruby',
       'ocarina',
       'weird-egg',
       'zeldas-letter',
@@ -648,6 +761,9 @@ export const STORY_PRESETS: StoryPreset[] = [
       'deku-shield',
       'deku-sticks',
       'slingshot',
+      'stone-emerald',
+      'stone-ruby',
+      'stone-sapphire',
       'ocarina',
       'weird-egg',
       'zeldas-letter',
@@ -682,6 +798,9 @@ export const STORY_PRESETS: StoryPreset[] = [
       'time-night',
       'rupees-100',
       'adults-wallet',
+      'stone-emerald',
+      'stone-ruby',
+      'stone-sapphire',
       'ocarina',
       'bombs',
       'magic-meter',
@@ -716,6 +835,9 @@ export const STORY_PRESETS: StoryPreset[] = [
       'deku-shield',
       'deku-sticks',
       'slingshot',
+      'stone-emerald',
+      'stone-ruby',
+      'stone-sapphire',
       'ocarina',
       'weird-egg',
       'zeldas-letter',
@@ -767,6 +889,9 @@ export const STORY_PRESETS: StoryPreset[] = [
       'deku-shield',
       'deku-sticks',
       'slingshot',
+      'stone-emerald',
+      'stone-ruby',
+      'stone-sapphire',
       'ocarina',
       'weird-egg',
       'zeldas-letter',

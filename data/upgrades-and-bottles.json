@@ -181,7 +181,7 @@
     {
       "id": "skr-50",
       "tokens": 50,
-      "reward": "Piece of Heart (hp-10)",
+      "reward": "Piece of Heart",
       "regionId": "kakariko-village",
       "gateTier": "tier-3-child-gear",
       "requiredIds": ["tokens-50"],
@@ -408,7 +408,420 @@
       "era": "adult",
       "gateTier": "tier-5-adult-gear",
       "requiredIds": ["era-adult", "epona", "blue-fire"],
-      "howToGet": "Complete the 12-step Adult Trading Sequence starting with the Pocket Egg in Kakariko Village and culminating at Biggoron on Death Mountain Summit (see songs-and-quests.json for all 12 timed steps & the Switch 2 thawed Zora's Domain shortcut!)."
+      "howToGet": "Complete the 12-step Adult Trading Sequence starting with the Pocket Egg in Kakariko Village and culminating at Biggoron on Death Mountain Summit. Open the Quests & Trading sheet for all 12 timed steps & the Switch 2 thawed Zora's Domain shortcut!"
+    },
+    {
+      "id": "eq-deku-shield",
+      "name": "Deku Shield",
+      "regionId": "kokiri-forest",
+      "era": "child",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child", "rupees-100"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Collect 40 Rupees around Kokiri Forest (including bonus Rupees for clearing thrown rocks for Kokiri kids in Switch 2) and purchase the Deku Shield at the Kokiri Shop so Mido lets you enter Inside the Great Deku Tree."
+    },
+    {
+      "id": "eq-ocarina",
+      "name": "Fairy Ocarina / Ocarina of Time",
+      "regionId": "kokiri-forest",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "stone-emerald"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Cross the western wooden bridge leaving Kokiri Forest after clearing Inside the Great Deku Tree to receive the Fairy Ocarina from Saria (upgraded to the Ocarina of Time in the Castle Town moat after collecting all 3 Spiritual Stones)."
+    },
+    {
+      "id": "eq-slingshot",
+      "name": "Fairy Slingshot",
+      "regionId": "deku-tree",
+      "era": "child",
+      "gateTier": "tier-0-immediate",
+      "requiredIds": ["era-child", "kokiri-sword", "deku-shield"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Climb the central trunk vines to 2F Inside the Great Deku Tree, shield-deflect the Deku Scrub, hop across the floating platform into the west chamber, and open the chest for the Fairy Slingshot (supports gyro aiming in Switch 2)."
+    },
+    {
+      "id": "eq-goron-bracelet",
+      "name": "Goron's Bracelet",
+      "regionId": "goron-city",
+      "era": "child",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["era-child", "song-lullaby", "song-saria"],
+      "switch2Status": "classic",
+      "howToGet": "Drop to 1F of Goron City, play Zelda's Lullaby on the patterned rug outside Darunia's chamber, and play Saria's Song inside to cheer up Darunia and earn the Goron's Bracelet for lifting Bomb Flowers."
+    },
+    {
+      "id": "eq-bomb-bag",
+      "name": "Bomb Bag (20 Bombs)",
+      "regionId": "dodongos-cavern",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "goron-bracelet", "slingshot"],
+      "switch2Status": "classic",
+      "howToGet": "Clear the 1F east wing and defeat both pairs of Lizalfos mini-bosses inside Dodongo's Cavern, light the torches in the west Dodongo room, and open the 2F chest for the Bomb Bag."
+    },
+    {
+      "id": "eq-boomerang",
+      "name": "Boomerang",
+      "regionId": "jabu-jabus-belly",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bottle", "slingshot"],
+      "switch2Status": "classic",
+      "howToGet": "Carry Princess Ruto onto the yellow switch in the 1F east wing of Inside Jabu-Jabu's Belly and defeat all four flying Stingers to spawn the Boomerang chest."
+    },
+    {
+      "id": "eq-bow",
+      "name": "Fairy Bow",
+      "regionId": "forest-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "hookshot"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Push the colored stone blocks up to the 2F upper gallery of the Forest Temple and defeat all three Stalfos knights to unlock the Fairy Bow."
+    },
+    {
+      "id": "eq-megaton-hammer",
+      "name": "Megaton Hammer",
+      "regionId": "fire-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "goron-tunic", "hookshot", "bombs"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat Flare Dancer inside the Fire Temple, ascend to the 5F ring chamber, step on the floor switch, and sprint the narrow curved rim before the fire barrier rises to claim the Megaton Hammer."
+    },
+    {
+      "id": "eq-iron-boots",
+      "name": "Iron Boots",
+      "regionId": "ice-cavern",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bottle"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Solve the sliding ice-block Silver Rupee puzzle inside the Ice Cavern and defeat the White Wolfos mini-boss in the rear chamber to open the Iron Boots chest (mapped to instant D-pad quick-equip in Switch 2!)."
+    },
+    {
+      "id": "eq-longshot",
+      "name": "Longshot",
+      "regionId": "water-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "iron-boots", "hookshot"],
+      "switch2Status": "classic",
+      "howToGet": "Raise the Water Temple level to 3F, cross the western waterfall platforms, and defeat Dark Link inside the illusion room (using Din's Fire or un-targeted Megaton Hammer swings) to claim the Longshot."
+    },
+    {
+      "id": "eq-hover-boots",
+      "name": "Hover Boots",
+      "regionId": "shadow-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "song-nocturne", "dins-fire", "lens-of-truth", "hookshot"],
+      "switch2Status": "classic",
+      "howToGet": "Ignite the Shadow Temple entrance torches with Din's Fire, use the Lens of Truth to navigate the B1 illusory walls, and defeat Adult Dead Hand to claim the Hover Boots."
+    },
+    {
+      "id": "eq-gerudo-card",
+      "name": "Gerudo Membership Card",
+      "regionId": "gerudo-fortress",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "epona", "hookshot"],
+      "switch2Status": "classic",
+      "howToGet": "Infiltrate Thieves' Hideout across Gerudo's Fortress, defeat all four dual-scimitar Gerudo guards, and rescue the four imprisoned Carpenters to earn full fortress access and the Gerudo Membership Card."
+    },
+    {
+      "id": "eq-silver-gauntlets",
+      "name": "Silver Gauntlets",
+      "regionId": "spirit-temple",
+      "era": "child",
+      "gateTier": "tier-4-cross-era",
+      "requiredIds": ["era-child", "song-requiem", "bombs", "boomerang"],
+      "switch2Status": "classic",
+      "howToGet": "Warp to Desert Colossus as Child Link via Requiem of Spirit, clear the Child left wing of the Spirit Temple, defeat the Iron Knuckle, and open the exterior chest on the colossus's left hand for the Silver Gauntlets."
+    },
+    {
+      "id": "eq-mirror-shield",
+      "name": "Mirror Shield",
+      "regionId": "spirit-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "silver-gauntlets", "longshot"],
+      "switch2Status": "classic",
+      "howToGet": "Push the heavy silver block to clear the Adult right wing of the Spirit Temple, defeat the 4F Iron Knuckle, and step onto the exterior right hand of the Desert Colossus to claim the Mirror Shield."
+    },
+    {
+      "id": "eq-light-arrows",
+      "name": "Light Arrows",
+      "regionId": "market",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "bow", "megaton-hammer", "longshot", "hover-boots", "mirror-shield"],
+      "switch2Status": "classic",
+      "howToGet": "Return to the Temple of Time in Hyrule Castle Town Market as Adult Link with all six Sage Medallions in hand to receive the sacred Light Arrows from Princess Zelda."
+    },
+    {
+      "id": "eq-golden-gauntlets",
+      "name": "Golden Gauntlets",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "fire-arrows", "longshot", "hover-boots", "lens-of-truth"],
+      "switch2Status": "classic",
+      "howToGet": "Enter the Shadow Trial on the right wing of Inside Ganon's Castle, shoot the torch with a Fire Arrow to reveal temporary platforms, use the Lens of Truth and Hover Boots to reach the giant chest, and claim the Golden Gauntlets."
+    }
+  ],
+  "bossHeartContainers": [
+    {
+      "id": "boss-hc-deku",
+      "title": "Queen Gohma — Boss Heart Container",
+      "bossName": "Queen Gohma",
+      "regionId": "deku-tree",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "kokiri-sword", "deku-shield", "slingshot"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Stun Queen Gohma's red eye with the Fairy Slingshot or a Deku Nut inside the B2 boss chamber of the Great Deku Tree and finish her with Deku Stick jump-slashes to claim your 1st full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-dodongo",
+      "title": "King Dodongo — Boss Heart Container",
+      "bossName": "King Dodongo",
+      "regionId": "dodongos-cavern",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bombs", "deku-shield"],
+      "switch2Status": "classic",
+      "howToGet": "Toss Bombs into King Dodongo's open jaws whenever he inhales deeply and punish each stun with jump-slashes inside Dodongo's Cavern to claim your 2nd full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-jabu",
+      "title": "Barinade — Boss Heart Container",
+      "bossName": "Barinade",
+      "regionId": "jabu-jabus-belly",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bottle", "boomerang"],
+      "switch2Status": "classic",
+      "howToGet": "Lock on with ZL and throw the Boomerang to sever Barinade's ceiling tentacles and spinning Bari jellyfish shield inside Jabu-Jabu's Belly to claim your 3rd full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-forest",
+      "title": "Phantom Ganon — Boss Heart Container",
+      "bossName": "Phantom Ganon",
+      "regionId": "forest-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "hookshot", "bow"],
+      "switch2Status": "classic",
+      "howToGet": "Shoot Phantom Ganon as he emerges from the purple-vortex portrait with the Fairy Bow, then bat his energy spheres back in Phase 2 inside the Forest Temple to claim your 4th full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-fire",
+      "title": "Volvagia — Boss Heart Container",
+      "bossName": "Volvagia",
+      "regionId": "fire-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "goron-tunic", "megaton-hammer"],
+      "switch2Status": "classic",
+      "howToGet": "Slam Volvagia's head with the Megaton Hammer as she emerges from glowing lava pits and follow with jump-slashes inside the Fire Temple to claim your 5th full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-water",
+      "title": "Morpha — Boss Heart Container",
+      "bossName": "Morpha",
+      "regionId": "water-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "iron-boots", "longshot"],
+      "switch2Status": "classic",
+      "howToGet": "Stand in a safe outer corner of Morpha's chamber, yank its red nucleus onto dry stone with the Longshot, and trap-slash it inside the Water Temple to claim your 6th full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-shadow",
+      "title": "Bongo Bongo — Boss Heart Container",
+      "bossName": "Bongo Bongo",
+      "regionId": "shadow-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "song-nocturne", "dins-fire", "hover-boots", "bow", "lens-of-truth"],
+      "switch2Status": "classic",
+      "howToGet": "Stun both severed hands with the Fairy Bow on the giant drum, activate the Lens of Truth, shoot Bongo Bongo's charging eye, and slash away inside the Shadow Temple to claim your 7th full Boss Heart Container."
+    },
+    {
+      "id": "boss-hc-spirit",
+      "title": "Twinrova — Boss Heart Container",
+      "bossName": "Twinrova",
+      "regionId": "spirit-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "silver-gauntlets", "mirror-shield", "longshot"],
+      "switch2Status": "classic",
+      "howToGet": "Deflect Koume and Kotake's beams into one another in Phase 1, then absorb three consecutive same-element blasts into your Mirror Shield in Phase 2 inside the Spirit Temple to claim your 8th and final Boss Heart Container."
+    }
+  ],
+  "storyTokens": [
+    {
+      "id": "stone-emerald",
+      "title": "Kokiri's Emerald (Spiritual Stone of Forest)",
+      "tokenKind": "spiritual-stone",
+      "regionId": "deku-tree",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "kokiri-sword", "deku-shield", "slingshot"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat Queen Gohma and step into the blue warp light to receive the Kokiri's Emerald from the Great Deku Tree, clearing Mido/Pokey's blockade so you can leave Kokiri Forest for Hyrule Field."
+    },
+    {
+      "id": "stone-ruby",
+      "title": "Goron's Ruby (Spiritual Stone of Fire)",
+      "tokenKind": "spiritual-stone",
+      "regionId": "dodongos-cavern",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bombs", "deku-shield"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat King Dodongo inside Dodongo's Cavern and step into the warp light to receive the Goron's Ruby from Darunia outside the cavern entrance."
+    },
+    {
+      "id": "stone-sapphire",
+      "title": "Zora's Sapphire (Spiritual Stone of Water)",
+      "tokenKind": "spiritual-stone",
+      "regionId": "jabu-jabus-belly",
+      "era": "child",
+      "gateTier": "tier-3-child-gear",
+      "requiredIds": ["era-child", "bottle", "boomerang"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat Barinade inside Lord Jabu-Jabu's Belly and rescue Princess Ruto to receive Zora's Sapphire—completing all 3 Spiritual Stones."
+    },
+    {
+      "id": "medallion-light",
+      "title": "Light Medallion (Sage Rauru)",
+      "tokenKind": "medallion",
+      "regionId": "market",
+      "era": "adult",
+      "gateTier": "tier-2-song",
+      "requiredIds": ["stone-emerald", "stone-ruby", "stone-sapphire", "song-time"],
+      "switch2Status": "classic",
+      "howToGet": "Play the Song of Time before the Altar of Time in the Temple of Time with all 3 Spiritual Stones to open the Door of Time, pull the Master Sword, and receive the Light Medallion from Rauru in the Chamber of Sages."
+    },
+    {
+      "id": "medallion-forest",
+      "title": "Forest Medallion (Sage Saria)",
+      "tokenKind": "medallion",
+      "regionId": "forest-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "hookshot", "bow"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Defeat Phantom Ganon in the Forest Temple to awaken Saria as the Forest Sage, earning the Forest Medallion and unlocking Prelude of Light Time Travel plus Switch 2's Hall of Fallen Foes dream beds."
+    },
+    {
+      "id": "medallion-fire",
+      "title": "Fire Medallion (Sage Darunia)",
+      "tokenKind": "medallion",
+      "regionId": "fire-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "goron-tunic", "megaton-hammer"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat Volvagia in the Fire Temple to awaken Darunia as the Fire Sage and earn the Fire Medallion."
+    },
+    {
+      "id": "medallion-water",
+      "title": "Water Medallion (Sage Ruto)",
+      "tokenKind": "medallion",
+      "regionId": "water-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "iron-boots", "longshot"],
+      "switch2Status": "updated-switch2",
+      "howToGet": "Defeat Morpha in the Water Temple to awaken Princess Ruto as the Water Sage, refilling Lake Hylia AND completely unfreezing Zora's Domain in the Switch 2 Remake!"
+    },
+    {
+      "id": "medallion-shadow",
+      "title": "Shadow Medallion (Sage Impa)",
+      "tokenKind": "medallion",
+      "regionId": "shadow-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "song-nocturne", "dins-fire", "hover-boots", "bow", "lens-of-truth"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat Bongo Bongo in the Shadow Temple to awaken Impa as the Shadow Sage and earn the Shadow Medallion."
+    },
+    {
+      "id": "medallion-spirit",
+      "title": "Spirit Medallion (Sage Nabooru)",
+      "tokenKind": "medallion",
+      "regionId": "spirit-temple",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "silver-gauntlets", "mirror-shield", "longshot"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat Twinrova in the Spirit Temple to awaken Nabooru as the Spirit Sage and earn the Spirit Medallion."
+    }
+  ],
+  "ganonTrials": [
+    {
+      "id": "trial-shadow",
+      "title": "Shadow Barrier Trial",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "fire-arrows", "longshot", "hover-boots", "lens-of-truth", "megaton-hammer"],
+      "switch2Status": "classic",
+      "howToGet": "Shoot the right-hand torch with a Fire Arrow to reveal white walkways, claim the Golden Gauntlets, use the Lens of Truth and Hover Boots across the invisible chasm, smash the rusty switch with the Megaton Hammer, and fire a Light Arrow into the Shadow core."
+    },
+    {
+      "id": "trial-forest",
+      "title": "Forest Barrier Trial",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "dins-fire", "fire-arrows", "hover-boots"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat the Wolfos in the entry room, ignite the torches with Din's Fire and a Fire Arrow, time the wind fans in Hover Boots to gather all 5 Silver Rupees, and dispel the Forest core with a Light Arrow."
+    },
+    {
+      "id": "trial-water",
+      "title": "Water Barrier Trial",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "bottle", "blue-fire", "megaton-hammer"],
+      "switch2Status": "classic",
+      "howToGet": "Defeat the Ice Wolfos to bottle free Blue Fire, push the two ice blocks into the floor hole and up onto the elevated ledge to melt the Red Ice grate, hit the rusty switch with the Megaton Hammer, and dispel the Water core with a Light Arrow."
+    },
+    {
+      "id": "trial-fire",
+      "title": "Fire Barrier Trial",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "goron-tunic", "golden-gauntlets", "longshot"],
+      "switch2Status": "classic",
+      "howToGet": "Equip the Goron Tunic across the sinking lava platforms to gather all 5 Silver Rupees, hurl the massive black stone pillar with your Golden Gauntlets to form a bridge, Longshot across the flare platforms, and dispel the Fire core with a Light Arrow."
+    },
+    {
+      "id": "trial-light",
+      "title": "Light Barrier Trial",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "golden-gauntlets", "lens-of-truth", "hookshot", "song-lullaby"],
+      "switch2Status": "classic",
+      "howToGet": "Lift the giant black boulder sealing the Light Trial entrance with your Golden Gauntlets, defeat the invisible Keese/Skulltula with Lens of Truth, play Zelda's Lullaby for the Small Key, grapple the ceiling targets for Silver Rupees, walk through the fake rear wall, and dispel the Light core with a Light Arrow."
+    },
+    {
+      "id": "trial-spirit",
+      "title": "Spirit Barrier Trial",
+      "regionId": "ganons-castle",
+      "era": "adult",
+      "gateTier": "tier-5-adult-gear",
+      "requiredIds": ["era-adult", "light-arrows", "hookshot", "bombs", "mirror-shield"],
+      "switch2Status": "classic",
+      "howToGet": "Hookshot around the central Beamos to gather Silver Rupees, lob a Bombchu (or spin-slash) onto the crystal switch behind the gate, reflect ceiling sunlight with your Mirror Shield onto the genuine sun crest, and dispel the final Spirit core with a Light Arrow."
     }
   ]
 }

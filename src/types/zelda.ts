@@ -30,6 +30,13 @@ export type SecretCategory =
   | 'big-poe'
   | 'switch2-exclusive';
 
+export type SecretSubCategory =
+  | 'dungeon-item'
+  | 'boss-heart'
+  | 'spiritual-stone'
+  | 'medallion'
+  | 'ganon-trial';
+
 export interface AltMethod {
   label: string;
   requiredIds: string[];
@@ -49,6 +56,7 @@ export interface UnifiedSecret {
   title: string;
   subtitle?: string;
   category: SecretCategory;
+  subCategory?: SecretSubCategory;
   regionId: string;
   era: Era;
   gateTier: GateTierId;
@@ -275,6 +283,41 @@ export interface EquipmentEntry {
   switch2Status?: Switch2Status;
 }
 
+export interface BossHeartContainerEntry {
+  id: string;
+  title: string;
+  bossName: string;
+  regionId: string;
+  era: Era;
+  gateTier: GateTierId;
+  requiredIds: string[];
+  switch2Status: Switch2Status;
+  howToGet: string;
+}
+
+export interface StoryTokenEntry {
+  id: string;
+  title: string;
+  tokenKind: 'spiritual-stone' | 'medallion';
+  regionId: string;
+  era: Era;
+  gateTier: GateTierId;
+  requiredIds: string[];
+  switch2Status: Switch2Status;
+  howToGet: string;
+}
+
+export interface GanonTrialEntry {
+  id: string;
+  title: string;
+  regionId: string;
+  era: Era;
+  gateTier: GateTierId;
+  requiredIds: string[];
+  switch2Status: Switch2Status;
+  howToGet: string;
+}
+
 export interface UpgradesAndBottlesData {
   bottles: BottleEntry[];
   bigPoeLocations: BigPoeLocation[];
@@ -282,6 +325,9 @@ export interface UpgradesAndBottlesData {
   skulltulaRewards: SkulltulaReward[];
   capacityUpgrades: CapacityUpgradeEntry[];
   gearAndEquipment: EquipmentEntry[];
+  bossHeartContainers: BossHeartContainerEntry[];
+  storyTokens: StoryTokenEntry[];
+  ganonTrials: GanonTrialEntry[];
 }
 
 export interface OcarinaSong {
@@ -372,9 +418,10 @@ export interface PlayerProgressState {
   bookmarkedRouteStepId?: string | null;
   mapLayerMode?: MapLayerMode;
   lastSession?: LastSessionSnapshot | null;
+  hasCompletedOnboarding?: boolean;
 }
 
-export type WorkspaceViewMode = 'map' | 'route';
+export type WorkspaceViewMode = 'map' | 'route' | 'area';
 
 export type MapLayerMode = 'illustrated' | 'schematic';
 
@@ -437,6 +484,18 @@ export interface RouteChapter {
 
 export type AccessStatus = 'completed' | 'available-now' | 'available-via-alt' | 'locked';
 
+export type VisitStage = 'completed' | 'do-now' | 'later-gear' | 'later-era';
+
+export interface RegionReachabilityResult {
+  isReachable: boolean;
+  blockerLabel?: string;
+  blockerReqId?: string;
+}
+
+export interface StoryPresetApplyOptions {
+  markPriorSecretsAndSteps?: boolean;
+}
+
 export type BlockerCategoryKind =
   | 'cross-era'
   | 'song'
@@ -455,6 +514,10 @@ export interface EvaluatedSecret {
   primaryBlockerGroupKey: string;
   primaryBlockerLabel: string;
   primaryBlockerCategory: BlockerCategoryKind;
+  environmentalConditions: string[];
+  isRegionLocked?: boolean;
+  regionLockReason?: string;
+  visitStage: VisitStage;
 }
 
 export interface RequirementBlockerBucket {
@@ -510,6 +573,9 @@ export interface RegionProgressSummary {
   lockedCount: number;
   percent: number;
   isComplete: boolean;
+  isReachable: boolean;
+  reachabilityBlocker?: string;
+  reachabilityBlockerReqId?: string;
   heartPiecesCompleted: number;
   heartPiecesTotal: number;
   skulltulasChildCompleted: number;
@@ -533,6 +599,10 @@ export interface GlobalProgressSummary {
   lockedTotal: number;
   heartPiecesCompleted: number;
   heartPiecesTotal: number;
+  bossHeartsCompleted: number;
+  bossHeartsTotal: number;
+  currentHeartContainers: number;
+  heartPieceQuarterRemainder: number;
   skulltulasCompleted: number;
   skulltulasTotal: number;
   skulltulasChildCompleted: number;
@@ -576,4 +646,5 @@ export interface UrlHashState {
   era: 'all' | 'child' | 'adult';
   sheet: string | null;
   spotlight: boolean;
+  lens?: string | null;
 }

@@ -1,9 +1,14 @@
 import {
+  ALL_ROUTE_STEPS,
   ALL_SECRETS,
   METADATA,
   REGIONS,
+  REQUIREMENTS,
   REQUIREMENT_BY_ID,
+  ROUTE_STEP_BY_ID,
   SECRETS_BY_REGION,
+  SECRET_BY_ID,
+  STEP_TO_CHAPTER_ID,
   STORY_PRESETS,
 } from '../data';
 import type {
@@ -19,12 +24,15 @@ import type {
   GlobalProgressSummary,
   PlayerProgressState,
   RegionProgressSummary,
+  RegionReachabilityResult,
   RequirementBlockerBucket,
   SecretCategory,
+  StoryPresetApplyOptions,
   TierSecretBucket,
   TypeSecretBucket,
   UnifiedSecret,
   UnlockDelta,
+  VisitStage,
 } from '../types/zelda';
 
 /**
@@ -42,17 +50,41 @@ export const DEFAULT_OWNED_REQUIREMENTS: readonly string[] = [
  * automatically satisfied once that secret is checked off.
  */
 export const SECRET_TO_REQUIREMENTS_MAP: Readonly<Record<string, readonly string[]>> = {
-  // Equipment
+  // Core Progression & Dungeon Equipment
   'eq-kokiri-sword': ['kokiri-sword'],
+  'eq-deku-shield': ['deku-shield'],
+  'eq-ocarina': ['ocarina'],
+  'eq-slingshot': ['slingshot'],
+  'eq-goron-bracelet': ['goron-bracelet'],
+  'eq-bomb-bag': ['bombs'],
+  'eq-boomerang': ['boomerang'],
   'eq-silver-scale': ['silver-scale'],
   'eq-golden-scale': ['golden-scale'],
   'eq-goron-tunic': ['goron-tunic'],
   'eq-zora-tunic': ['zora-tunic'],
   'eq-epona': ['epona'],
   'eq-hookshot': ['hookshot'],
+  'eq-bow': ['bow'],
+  'eq-megaton-hammer': ['megaton-hammer'],
+  'eq-iron-boots': ['iron-boots'],
+  'eq-longshot': ['longshot'],
+  'eq-hover-boots': ['hover-boots'],
+  'eq-gerudo-card': ['gerudo-card'],
   'eq-lens-of-truth': ['lens-of-truth'],
+  'eq-silver-gauntlets': ['silver-gauntlets'],
+  'eq-mirror-shield': ['mirror-shield'],
   'eq-fire-arrows': ['fire-arrows'],
   'eq-ice-arrows': ['ice-arrows'],
+  'eq-light-arrows': ['light-arrows'],
+  'eq-golden-gauntlets': ['golden-gauntlets'],
+
+  // Spiritual Stones & Story-Unlocking Sage Medallions
+  'stone-emerald': ['stone-emerald'],
+  'stone-ruby': ['stone-ruby'],
+  'stone-sapphire': ['stone-sapphire'],
+  'medallion-light': ['era-adult'],
+  'medallion-forest': ['time-travel'],
+  'medallion-water': ['zora-thawed'],
 
   // Empty Bottles (all 5 Switch 2 bottles satisfy 'bottle')
   'bottle-01': ['bottle'],
@@ -99,6 +131,19 @@ const SKULLTULA_TOKEN_MILESTONES: ReadonlyArray<{ threshold: number; reqId: stri
 ];
 
 /**
+ * Environmental / consumable cues surfaced as soft badges on cards rather than
+ * hard progression locks (`time-night`, `time-day`, `deku-sticks`, and—once any
+ * Empty Bottle is owned—`bottled-bug` and `blue-fire`).
+ */
+const ENVIRONMENTAL_CONDITION_LABELS: Readonly<Record<string, string>> = {
+  'time-night': 'Night Only',
+  'time-day': 'Daytime Only',
+  'bottled-bug': 'Bring Bottled Bugs',
+  'blue-fire': 'Bring Blue Fire',
+  'deku-sticks': 'Deku Sticks',
+};
+
+/**
  * Priority weights for selecting the single most informative gear/item blocker
  * when multiple requirements are missing on a locked secret.
  */
@@ -125,13 +170,16 @@ const GEAR_PRIORITY_WEIGHT: Readonly<Record<string, number>> = {
   'lens-of-truth': 70,
   'mask-of-truth': 68,
   'skull-mask': 66,
+  'stone-sapphire': 65,
   boomerang: 64,
   'silver-scale': 62,
   'magic-beans': 60,
   'dins-fire': 58,
+  'stone-ruby': 57,
   bombs: 56,
   'goron-bracelet': 54,
   slingshot: 52,
+  'stone-emerald': 50,
   'zeldas-letter': 48,
   'weird-egg': 46,
   ocarina: 44,
@@ -191,6 +239,21 @@ const BLOCKER_CATEGORY_ORDER: Readonly<Record<BlockerCategoryKind, number>> = {
   other: 5,
 };
 
+/**
+ * Maps each `STORY_PRESETS` ID to the inclusive Optimal Route step cutoff completed
+ * prior to reaching that checkpoint when `markPriorSecretsAndSteps: true` is used.
+ */
+const PRESET_CATCHUP_CUTOFF_STEP: Readonly<Record<string, string | null>> = {
+  'fresh-start': null,
+  'goron-city-visit-1': 'ch-03-step-06',
+  'post-dodongo': 'ch-05-step-01',
+  'three-stones': 'ch-07-step-10',
+  'fresh-adult-hookshot': 'ch-08-step-05',
+  'post-forest-temple': 'ch-10-step-10',
+  'post-water-temple': 'ch-13-step-01',
+  endgame: 'ch-17-step-02',
+};
+
 export function createDefaultProgressState(): PlayerProgressState {
   const ownedRequirementIds: Record<string, boolean> = {};
   for (const id of DEFAULT_OWNED_REQUIREMENTS) {
@@ -226,14 +289,22 @@ export function countCompletedSkulltulas(
 
 /**
  * Derives the full active set of satisfied requirement IDs from:
- * 1. Explicitly owned requirements (`state.ownedRequirementIds`)
- * 2. Auto-counted Gold Skulltula token milestones (`tokens-10`..`tokens-100`)
- * 3. Checked equipment, bottles, songs, Great Fairy #1, Skulltula rewards, and masks
- * 4. Transitive upgrade hierarchies (Wallets, Hookshot/Longshot, Scales, Gauntlets)
+ * 1. Checklist Mode override (`!state.loadoutModeEnabled` -> unlocks all requirements)
+ * 2. Explicitly owned requirements (`state.ownedRequirementIds`)
+ * 3. Completed Optimal Route steps' `unlocksRequirementIds` (`state.completedRouteStepIds`)
+ * 4. Auto-counted Gold Skulltula token milestones (`tokens-10`..`tokens-100`)
+ * 5. Checked equipment, stones, medallions, bottles, songs, Great Fairy #1, Skulltula rewards, and masks
+ * 6. Transitive upgrade hierarchies (Wallets, Hookshot/Longshot, Scales, Gauntlets)
+ * 7. Environmental / renewable cues (`time-night`, `time-day`, `deku-sticks`, plus `bottled-bug` & `blue-fire` once `bottle` is owned)
  */
 export function deriveEffectiveRequirements(state: PlayerProgressState): Set<string> {
   if (!state.loadoutModeEnabled) {
-    return new Set(DEFAULT_OWNED_REQUIREMENTS);
+    return new Set([
+      ...REQUIREMENTS.map((r) => r.id),
+      'stone-emerald',
+      'stone-ruby',
+      'stone-sapphire',
+    ]);
   }
 
   const effective = new Set<string>();
@@ -241,6 +312,19 @@ export function deriveEffectiveRequirements(state: PlayerProgressState): Set<str
   for (const [reqId, isOwned] of Object.entries(state.ownedRequirementIds)) {
     if (isOwned) {
       effective.add(reqId);
+    }
+  }
+
+  // Sync completed Optimal Route steps -> unlocked requirements
+  if (state.completedRouteStepIds) {
+    for (const [stepId, isCompleted] of Object.entries(state.completedRouteStepIds)) {
+      if (!isCompleted) continue;
+      const step = ROUTE_STEP_BY_ID[stepId];
+      if (step?.unlocksRequirementIds) {
+        for (const reqId of step.unlocksRequirementIds) {
+          effective.add(reqId);
+        }
+      }
     }
   }
 
@@ -286,7 +370,426 @@ export function deriveEffectiveRequirements(state: PlayerProgressState): Set<str
     effective.add('goron-bracelet');
   }
 
+  // Environmental & renewable conditions are surfaced as soft badges on cards
+  // rather than hard progression locks.
+  effective.add('time-night');
+  effective.add('time-day');
+  effective.add('deku-sticks');
+  if (effective.has('bottle')) {
+    effective.add('bottled-bug');
+    effective.add('blue-fire');
+  }
+
   return effective;
+}
+
+/**
+ * Evaluates canonical Ocarina of Time world-graph reachability for any of the
+ * 34 overworld provinces, dungeons, mini-dungeons, or Switch 2 dream hubs.
+ */
+export function evaluateRegionReachability(
+  regionId: string,
+  effectiveReqs: ReadonlySet<string>,
+): RegionReachabilityResult {
+  const has = (reqId: string) => effectiveReqs.has(reqId);
+
+  switch (regionId) {
+    case 'kokiri-forest':
+    case 'lost-woods':
+    case 'sacred-forest-meadow': {
+      if (has('era-child') || has('era-adult')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: 'Begin your adventure in Kokiri Forest',
+        blockerReqId: 'era-child',
+      };
+    }
+
+    case 'deku-tree': {
+      if (!has('era-child')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Return to Child Era via Prelude of Light to enter Inside the Great Deku Tree',
+          blockerReqId: 'era-child',
+        };
+      }
+      if (!has('kokiri-sword') || !has('deku-shield')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Equip Kokiri Sword & Deku Shield to pass Mido',
+          blockerReqId: !has('kokiri-sword') ? 'kokiri-sword' : 'deku-shield',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'hyrule-field':
+    case 'lon-lon-ranch':
+    case 'market':
+    case 'kakariko-village':
+    case 'graveyard':
+    case 'lake-hylia':
+    case 'zoras-river':
+    case 'gerudo-valley': {
+      if (has('stone-emerald') || has('era-adult')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: 'Clear Inside the Great Deku Tree to leave Kokiri Forest',
+        blockerReqId: 'stone-emerald',
+      };
+    }
+
+    case 'hyrule-castle': {
+      const hf = evaluateRegionReachability('hyrule-field', effectiveReqs);
+      if (!hf.isReachable) return hf;
+      if (!has('era-child')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Return to Child Era via Pedestal of Time to visit Hyrule Castle Grounds',
+          blockerReqId: 'era-child',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'outside-ganons-castle': {
+      const hf = evaluateRegionReachability('hyrule-field', effectiveReqs);
+      if (!hf.isReachable) return hf;
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Advance to the Adult Era to reach Outside Ganon's Castle",
+          blockerReqId: 'era-adult',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'death-mountain-trail':
+    case 'goron-city': {
+      const hf = evaluateRegionReachability('hyrule-field', effectiveReqs);
+      if (!hf.isReachable) return hf;
+      if (has('zeldas-letter') || has('bombs') || has('era-adult')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: "Show Zelda's Letter to the Kakariko Gate Guard",
+        blockerReqId: 'zeldas-letter',
+      };
+    }
+
+    case 'dodongos-cavern': {
+      const dmt = evaluateRegionReachability('death-mountain-trail', effectiveReqs);
+      if (!dmt.isReachable) return dmt;
+      if (has('goron-bracelet') || has('bombs') || has('era-adult')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: "Obtain Goron's Bracelet from Darunia in Goron City",
+        blockerReqId: 'goron-bracelet',
+      };
+    }
+
+    case 'death-mountain-crater': {
+      if (has('song-bolero') && (has('era-child') || has('era-adult'))) {
+        const hf = evaluateRegionReachability('hyrule-field', effectiveReqs);
+        if (hf.isReachable) return { isReachable: true };
+      }
+      const dmt = evaluateRegionReachability('death-mountain-trail', effectiveReqs);
+      if (!dmt.isReachable) return dmt;
+      if (has('bombs') || has('goron-bracelet') || has('era-adult') || has('song-bolero')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: "Obtain Bombs or Goron's Bracelet to reach Death Mountain Crater",
+        blockerReqId: 'bombs',
+      };
+    }
+
+    case 'zoras-domain': {
+      const hf = evaluateRegionReachability('hyrule-field', effectiveReqs);
+      if (!hf.isReachable) return hf;
+      if (has('song-lullaby') || has('silver-scale')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: "Play Zelda's Lullaby at Zora's River Waterfall",
+        blockerReqId: 'song-lullaby',
+      };
+    }
+
+    case 'zoras-fountain': {
+      const zd = evaluateRegionReachability('zoras-domain', effectiveReqs);
+      if (!zd.isReachable) return zd;
+      if (has('bottle') || has('era-adult')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: "Find Ruto's Letter in Lake Hylia & show King Zora",
+        blockerReqId: 'bottle',
+      };
+    }
+
+    case 'jabu-jabus-belly': {
+      const zf = evaluateRegionReachability('zoras-fountain', effectiveReqs);
+      if (!zf.isReachable) return zf;
+      if (!has('era-child')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Return to Child Era to enter Inside Jabu-Jabu's Belly",
+          blockerReqId: 'era-child',
+        };
+      }
+      if (!has('bottle')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Offer a Bottled Fish in front of Lord Jabu-Jabu',
+          blockerReqId: 'bottle',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'bottom-of-the-well': {
+      const kak = evaluateRegionReachability('kakariko-village', effectiveReqs);
+      if (!kak.isReachable) return kak;
+      if (!has('era-child')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Return to Child Era via Pedestal of Time to enter Bottom of the Well',
+          blockerReqId: 'era-child',
+        };
+      }
+      if (!has('song-storms')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Play Song of Storms in Kakariko Windmill as Child Link to drain the Well',
+          blockerReqId: 'song-storms',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'forest-temple': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to enter the Forest Temple',
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (!has('hookshot')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Obtain the Hookshot in Dampe's Grave to grapple into the Forest Temple",
+          blockerReqId: 'hookshot',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'fire-temple': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to enter the Fire Temple',
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (has('song-bolero') || has('hookshot') || has('bombs')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: 'Use Hookshot or Bolero of Fire to reach the Fire Temple',
+        blockerReqId: 'hookshot',
+      };
+    }
+
+    case 'ice-cavern': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to enter the Ice Cavern',
+          blockerReqId: 'era-adult',
+        };
+      }
+      const zf = evaluateRegionReachability('zoras-fountain', effectiveReqs);
+      if (!zf.isReachable) return zf;
+      return { isReachable: true };
+    }
+
+    case 'water-temple': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to enter the Water Temple',
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (!has('iron-boots')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Obtain the Iron Boots in Ice Cavern to sink to the Water Temple',
+          blockerReqId: 'iron-boots',
+        };
+      }
+      if (!has('hookshot')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Obtain the Hookshot to open the submerged Water Temple gate',
+          blockerReqId: 'hookshot',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'shadow-temple': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to enter the Shadow Temple',
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (!has('song-nocturne')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Learn Nocturne of Shadow from Sheik in Kakariko Village',
+          blockerReqId: 'song-nocturne',
+        };
+      }
+      if (!has('dins-fire')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Cast Din's Fire on the Graveyard torches to unseal the Shadow Temple",
+          blockerReqId: 'dins-fire',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'gerudo-fortress': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Advance to the Adult Era to cross into Gerudo's Fortress",
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (has('epona') || has('longshot') || has('gerudo-card')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: "Rescue Epona or obtain the Longshot to cross Gerudo Valley's broken bridge",
+        blockerReqId: 'epona',
+      };
+    }
+
+    case 'gerudo-training-ground': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to enter Gerudo Training Ground',
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (!has('gerudo-card')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Rescue all 4 Carpenters for the Gerudo Membership Card',
+          blockerReqId: 'gerudo-card',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'haunted-wasteland': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Advance to the Adult Era to cross Haunted Wasteland',
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (has('gerudo-card') || has('longshot') || has('hover-boots')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: 'Earn the Gerudo Membership Card to open the Haunted Wasteland gate',
+        blockerReqId: 'gerudo-card',
+      };
+    }
+
+    case 'desert-colossus':
+    case 'spirit-temple': {
+      if (has('song-requiem') && (has('stone-emerald') || has('era-adult'))) {
+        return { isReachable: true };
+      }
+      const hw = evaluateRegionReachability('haunted-wasteland', effectiveReqs);
+      if (!hw.isReachable) {
+        if (!has('era-adult')) {
+          return {
+            isReachable: false,
+            blockerLabel: 'Learn Requiem of Spirit or cross Haunted Wasteland as Adult Link',
+            blockerReqId: 'song-requiem',
+          };
+        }
+        return hw;
+      }
+      if (!has('lens-of-truth')) {
+        return {
+          isReachable: false,
+          blockerLabel: 'Obtain the Lens of Truth to follow the Poe Guide across Haunted Wasteland',
+          blockerReqId: 'lens-of-truth',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'ganons-castle': {
+      if (!has('era-adult')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Advance to the Adult Era to enter Inside Ganon's Castle",
+          blockerReqId: 'era-adult',
+        };
+      }
+      if (!has('light-arrows')) {
+        return {
+          isReachable: false,
+          blockerLabel: "Receive the Light Arrows in the Temple of Time to enter Inside Ganon's Castle",
+          blockerReqId: 'light-arrows',
+        };
+      }
+      return { isReachable: true };
+    }
+
+    case 'hall-of-fallen-foes': {
+      if (has('song-prelude')) {
+        return { isReachable: true };
+      }
+      return {
+        isReachable: false,
+        blockerLabel: 'Learn Prelude of Light after Forest Temple to unlock Hall of Fallen Foes',
+        blockerReqId: 'song-prelude',
+      };
+    }
+
+    default:
+      return { isReachable: true };
+  }
 }
 
 export function matchesEraFilter(secretEra: Era, eraFilter: EraFilter): boolean {
@@ -306,6 +809,105 @@ export function matchesSecretFilters(
     return false;
   }
   return true;
+}
+
+function extractEnvironmentalConditions(secret: UnifiedSecret): string[] {
+  const conditions: string[] = [];
+  const seen = new Set<string>();
+  for (const reqId of secret.requiredIds) {
+    const label = ENVIRONMENTAL_CONDITION_LABELS[reqId];
+    if (label && !seen.has(label)) {
+      seen.add(label);
+      conditions.push(label);
+    }
+  }
+  return conditions;
+}
+
+function computeMissingRequirementIds(
+  requiredIds: readonly string[],
+  activeReqs: ReadonlySet<string>,
+): string[] {
+  const missing: string[] = [];
+  const seen = new Set<string>();
+
+  for (const reqId of requiredIds) {
+    // Always-available environmental conditions never block progression
+    if (reqId === 'time-night' || reqId === 'time-day' || reqId === 'deku-sticks') {
+      continue;
+    }
+    // Bottled Bugs & Blue Fire only require owning any Empty Bottle for gating
+    if (reqId === 'bottled-bug' || reqId === 'blue-fire') {
+      if (!activeReqs.has('bottle') && !seen.has('bottle')) {
+        seen.add('bottle');
+        missing.push('bottle');
+      }
+      continue;
+    }
+    if (!activeReqs.has(reqId) && !seen.has(reqId)) {
+      seen.add(reqId);
+      missing.push(reqId);
+    }
+  }
+
+  return missing;
+}
+
+function resolveRegionBlockerCategory(blockerReqId?: string): BlockerCategoryKind {
+  if (!blockerReqId) return 'other';
+  if (blockerReqId === 'time-travel') return 'cross-era';
+  if (blockerReqId.startsWith('song-') || REQUIREMENT_BY_ID[blockerReqId]?.category === 'song') {
+    return 'song';
+  }
+  const cat = REQUIREMENT_BY_ID[blockerReqId]?.category;
+  if (
+    cat === 'gear' ||
+    cat === 'item' ||
+    cat === 'quest' ||
+    cat === 'upgrade' ||
+    cat === 'story'
+  ) {
+    return 'gear';
+  }
+  if (cat === 'economy' || cat === 'milestone') {
+    return 'wallet-milestone';
+  }
+  return 'other';
+}
+
+function computeVisitStage(
+  secret: UnifiedSecret,
+  status: AccessStatus,
+  missingPrimaryIds: readonly string[],
+  activeReqs: ReadonlySet<string>,
+  activeEraFilter: EraFilter,
+  reachBlockerReqId?: string,
+): VisitStage {
+  if (status === 'completed') {
+    return 'completed';
+  }
+  if (status === 'available-now' || status === 'available-via-alt') {
+    return 'do-now';
+  }
+
+  const missingSet = new Set(missingPrimaryIds);
+  if (reachBlockerReqId === 'era-adult' || reachBlockerReqId === 'era-child') {
+    return 'later-era';
+  }
+  if (
+    (secret.era === 'adult' && !activeReqs.has('era-adult')) ||
+    (secret.era === 'child' && !activeReqs.has('era-child')) ||
+    missingSet.has('era-adult') ||
+    missingSet.has('era-child') ||
+    missingSet.has('time-travel') ||
+    (secret.era === 'cross-era' && !activeReqs.has('time-travel')) ||
+    (activeEraFilter === 'child' && secret.era === 'adult') ||
+    (activeEraFilter === 'adult' && secret.era === 'child')
+  ) {
+    return 'later-era';
+  }
+
+  return 'later-gear';
 }
 
 function resolvePrimaryBlocker(
@@ -350,7 +952,6 @@ function resolvePrimaryBlocker(
     (id) => REQUIREMENT_BY_ID[id]?.category === 'song' || id.startsWith('song-'),
   );
   if (missingSongs.length > 0) {
-    // Prefer warp/late songs over basic songs when multiple songs are missing
     const chosenSongId = missingSongs[missingSongs.length - 1];
     const reqName = REQUIREMENT_BY_ID[chosenSongId]?.name ?? chosenSongId;
     return {
@@ -362,12 +963,7 @@ function resolvePrimaryBlocker(
   }
 
   // 3. Specific Dungeon / Quest Gear & Story Unlocks
-  // Exclude 'bottled-bug' (and 'bottle' when paired with 'bottled-bug') so soft-soil
-  // bug Skulltulas group cleanly under 'Needs Bottled Bugs' in step 5.
-  const isSoftSoilBugGate = missingSet.has('bottled-bug');
   const gearCandidates = missingPrimaryIds.filter((id) => {
-    if (id === 'bottled-bug') return false;
-    if (id === 'bottle' && isSoftSoilBugGate) return false;
     const cat = REQUIREMENT_BY_ID[id]?.category;
     return (
       cat === 'gear' ||
@@ -409,33 +1005,7 @@ function resolvePrimaryBlocker(
     };
   }
 
-  // 5. Nighttime / Daytime / Bottled Bugs
-  if (missingSet.has('bottled-bug')) {
-    return {
-      primaryBlockerId: 'bottled-bug',
-      primaryBlockerGroupKey: 'blocker:time-bug:bottled-bug',
-      primaryBlockerLabel: 'Needs Bottled Bugs',
-      primaryBlockerCategory: 'time-bug',
-    };
-  }
-  if (missingSet.has('time-night')) {
-    return {
-      primaryBlockerId: 'time-night',
-      primaryBlockerGroupKey: 'blocker:time-bug:time-night',
-      primaryBlockerLabel: 'Needs Nighttime',
-      primaryBlockerCategory: 'time-bug',
-    };
-  }
-  if (missingSet.has('time-day')) {
-    return {
-      primaryBlockerId: 'time-day',
-      primaryBlockerGroupKey: 'blocker:time-bug:time-day',
-      primaryBlockerLabel: 'Needs Daytime',
-      primaryBlockerCategory: 'time-bug',
-    };
-  }
-
-  // 6. Remaining gates (e.g. 'era-adult' or 'era-child' standalone)
+  // 5. Remaining gates (e.g. 'era-adult' or 'era-child' standalone)
   const fallbackId = missingPrimaryIds[0];
   const fallbackName = REQUIREMENT_BY_ID[fallbackId]?.name ?? fallbackId;
   return {
@@ -447,7 +1017,8 @@ function resolvePrimaryBlocker(
 }
 
 /**
- * Evaluates a single `UnifiedSecret` against the player's current progression state.
+ * Evaluates a single `UnifiedSecret` against the player's current progression state
+ * and world-reachability graph.
  */
 export function evaluateSecret(
   secret: UnifiedSecret,
@@ -455,9 +1026,10 @@ export function evaluateSecret(
   effectiveReqs?: Set<string>,
 ): EvaluatedSecret {
   const activeReqs = effectiveReqs ?? deriveEffectiveRequirements(state);
-  const missingPrimaryIds = secret.requiredIds.filter((reqId) => !activeReqs.has(reqId));
-  const satisfiedAltMethods: AltMethod[] = secret.altMethods.filter((alt) =>
-    alt.requiredIds.every((reqId) => activeReqs.has(reqId)),
+  const environmentalConditions = extractEnvironmentalConditions(secret);
+  const missingPrimaryIds = computeMissingRequirementIds(secret.requiredIds, activeReqs);
+  const satisfiedAltMethods: AltMethod[] = secret.altMethods.filter(
+    (alt) => computeMissingRequirementIds(alt.requiredIds, activeReqs).length === 0,
   );
 
   if (state.completedSecretIds[secret.id]) {
@@ -470,7 +1042,46 @@ export function evaluateSecret(
       primaryBlockerGroupKey: 'completed',
       primaryBlockerLabel: 'Completed',
       primaryBlockerCategory: 'other',
+      environmentalConditions,
+      visitStage: 'completed',
     };
+  }
+
+  if (state.loadoutModeEnabled) {
+    const reach = evaluateRegionReachability(secret.regionId, activeReqs);
+    if (!reach.isReachable) {
+      const regionBlockerLabel = reach.blockerLabel ?? 'Region Not Yet Reachable';
+      const combinedMissing = [...missingPrimaryIds];
+      if (
+        reach.blockerReqId &&
+        !activeReqs.has(reach.blockerReqId) &&
+        !combinedMissing.includes(reach.blockerReqId)
+      ) {
+        combinedMissing.unshift(reach.blockerReqId);
+      }
+
+      return {
+        secret,
+        status: 'locked',
+        missingPrimaryIds: combinedMissing,
+        satisfiedAltMethods: [],
+        primaryBlockerId: reach.blockerReqId,
+        primaryBlockerGroupKey: `blocker:region:${reach.blockerReqId ?? secret.regionId}`,
+        primaryBlockerLabel: regionBlockerLabel,
+        primaryBlockerCategory: resolveRegionBlockerCategory(reach.blockerReqId),
+        environmentalConditions,
+        isRegionLocked: true,
+        regionLockReason: regionBlockerLabel,
+        visitStage: computeVisitStage(
+          secret,
+          'locked',
+          combinedMissing,
+          activeReqs,
+          state.activeEraFilter,
+          reach.blockerReqId,
+        ),
+      };
+    }
   }
 
   let status: AccessStatus;
@@ -496,6 +1107,8 @@ export function evaluateSecret(
       primaryBlockerLabel:
         status === 'available-via-alt' ? 'Ready via Early Trick' : 'Ready Right Now',
       primaryBlockerCategory: 'other',
+      environmentalConditions,
+      visitStage: 'do-now',
     };
   }
 
@@ -509,12 +1122,20 @@ export function evaluateSecret(
     primaryBlockerGroupKey: blocker.primaryBlockerGroupKey,
     primaryBlockerLabel: blocker.primaryBlockerLabel,
     primaryBlockerCategory: blocker.primaryBlockerCategory,
+    environmentalConditions,
+    visitStage: computeVisitStage(
+      secret,
+      status,
+      missingPrimaryIds,
+      activeReqs,
+      state.activeEraFilter,
+    ),
   };
 }
 
 /**
- * Evaluates and groups all secrets inside a region for the Region Dossier drawer.
- * Supports all 3 `DrawerGroupMode`s: `'blocker'` (default), `'tier'`, and `'type'`.
+ * Evaluates and groups all secrets inside a region for the Region Dossier drawer
+ * and Guided Co-Pilot views. Supports `'blocker'` (default), `'tier'`, and `'type'`.
  */
 export function categorizeRegionSecrets(
   regionId: string,
@@ -613,7 +1234,7 @@ export function categorizeRegionSecrets(
 }
 
 /**
- * Computes completion & accessibility summary metrics for a single region or dungeon.
+ * Computes completion, reachability & accessibility summary metrics for a single region or dungeon.
  */
 export function computeRegionSummary(
   regionId: string,
@@ -621,6 +1242,10 @@ export function computeRegionSummary(
   effectiveReqs?: Set<string>,
 ): RegionProgressSummary {
   const activeReqs = effectiveReqs ?? deriveEffectiveRequirements(state);
+  const reachability: RegionReachabilityResult = state.loadoutModeEnabled
+    ? evaluateRegionReachability(regionId, activeReqs)
+    : { isReachable: true };
+
   const allRegionSecrets = SECRETS_BY_REGION[regionId] ?? [];
   const visibleSecrets = allRegionSecrets.filter((sec) => matchesSecretFilters(sec, state));
 
@@ -686,6 +1311,9 @@ export function computeRegionSummary(
     lockedCount,
     percent,
     isComplete,
+    isReachable: reachability.isReachable,
+    reachabilityBlocker: reachability.blockerLabel,
+    reachabilityBlockerReqId: reachability.blockerReqId,
     heartPiecesCompleted,
     heartPiecesTotal,
     skulltulasChildCompleted,
@@ -713,7 +1341,7 @@ export function computeAllRegionSummaries(
 }
 
 /**
- * Computes global 100% completion and collectible category counters across Hyrule.
+ * Computes global 100% completion, live Heart Container math, and category counters across Hyrule.
  */
 export function computeGlobalProgress(state: PlayerProgressState): GlobalProgressSummary {
   const effectiveReqs = deriveEffectiveRequirements(state);
@@ -729,6 +1357,8 @@ export function computeGlobalProgress(state: PlayerProgressState): GlobalProgres
 
   let heartPiecesCompleted = 0;
   let heartPiecesTotal = 0;
+  let bossHeartsCompleted = 0;
+  let bossHeartsTotal = 0;
   let skulltulasChildCompleted = 0;
   let skulltulasChildTotal = 0;
   let skulltulasAdultCompleted = 0;
@@ -763,6 +1393,11 @@ export function computeGlobalProgress(state: PlayerProgressState): GlobalProgres
       availableViaAltTotal += 1;
     } else if (ev.status === 'locked') {
       lockedTotal += 1;
+    }
+
+    if (sec.subCategory === 'boss-heart') {
+      bossHeartsTotal += 1;
+      if (isDone) bossHeartsCompleted += 1;
     }
 
     switch (sec.category) {
@@ -811,6 +1446,11 @@ export function computeGlobalProgress(state: PlayerProgressState): GlobalProgres
     }
   }
 
+  const startingHearts = METADATA.expectedCounts.startingHearts ?? 3;
+  const currentHeartContainers =
+    startingHearts + bossHeartsCompleted + Math.floor(heartPiecesCompleted / 4);
+  const heartPieceQuarterRemainder = heartPiecesCompleted % 4;
+
   const skulltulasCompleted = skulltulasChildCompleted + skulltulasAdultCompleted;
   const skulltulasTotal = skulltulasChildTotal + skulltulasAdultTotal;
   const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -828,6 +1468,10 @@ export function computeGlobalProgress(state: PlayerProgressState): GlobalProgres
     lockedTotal,
     heartPiecesCompleted,
     heartPiecesTotal,
+    bossHeartsCompleted,
+    bossHeartsTotal,
+    currentHeartContainers,
+    heartPieceQuarterRemainder,
     skulltulasCompleted,
     skulltulasTotal,
     skulltulasChildCompleted,
@@ -952,19 +1596,94 @@ export function toggleRequirementOwned(
 export function applyStoryPreset(
   state: PlayerProgressState,
   presetId: string,
+  options?: StoryPresetApplyOptions,
 ): PlayerProgressState {
   const preset = STORY_PRESETS.find((p) => p.id === presetId);
   if (!preset) {
     return state;
   }
+
   const ownedRequirementIds: Record<string, boolean> = {};
   for (const reqId of preset.ownedRequirementIds) {
     ownedRequirementIds[reqId] = true;
   }
+
+  if (!options?.markPriorSecretsAndSteps) {
+    return {
+      ...state,
+      activeEraFilter: preset.eraFilter,
+      loadoutModeEnabled: true,
+      ownedRequirementIds,
+      hasCompletedOnboarding: true,
+    };
+  }
+
+  const cutoffStepId = PRESET_CATCHUP_CUTOFF_STEP[presetId];
+  if (cutoffStepId === null) {
+    return {
+      ...state,
+      completedSecretIds: {},
+      completedRouteStepIds: {},
+      activeRouteChapterId: 'ch-01',
+      bookmarkedRouteStepId: 'ch-01-step-01',
+      activeEraFilter: preset.eraFilter,
+      loadoutModeEnabled: true,
+      ownedRequirementIds,
+      hasCompletedOnboarding: true,
+    };
+  }
+
+  const cutoffIndex = cutoffStepId
+    ? ALL_ROUTE_STEPS.findIndex((s) => s.id === cutoffStepId)
+    : -1;
+
+  const nextCompletedSteps: Record<string, boolean> = {
+    ...(state.completedRouteStepIds ?? {}),
+  };
+  const nextCompletedSecrets: Record<string, boolean> = {
+    ...state.completedSecretIds,
+  };
+
+  if (cutoffIndex >= 0) {
+    for (let i = 0; i <= cutoffIndex; i += 1) {
+      const step = ALL_ROUTE_STEPS[i];
+      nextCompletedSteps[step.id] = true;
+
+      const isCoreStep =
+        step.kind === 'story' || step.kind === 'dungeon' || step.kind === 'boss';
+
+      for (const secId of step.secretIds) {
+        const sec = SECRET_BY_ID[secId];
+        if (!sec) continue;
+        const isStoryOrDungeonSecret =
+          isCoreStep ||
+          Boolean(sec.subCategory) ||
+          Boolean(SECRET_TO_REQUIREMENTS_MAP[secId]);
+
+        if (isStoryOrDungeonSecret) {
+          nextCompletedSecrets[secId] = true;
+          if (secId === 'hp-10') nextCompletedSecrets['skr-50'] = true;
+          if (secId === 'skr-50') nextCompletedSecrets['hp-10'] = true;
+        }
+      }
+    }
+  }
+
+  const nextStep =
+    cutoffIndex >= 0 && cutoffIndex + 1 < ALL_ROUTE_STEPS.length
+      ? ALL_ROUTE_STEPS[cutoffIndex + 1]
+      : ALL_ROUTE_STEPS[Math.max(0, cutoffIndex)];
+  const nextChapterId = nextStep ? STEP_TO_CHAPTER_ID[nextStep.id] : state.activeRouteChapterId;
+
   return {
     ...state,
+    completedSecretIds: nextCompletedSecrets,
+    completedRouteStepIds: nextCompletedSteps,
+    activeRouteChapterId: nextChapterId ?? state.activeRouteChapterId,
+    bookmarkedRouteStepId: nextStep?.id ?? state.bookmarkedRouteStepId ?? null,
     activeEraFilter: preset.eraFilter,
     loadoutModeEnabled: true,
     ownedRequirementIds,
+    hasCompletedOnboarding: true,
   };
 }

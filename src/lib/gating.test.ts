@@ -5,7 +5,9 @@ import {
   AREA_GUIDE_BY_REGION_ID,
   AREA_GUIDES,
   ATTACHED_DUNGEONS_BY_REGION,
+  BOSS_HEART_CONTAINERS,
   DUNGEON_AND_SPECIAL_REGIONS,
+  GANON_TRIALS,
   GOLD_SKULLTULAS,
   HEART_PIECES,
   METADATA,
@@ -20,6 +22,7 @@ import {
   SECRET_BY_ID,
   SONGS_AND_QUESTS,
   STORY_PRESETS,
+  STORY_TOKENS,
   UPGRADES_AND_BOTTLES,
 } from '../data';
 import {
@@ -31,7 +34,9 @@ import {
   computeUnlockDelta,
   createDefaultProgressState,
   deriveEffectiveRequirements,
+  evaluateRegionReachability,
   evaluateSecret,
+  SECRET_TO_REQUIREMENTS_MAP,
   toggleRequirementOwned,
   toggleSecretCompleted,
 } from './gating';
@@ -47,15 +52,16 @@ import {
 } from './storage';
 
 describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () => {
-  it('matches every expected count in METADATA.expectedCounts and totals 232 normalized secrets', () => {
+  it('matches every expected count in METADATA.expectedCounts and totals 271 normalized secrets (270 countable)', () => {
     const exp = METADATA.expectedCounts;
 
     expect(OVERWORLD_REGIONS).toHaveLength(exp.overworldRegions); // 21
     expect(DUNGEON_AND_SPECIAL_REGIONS).toHaveLength(exp.dungeonsAndSpecialAreas); // 13
     expect(REGIONS).toHaveLength(exp.totalRegions); // 34
-    expect(REQUIREMENTS).toHaveLength(66);
+    expect(REQUIREMENTS).toHaveLength(69); // 66 original + 3 Spiritual Stones
 
     const byCat = (cat: string) => ALL_SECRETS.filter((s) => s.category === cat);
+    const bySubCat = (sub: string) => ALL_SECRETS.filter((s) => s.subCategory === sub);
 
     expect(byCat('heart-piece')).toHaveLength(exp.heartPieces); // 36
     expect(byCat('gold-skulltula')).toHaveLength(exp.goldSkulltulasTotal); // 100
@@ -63,8 +69,8 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     expect(byCat('big-poe')).toHaveLength(exp.bigPoesTotal); // 10
     expect(byCat('great-fairy')).toHaveLength(exp.greatFairies); // 6
     expect(byCat('skulltula-reward')).toHaveLength(6);
-    expect(byCat('capacity-upgrade')).toHaveLength(10);
-    expect(byCat('equipment')).toHaveLength(12);
+    expect(byCat('capacity-upgrade')).toHaveLength(18); // 10 capacity + 8 Boss Heart Containers
+    expect(byCat('equipment')).toHaveLength(43); // 28 gear/items + 9 stones/medallions + 6 Ganon trials
     expect(byCat('ocarina-song')).toHaveLength(exp.ocarinaSongs); // 13
     expect(byCat('magic-bean')).toHaveLength(exp.magicBeanLocations); // 10
     expect(byCat('mask-trade')).toHaveLength(exp.happyMaskTrades); // 4
@@ -72,8 +78,18 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     expect(byCat('cow-or-grotto')).toHaveLength(5);
     expect(byCat('switch2-exclusive')).toHaveLength(3);
 
-    expect(ALL_SECRETS).toHaveLength(232);
-    expect(Object.keys(SECRET_BY_ID)).toHaveLength(232);
+    // Phase 1 Core Subcategories (39 newly checkable cards)
+    expect(bySubCat('dungeon-item')).toHaveLength(16);
+    expect(bySubCat('boss-heart')).toHaveLength(8);
+    expect(bySubCat('spiritual-stone')).toHaveLength(3);
+    expect(bySubCat('medallion')).toHaveLength(6);
+    expect(bySubCat('ganon-trial')).toHaveLength(6);
+    expect(BOSS_HEART_CONTAINERS).toHaveLength(8);
+    expect(STORY_TOKENS).toHaveLength(9);
+    expect(GANON_TRIALS).toHaveLength(6);
+
+    expect(ALL_SECRETS).toHaveLength(271);
+    expect(Object.keys(SECRET_BY_ID)).toHaveLength(271);
 
     // 56 Overworld + 44 Dungeon Gold Skulltulas (51 Child + 49 Adult)
     const overworldGs = GOLD_SKULLTULAS.filter(
@@ -102,7 +118,7 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
 
     // skr-50 cross-lists hp-10 so countsToward100Percent is false only on skr-50
     expect(SECRET_BY_ID['skr-50']?.countsToward100Percent).toBe(false);
-    expect(ALL_SECRETS.filter((s) => s.countsToward100Percent)).toHaveLength(231);
+    expect(ALL_SECRETS.filter((s) => s.countsToward100Percent)).toHaveLength(270);
   });
 
   it('validates that every secret, preset, and requirement maps to valid regions and requirement IDs', () => {
@@ -123,13 +139,44 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
       }
     }
 
+    // Every core dungeon/progression item & spiritual stone maps in SECRET_TO_REQUIREMENTS_MAP
+    const expectedProgressionMappings: Record<string, string[]> = {
+      'eq-deku-shield': ['deku-shield'],
+      'eq-ocarina': ['ocarina'],
+      'eq-slingshot': ['slingshot'],
+      'eq-goron-bracelet': ['goron-bracelet'],
+      'eq-bomb-bag': ['bombs'],
+      'eq-boomerang': ['boomerang'],
+      'eq-bow': ['bow'],
+      'eq-megaton-hammer': ['megaton-hammer'],
+      'eq-iron-boots': ['iron-boots'],
+      'eq-longshot': ['longshot'],
+      'eq-hover-boots': ['hover-boots'],
+      'eq-gerudo-card': ['gerudo-card'],
+      'eq-silver-gauntlets': ['silver-gauntlets'],
+      'eq-mirror-shield': ['mirror-shield'],
+      'eq-light-arrows': ['light-arrows'],
+      'eq-golden-gauntlets': ['golden-gauntlets'],
+      'stone-emerald': ['stone-emerald'],
+      'stone-ruby': ['stone-ruby'],
+      'stone-sapphire': ['stone-sapphire'],
+      'medallion-light': ['era-adult'],
+      'medallion-forest': ['time-travel'],
+      'medallion-water': ['zora-thawed'],
+    };
+    for (const [secId, expectedReqs] of Object.entries(expectedProgressionMappings)) {
+      expect(SECRET_BY_ID[secId]).toBeDefined();
+      expect(SECRET_TO_REQUIREMENTS_MAP[secId]).toEqual(expectedReqs);
+    }
+
     for (const req of REQUIREMENTS) {
       const sourceRegionId = REQUIREMENT_SOURCE_REGION[req.id];
       expect(sourceRegionId).toBeDefined();
       expect(REGION_BY_ID[sourceRegionId]).toBeDefined();
     }
 
-    expect(STORY_PRESETS).toHaveLength(7);
+    expect(STORY_PRESETS).toHaveLength(8);
+    expect(STORY_PRESETS.some((p) => p.id === 'goron-city-visit-1')).toBe(true);
     for (const preset of STORY_PRESETS) {
       for (const reqId of preset.ownedRequirementIds) {
         expect(REQUIREMENT_BY_ID[reqId]).toBeDefined();
@@ -145,7 +192,7 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     ).toContain('bottom-of-the-well');
   });
 
-  it('extracts Step 1 / Step 2 crossEraSteps and preserves timers, song buttons, and warp bean gates', () => {
+  it('extracts Step 1 / Step 2 crossEraSteps, preserves timers/song buttons, and strips all raw .json or secret-ID leaks', () => {
     for (const crossId of ['hp-05', 'hp-06', 'gs-010', 'hp-20', 'hp-36', 'song-scarecrow']) {
       const sec = SECRET_BY_ID[crossId];
       expect(sec?.crossEraSteps).toBeDefined();
@@ -183,13 +230,411 @@ describe('Canonical Dataset & Normalization Integrity (src/data/index.ts)', () =
     expect(HEART_PIECES).toHaveLength(36);
     expect(UPGRADES_AND_BOTTLES.bottles).toHaveLength(5);
     expect(SONGS_AND_QUESTS.ocarinaSongs).toHaveLength(13);
+
+    // Ensure eq-biggoron-sword and all Area Walkthrough Guides contain zero raw .json or backtick secret IDs
+    expect(SECRET_BY_ID['eq-biggoron-sword']?.howToGet).toContain(
+      'Open the Quests & Trading sheet for all 12 timed steps',
+    );
+    expect(SECRET_BY_ID['eq-biggoron-sword']?.howToGet).not.toContain('.json');
+
+    const rawSecretSlugPattern =
+      /`(?:eq|hp|gs|gf|skr|cap|bottle|bean|song|poe|mask|biggoron|cow|grotto|sw2|boss-hc|stone|medallion|trial)-[a-z0-9-]+`/;
+    for (const sec of ALL_SECRETS) {
+      expect(sec.howToGet).not.toMatch(/\.json\b/i);
+      expect(sec.howToGet).not.toMatch(rawSecretSlugPattern);
+    }
+    for (const guide of AREA_GUIDES) {
+      const proseChunks = [
+        guide.tagline,
+        guide.recommendedVisitOrder,
+        ...guide.entrancesAndShortcuts,
+        ...guide.proTips,
+        ...(guide.bossStrategy
+          ? [guide.bossStrategy.bossName, guide.bossStrategy.weakness, guide.bossStrategy.strategy]
+          : []),
+        ...guide.phases.flatMap((p) => [p.title, ...p.steps]),
+      ];
+      for (const text of proseChunks) {
+        expect(text).not.toMatch(/\.json\b/i);
+        expect(text).not.toMatch(rawSecretSlugPattern);
+      }
+    }
+  });
+});
+
+describe('World-Reachability Graph, Progression Fixes & Environmental Tags (src/lib/gating.ts)', () => {
+  it('enforces Kokiri Fresh Start world-reachability locks (Mido & Pokey) and unlocks Hyrule Field via Deku Tree clear', () => {
+    const fresh = createDefaultProgressState();
+    const freshEff = deriveEffectiveRequirements(fresh);
+
+    // Only Kokiri Forest, Lost Woods, and Sacred Forest Meadow are reachable on a true Fresh Start
+    const reachableOnFreshStart = REGIONS.filter(
+      (r) => evaluateRegionReachability(r.id, freshEff).isReachable,
+    ).map((r) => r.id);
+    expect(reachableOnFreshStart.sort()).toEqual([
+      'kokiri-forest',
+      'lost-woods',
+      'sacred-forest-meadow',
+    ]);
+
+    // Mido blocks Inside the Great Deku Tree until BOTH Kokiri Sword and Deku Shield are equipped
+    const dekuLocked = evaluateRegionReachability('deku-tree', freshEff);
+    expect(dekuLocked.isReachable).toBe(false);
+    expect(dekuLocked.blockerLabel).toBe('Equip Kokiri Sword & Deku Shield to pass Mido');
+    expect(dekuLocked.blockerReqId).toBe('kokiri-sword');
+
+    const withSwordOnly = toggleSecretCompleted(fresh, 'eq-kokiri-sword', true);
+    const dekuStillLocked = evaluateRegionReachability(
+      'deku-tree',
+      deriveEffectiveRequirements(withSwordOnly),
+    );
+    expect(dekuStillLocked.isReachable).toBe(false);
+    expect(dekuStillLocked.blockerReqId).toBe('deku-shield');
+
+    const withSwordAndShield = toggleSecretCompleted(withSwordOnly, 'eq-deku-shield', true);
+    expect(
+      evaluateRegionReachability('deku-tree', deriveEffectiveRequirements(withSwordAndShield))
+        .isReachable,
+    ).toBe(true);
+
+    // Pokey blocks leaving Kokiri Forest until Kokiri's Emerald (stone-emerald) is earned
+    const hfLockedSummary = computeRegionSummary('hyrule-field', fresh);
+    expect(hfLockedSummary.isReachable).toBe(false);
+    expect(hfLockedSummary.reachabilityBlocker).toBe(
+      'Clear Inside the Great Deku Tree to leave Kokiri Forest',
+    );
+    expect(hfLockedSummary.reachabilityBlockerReqId).toBe('stone-emerald');
+    expect(hfLockedSummary.readyNowCount).toBe(0);
+
+    const kakarikoHpOnFresh = evaluateSecret(SECRET_BY_ID['hp-07']!, fresh);
+    expect(kakarikoHpOnFresh.status).toBe('locked');
+    expect(kakarikoHpOnFresh.isRegionLocked).toBe(true);
+    expect(kakarikoHpOnFresh.regionLockReason).toBe(
+      'Clear Inside the Great Deku Tree to leave Kokiri Forest',
+    );
+    expect(kakarikoHpOnFresh.primaryBlockerLabel).toBe(
+      'Clear Inside the Great Deku Tree to leave Kokiri Forest',
+    );
+
+    // Checking stone-emerald unlocks Hyrule Field & central overworld hubs
+    const postDeku = toggleSecretCompleted(withSwordAndShield, 'stone-emerald', true);
+    const postDekuEff = deriveEffectiveRequirements(postDeku);
+    for (const regionId of [
+      'hyrule-field',
+      'lon-lon-ranch',
+      'market',
+      'hyrule-castle',
+      'kakariko-village',
+      'graveyard',
+      'lake-hylia',
+      'zoras-river',
+      'gerudo-valley',
+    ]) {
+      expect(evaluateRegionReachability(regionId, postDekuEff).isReachable).toBe(true);
+    }
+    expect(evaluateSecret(SECRET_BY_ID['hp-07']!, postDeku).status).toBe('available-now');
+  });
+
+  it('enforces canonical gate rules across Child & Adult dungeons and special regions', () => {
+    let state = toggleSecretCompleted(createDefaultProgressState(), 'stone-emerald', true);
+
+    // Death Mountain Trail & Goron City require Zelda's Letter (or Bombs / Adult)
+    expect(
+      evaluateRegionReachability('goron-city', deriveEffectiveRequirements(state)),
+    ).toMatchObject({
+      isReachable: false,
+      blockerLabel: "Show Zelda's Letter to the Kakariko Gate Guard",
+      blockerReqId: 'zeldas-letter',
+    });
+    state = toggleRequirementOwned(state, 'zeldas-letter', true);
+    expect(
+      evaluateRegionReachability('goron-city', deriveEffectiveRequirements(state)).isReachable,
+    ).toBe(true);
+
+    // Dodongo's Cavern requires Goron's Bracelet (or Bombs / Adult)
+    expect(
+      evaluateRegionReachability('dodongos-cavern', deriveEffectiveRequirements(state)),
+    ).toMatchObject({
+      isReachable: false,
+      blockerLabel: "Obtain Goron's Bracelet from Darunia in Goron City",
+      blockerReqId: 'goron-bracelet',
+    });
+    state = toggleSecretCompleted(state, 'eq-goron-bracelet', true);
+    expect(
+      evaluateRegionReachability('dodongos-cavern', deriveEffectiveRequirements(state)).isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('death-mountain-crater', deriveEffectiveRequirements(state))
+        .isReachable,
+    ).toBe(true);
+
+    // Zora's Domain -> Zora's Fountain -> Jabu-Jabu's Belly
+    expect(
+      evaluateRegionReachability('zoras-domain', deriveEffectiveRequirements(state)),
+    ).toMatchObject({
+      isReachable: false,
+      blockerLabel: "Play Zelda's Lullaby at Zora's River Waterfall",
+      blockerReqId: 'song-lullaby',
+    });
+    state = toggleSecretCompleted(state, 'song-lullaby', true);
+    expect(
+      evaluateRegionReachability('zoras-domain', deriveEffectiveRequirements(state)).isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('zoras-fountain', deriveEffectiveRequirements(state)),
+    ).toMatchObject({
+      isReachable: false,
+      blockerLabel: "Find Ruto's Letter in Lake Hylia & show King Zora",
+      blockerReqId: 'bottle',
+    });
+    state = toggleSecretCompleted(state, 'bottle-01', true);
+    expect(
+      evaluateRegionReachability('zoras-fountain', deriveEffectiveRequirements(state)).isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('jabu-jabus-belly', deriveEffectiveRequirements(state))
+        .isReachable,
+    ).toBe(true);
+
+    // Bottom of the Well requires Child + Song of Storms
+    expect(
+      evaluateRegionReachability('bottom-of-the-well', deriveEffectiveRequirements(state))
+        .blockerReqId,
+    ).toBe('song-storms');
+    state = toggleSecretCompleted(state, 'song-storms', true);
+    expect(
+      evaluateRegionReachability('bottom-of-the-well', deriveEffectiveRequirements(state))
+        .isReachable,
+    ).toBe(true);
+
+    // Requiem of Spirit warps Child Link directly to Desert Colossus & Spirit Temple!
+    expect(
+      evaluateRegionReachability('spirit-temple', deriveEffectiveRequirements(state)).isReachable,
+    ).toBe(false);
+    const childRequiem = toggleSecretCompleted(state, 'song-requiem', true);
+    expect(
+      evaluateRegionReachability('desert-colossus', deriveEffectiveRequirements(childRequiem))
+        .isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('spirit-temple', deriveEffectiveRequirements(childRequiem))
+        .isReachable,
+    ).toBe(true);
+
+    // Adult dungeon progression checks
+    let adultState = applyStoryPreset(createDefaultProgressState(), 'fresh-adult-hookshot');
+    expect(
+      evaluateRegionReachability('forest-temple', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('fire-temple', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('ice-cavern', deriveEffectiveRequirements(adultState)).isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('water-temple', deriveEffectiveRequirements(adultState))
+        .blockerReqId,
+    ).toBe('iron-boots');
+
+    adultState = toggleSecretCompleted(adultState, 'eq-iron-boots', true);
+    expect(
+      evaluateRegionReachability('water-temple', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+
+    expect(
+      evaluateRegionReachability('shadow-temple', deriveEffectiveRequirements(adultState))
+        .blockerReqId,
+    ).toBe('song-nocturne');
+    adultState = toggleSecretCompleted(adultState, 'song-nocturne', true);
+    adultState = toggleSecretCompleted(adultState, 'gf-01', true); // Din's Fire
+    expect(
+      evaluateRegionReachability('shadow-temple', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+
+    expect(
+      evaluateRegionReachability('gerudo-training-ground', deriveEffectiveRequirements(adultState))
+        .blockerReqId,
+    ).toBe('gerudo-card');
+    adultState = toggleSecretCompleted(adultState, 'eq-gerudo-card', true);
+    expect(
+      evaluateRegionReachability('gerudo-training-ground', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('haunted-wasteland', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+    expect(
+      evaluateRegionReachability('spirit-temple', deriveEffectiveRequirements(adultState))
+        .blockerReqId,
+    ).toBe('lens-of-truth');
+    adultState = toggleSecretCompleted(adultState, 'eq-lens-of-truth', true);
+    expect(
+      evaluateRegionReachability('spirit-temple', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+
+    expect(
+      evaluateRegionReachability('ganons-castle', deriveEffectiveRequirements(adultState))
+        .blockerReqId,
+    ).toBe('light-arrows');
+    adultState = toggleSecretCompleted(adultState, 'eq-light-arrows', true);
+    expect(
+      evaluateRegionReachability('ganons-castle', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+
+    expect(
+      evaluateRegionReachability('hall-of-fallen-foes', deriveEffectiveRequirements(adultState))
+        .blockerReqId,
+    ).toBe('song-prelude');
+    adultState = toggleSecretCompleted(adultState, 'song-prelude', true);
+    expect(
+      evaluateRegionReachability('hall-of-fallen-foes', deriveEffectiveRequirements(adultState))
+        .isReachable,
+    ).toBe(true);
+  });
+
+  it('surfaces environmentalConditions as soft badges instead of hard progression locks', () => {
+    const fresh = createDefaultProgressState();
+
+    // gs-001 in Kokiri Forest is immediately available-now with ['Night Only'] badge on Fresh Start!
+    const gs001 = evaluateSecret(SECRET_BY_ID['gs-001']!, fresh);
+    expect(gs001.status).toBe('available-now');
+    expect(gs001.visitStage).toBe('do-now');
+    expect(gs001.environmentalConditions).toEqual(['Night Only']);
+
+    // gs-002 (Kokiri Shop Soft Soil) requires an Empty Bottle + surfaces ['Bring Bottled Bugs']
+    const gs002BeforeBottle = evaluateSecret(SECRET_BY_ID['gs-002']!, fresh);
+    expect(gs002BeforeBottle.status).toBe('locked');
+    expect(gs002BeforeBottle.missingPrimaryIds).toEqual(['bottle']);
+    expect(gs002BeforeBottle.environmentalConditions).toEqual(['Bring Bottled Bugs']);
+    expect(gs002BeforeBottle.visitStage).toBe('later-gear');
+
+    // Owning any Empty Bottle unlocks gs-002 without needing a separate 'bottled-bug' toggle
+    const withBottle = toggleSecretCompleted(fresh, 'bottle-01', true);
+    const gs002AfterBottle = evaluateSecret(SECRET_BY_ID['gs-002']!, withBottle);
+    expect(gs002AfterBottle.status).toBe('available-now');
+    expect(gs002AfterBottle.visitStage).toBe('do-now');
+    expect(gs002AfterBottle.environmentalConditions).toEqual(['Bring Bottled Bugs']);
+  });
+
+  it('wires completedRouteStepIds -> unlocksRequirementIds and unlocks 100% of Hyrule when loadoutModeEnabled === false', () => {
+    const fresh = createDefaultProgressState();
+    expect(deriveEffectiveRequirements(fresh).has('stone-emerald')).toBe(false);
+
+    // Completing Route Steps ch-01-step-05 & ch-02-step-05 grants stone-emerald & zeldas-letter
+    const withRouteStep: ReturnType<typeof createDefaultProgressState> = {
+      ...fresh,
+      completedRouteStepIds: {
+        'ch-01-step-05': true,
+        'ch-02-step-04': true,
+        'ch-02-step-05': true,
+      },
+    };
+    const routeEff = deriveEffectiveRequirements(withRouteStep);
+    expect(routeEff.has('stone-emerald')).toBe(true);
+    expect(routeEff.has('weird-egg')).toBe(true);
+    expect(routeEff.has('zeldas-letter')).toBe(true);
+    expect(evaluateRegionReachability('goron-city', routeEff).isReachable).toBe(true);
+
+    // Turning Loadout Gating OFF ("Checklist Mode") unlocks all 69 requirements, all 34 regions, and all 271 secrets!
+    const checklistModeState = {
+      ...fresh,
+      loadoutModeEnabled: false,
+    };
+    const checklistEff = deriveEffectiveRequirements(checklistModeState);
+    expect(checklistEff.size).toBe(69);
+    for (const req of REQUIREMENTS) {
+      expect(checklistEff.has(req.id)).toBe(true);
+    }
+
+    const allSummaries = computeAllRegionSummaries(checklistModeState);
+    for (const summary of Object.values(allSummaries)) {
+      expect(summary.isReachable).toBe(true);
+      expect(summary.lockedCount).toBe(0);
+      expect(summary.readyNowCount).toBe(summary.totalCount);
+    }
+  });
+
+  it('separates visitStage cleanly on the Goron City — 1st Visit preset and computes Live Heart Container math', () => {
+    const goronPresetState = applyStoryPreset(createDefaultProgressState(), 'goron-city-visit-1');
+    const goronEff = deriveEffectiveRequirements(goronPresetState);
+
+    expect(evaluateRegionReachability('goron-city', goronEff).isReachable).toBe(true);
+    expect(evaluateRegionReachability('dodongos-cavern', goronEff).isReachable).toBe(false);
+
+    // Inside Goron City on Visit 1:
+    // - eq-goron-bracelet & hp-16 (Lit Urn) are 'do-now'
+    // - cap-bombs-30 & gs-030 (Boulder Maze) are 'later-gear' (need Bombs)
+    // - eq-goron-tunic & gs-031 (Center Platform) are 'later-era' (Adult Era)
+    expect(evaluateSecret(SECRET_BY_ID['eq-goron-bracelet']!, goronPresetState).visitStage).toBe(
+      'do-now',
+    );
+    expect(evaluateSecret(SECRET_BY_ID['hp-16']!, goronPresetState).visitStage).toBe('do-now');
+    expect(evaluateSecret(SECRET_BY_ID['cap-bombs-30']!, goronPresetState).visitStage).toBe(
+      'later-gear',
+    );
+    expect(evaluateSecret(SECRET_BY_ID['gs-030']!, goronPresetState).visitStage).toBe(
+      'later-gear',
+    );
+    expect(evaluateSecret(SECRET_BY_ID['eq-goron-tunic']!, goronPresetState).visitStage).toBe(
+      'later-era',
+    );
+    expect(evaluateSecret(SECRET_BY_ID['gs-031']!, goronPresetState).visitStage).toBe(
+      'later-era',
+    );
+
+    // Live Heart Meter math: 3 starting + bossHeartsCompleted + floor(heartPiecesCompleted / 4)
+    let heartState = createDefaultProgressState();
+    const freshGlobal = computeGlobalProgress(heartState);
+    expect(freshGlobal.bossHeartsTotal).toBe(8);
+    expect(freshGlobal.bossHeartsCompleted).toBe(0);
+    expect(freshGlobal.currentHeartContainers).toBe(3);
+    expect(freshGlobal.heartPieceQuarterRemainder).toBe(0);
+
+    // Check 2 Boss Hearts + 7 Heart Pieces -> 3 + 2 + 1 = 6 full hearts, 3/4 remainder
+    heartState = toggleSecretCompleted(heartState, 'boss-hc-deku', true);
+    heartState = toggleSecretCompleted(heartState, 'boss-hc-dodongo', true);
+    for (const hpId of ['hp-01', 'hp-02', 'hp-03', 'hp-04', 'hp-07', 'hp-08', 'hp-10']) {
+      heartState = toggleSecretCompleted(heartState, hpId, true);
+    }
+    // Verify hp-10 auto-synced skr-50 without double-counting Heart Pieces!
+    expect(heartState.completedSecretIds['skr-50']).toBe(true);
+    const midGlobal = computeGlobalProgress(heartState);
+    expect(midGlobal.bossHeartsCompleted).toBe(2);
+    expect(midGlobal.heartPiecesCompleted).toBe(7);
+    expect(midGlobal.currentHeartContainers).toBe(6);
+    expect(midGlobal.heartPieceQuarterRemainder).toBe(3);
+
+    // Complete all 8 Boss Hearts + all 36 Heart Pieces -> 20 Heart Containers, 0 remainder
+    for (const bossHc of BOSS_HEART_CONTAINERS) {
+      heartState = toggleSecretCompleted(heartState, bossHc.id, true);
+    }
+    for (const hp of HEART_PIECES) {
+      heartState = toggleSecretCompleted(heartState, hp.id, true);
+    }
+    const maxGlobal = computeGlobalProgress(heartState);
+    expect(maxGlobal.bossHeartsCompleted).toBe(8);
+    expect(maxGlobal.heartPiecesCompleted).toBe(36);
+    expect(maxGlobal.currentHeartContainers).toBe(20);
+    expect(maxGlobal.heartPieceQuarterRemainder).toBe(0);
   });
 });
 
 describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts)', () => {
   it('places Switch 2 cross-era puzzles (hp-05, hp-06, gs-010) in Cross-Era blocker bucket until unlocked', () => {
-    const fresh = createDefaultProgressState();
-    const hyruleFieldCats = categorizeRegionSecrets('hyrule-field', fresh, 'blocker');
+    const postDekuChild = toggleSecretCompleted(
+      createDefaultProgressState(),
+      'stone-emerald',
+      true,
+    );
+    const hyruleFieldCats = categorizeRegionSecrets('hyrule-field', postDekuChild, 'blocker');
 
     const crossBucket = hyruleFieldCats.lockedBuckets.find((b) => b.category === 'cross-era');
     expect(crossBucket).toBeDefined();
@@ -197,7 +642,7 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
     expect(crossIds).toEqual(expect.arrayContaining(['hp-05', 'hp-06', 'gs-010']));
 
     // Grant Time Travel + prerequisites -> all 3 move to readyNow
-    let unlockedState = toggleRequirementOwned(fresh, 'era-adult', true);
+    let unlockedState = toggleRequirementOwned(postDekuChild, 'era-adult', true);
     unlockedState = toggleRequirementOwned(unlockedState, 'time-travel', true);
     unlockedState = toggleRequirementOwned(unlockedState, 'bombs', true);
     unlockedState = toggleRequirementOwned(unlockedState, 'hookshot', true);
@@ -208,27 +653,28 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
   });
 
   it('evaluates early alternate tricks (available-via-alt) in both Child and Adult directions', () => {
-    const freshChild = createDefaultProgressState();
+    let postDekuChild = toggleSecretCompleted(createDefaultProgressState(), 'stone-emerald', true);
+    postDekuChild = toggleRequirementOwned(postDekuChild, 'zeldas-letter', true);
 
-    // On Fresh Start (era-child only):
+    // Once Hyrule Field & Death Mountain Trail are reachable as Child Link:
     // - hp-33 (Gerudo Valley Gorge Chest) is available-now via primary ['era-child']
     // - hp-08 (Kakariko Rooftop Man) is available-via-alt (primary needs Adult + Hookshot)
     // - hp-18 (Dodongo's Cavern Cliff) is available-via-alt (primary needs Child + Beans + Adult)
-    const hp33AsChild = evaluateSecret(SECRET_BY_ID['hp-33']!, freshChild);
+    const hp33AsChild = evaluateSecret(SECRET_BY_ID['hp-33']!, postDekuChild);
     expect(hp33AsChild.status).toBe('available-now');
 
-    const hp08AsChild = evaluateSecret(SECRET_BY_ID['hp-08']!, freshChild);
+    const hp08AsChild = evaluateSecret(SECRET_BY_ID['hp-08']!, postDekuChild);
     expect(hp08AsChild.status).toBe('available-via-alt');
     expect(hp08AsChild.readyAltMethod?.requiredIds).toEqual(['era-child']);
 
-    const hp18AsChild = evaluateSecret(SECRET_BY_ID['hp-18']!, freshChild);
+    const hp18AsChild = evaluateSecret(SECRET_BY_ID['hp-18']!, postDekuChild);
     expect(hp18AsChild.status).toBe('available-via-alt');
     expect(hp18AsChild.readyAltMethod?.requiredIds).toEqual(['era-child']);
 
     // On Fresh Adult + Hookshot (era-adult + hookshot, WITHOUT era-child):
     // - hp-33 becomes available-via-alt via Adult Hookshot onto the new Switch 2 chest!
     // - hp-08 becomes available-now via primary ['era-adult', 'hookshot']!
-    const adultHookshotState = applyStoryPreset(freshChild, 'fresh-adult-hookshot');
+    const adultHookshotState = applyStoryPreset(postDekuChild, 'fresh-adult-hookshot');
     expect(adultHookshotState.ownedRequirementIds['era-child']).toBeUndefined();
     expect(adultHookshotState.ownedRequirementIds['era-adult']).toBe(true);
     expect(adultHookshotState.ownedRequirementIds['hookshot']).toBe(true);
@@ -242,18 +688,20 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
   });
 
   it('surfaces Ready Right Now alongside distinct locked blocker categories in Kakariko & Death Mountain Crater', () => {
-    const fresh = createDefaultProgressState();
+    const goronVisit = applyStoryPreset(createDefaultProgressState(), 'goron-city-visit-1');
+    const craterReachable = toggleSecretCompleted(goronVisit, 'eq-goron-bracelet', true);
 
-    const kakariko = categorizeRegionSecrets('kakariko-village', fresh, 'blocker');
+    const kakariko = categorizeRegionSecrets('kakariko-village', craterReachable, 'blocker');
     expect(kakariko.readyNow.map((i) => i.secret.id)).toEqual(
-      expect.arrayContaining(['hp-07', 'hp-08', 'bottle-03', 'gs-018']),
+      expect.arrayContaining(['hp-07', 'hp-08', 'bottle-03', 'gs-018', 'gs-019', 'gs-020']),
     );
     const kakarikoBucketCategories = new Set(kakariko.lockedBuckets.map((b) => b.category));
     expect(kakarikoBucketCategories.has('gear')).toBe(true);
     expect(kakarikoBucketCategories.has('wallet-milestone')).toBe(true);
-    expect(kakarikoBucketCategories.has('time-bug')).toBe(true);
+    // Environmental conditions (time-night / bottled-bug) never create hard 'time-bug' locks!
+    expect(kakarikoBucketCategories.has('time-bug')).toBe(false);
 
-    const crater = categorizeRegionSecrets('death-mountain-crater', fresh, 'blocker');
+    const crater = categorizeRegionSecrets('death-mountain-crater', craterReachable, 'blocker');
     expect(crater.readyNow.map((i) => i.secret.id)).toEqual(
       expect.arrayContaining(['hp-19', 'gs-032']),
     );
@@ -272,7 +720,7 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
   });
 
   it('auto-derives Gold Skulltula token milestones (10/20/30/40/50/100), secret syncs, and transitive gear', () => {
-    let state = createDefaultProgressState();
+    let state = toggleSecretCompleted(createDefaultProgressState(), 'stone-emerald', true);
 
     const markSkulltulas = (upTo: number) => {
       const nextCompleted = { ...state.completedSecretIds };
@@ -304,13 +752,16 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
     expect(deriveEffectiveRequirements(state).has('tokens-100')).toBe(true);
     expect(evaluateSecret(SECRET_BY_ID['skr-100']!, state).status).toBe('available-now');
 
-    // Secret-to-requirement sync
+    // Secret-to-requirement sync (including Medallions & Dungeon Gear)
     let syncState = createDefaultProgressState();
     syncState = toggleSecretCompleted(syncState, 'eq-hookshot', true);
     syncState = toggleSecretCompleted(syncState, 'bottle-01', true);
     syncState = toggleSecretCompleted(syncState, 'skr-10', true);
     syncState = toggleSecretCompleted(syncState, 'gf-01', true);
     syncState = toggleSecretCompleted(syncState, 'mask-step-4', true);
+    syncState = toggleSecretCompleted(syncState, 'medallion-light', true);
+    syncState = toggleSecretCompleted(syncState, 'medallion-forest', true);
+    syncState = toggleSecretCompleted(syncState, 'medallion-water', true);
 
     const eff = deriveEffectiveRequirements(syncState);
     expect(eff.has('hookshot')).toBe(true);
@@ -319,6 +770,9 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
     expect(eff.has('magic-meter')).toBe(true);
     expect(eff.has('dins-fire')).toBe(true);
     expect(eff.has('mask-of-truth')).toBe(true);
+    expect(eff.has('era-adult')).toBe(true);
+    expect(eff.has('time-travel')).toBe(true);
+    expect(eff.has('zora-thawed')).toBe(true);
 
     // Transitive upgrade hierarchy (Giant's Wallet -> Adult's Wallet & Rupees; Longshot -> Hookshot; Golden Gauntlets -> Silver & Bracelet)
     let transState = createDefaultProgressState();
@@ -341,15 +795,23 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
   });
 
   it('computes accurate unlock deltas when toggling Bombs or Hookshot ON, and computes regional/global summaries', () => {
-    const fresh = createDefaultProgressState();
-    const withBombs = toggleRequirementOwned(fresh, 'bombs', true);
-    const bombDelta = computeUnlockDelta(fresh, withBombs, 'Bomb Bag (Bombs)');
+    const goronVisit = applyStoryPreset(createDefaultProgressState(), 'goron-city-visit-1');
+    const withBombs = toggleRequirementOwned(goronVisit, 'bombs', true);
+    const bombDelta = computeUnlockDelta(goronVisit, withBombs, 'Bomb Bag (Bombs)');
 
-    expect(bombDelta.totalUnlocked).toBeGreaterThanOrEqual(7);
+    expect(bombDelta.totalUnlocked).toBeGreaterThanOrEqual(12);
     expect(bombDelta.triggerLabel).toBe('Bomb Bag (Bombs)');
     const bombUnlockedIds = bombDelta.newlyUnlocked.map((i) => i.secret.id);
     expect(bombUnlockedIds).toEqual(
-      expect.arrayContaining(['hp-03', 'hp-22', 'hp-23', 'gs-030', 'cap-bombs-30']),
+      expect.arrayContaining([
+        'hp-03',
+        'hp-22',
+        'hp-23',
+        'gs-030',
+        'cap-bombs-30',
+        'boss-hc-dodongo',
+        'stone-ruby',
+      ]),
     );
     expect(bombDelta.byRegion['zoras-river']?.map((i) => i.secret.id)).toEqual(
       expect.arrayContaining(['hp-22', 'hp-23']),
@@ -357,7 +819,7 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
 
     // Toggling Hookshot ON as Adult Link
     const adultBase: ReturnType<typeof createDefaultProgressState> = {
-      ...fresh,
+      ...goronVisit,
       ownedRequirementIds: {
         'era-adult': true,
         'time-day': true,
@@ -375,6 +837,7 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
     );
 
     // Summaries invariant: completedCount + readyNowCount + lockedCount === totalCount
+    const fresh = createDefaultProgressState();
     const allSummaries = computeAllRegionSummaries(fresh);
     expect(Object.keys(allSummaries)).toHaveLength(34);
     for (const summary of Object.values(allSummaries)) {
@@ -384,17 +847,20 @@ describe('Gating Engine, Cross-Era Puzzles & Alternate Tricks (src/lib/gating.ts
       expect(Number.isNaN(summary.percent)).toBe(false);
     }
 
-    // Empty-secret dungeon (ganons-castle) never divides by zero
+    // Inside Ganon's Castle now tracks Golden Gauntlets + all 6 Elemental Barrier Trials (7 cards)
     const ganonSummary = computeRegionSummary('ganons-castle', fresh);
-    expect(ganonSummary.totalCount).toBe(0);
+    expect(ganonSummary.totalCount).toBe(7);
     expect(ganonSummary.percent).toBe(0);
     expect(ganonSummary.isComplete).toBe(false);
+    expect(ganonSummary.isReachable).toBe(false);
 
     const global = computeGlobalProgress(fresh);
-    expect(global.totalCount).toBe(231);
-    expect(global.allTotalCount).toBe(232);
+    expect(global.totalCount).toBe(270);
+    expect(global.allTotalCount).toBe(271);
     expect(global.heartPiecesTotal).toBe(36);
+    expect(global.bossHeartsTotal).toBe(8);
     expect(global.skulltulasTotal).toBe(100);
+    expect(global.totalRegionsCount).toBe(34);
   });
 });
 
@@ -500,7 +966,7 @@ describe('Storage, Backup JSON Export/Import & URL Hash Routing (src/lib/storage
 });
 
 describe('Area Walkthrough Guides & Optimal 100% Route Integrity', () => {
-  it('validates all 34 AreaWalkthroughGuides and 232 regional secret mappings', () => {
+  it('validates all 34 AreaWalkthroughGuides and 271 regional secret mappings', () => {
     expect(AREA_GUIDES).toHaveLength(34);
     const seenSecrets = new Set<string>();
 
@@ -532,7 +998,7 @@ describe('Area Walkthrough Guides & Optimal 100% Route Integrity', () => {
     expect(seenSecrets.size).toBe(ALL_SECRETS.length);
   });
 
-  it('validates all 18 Optimal Route chapters and 231/231 100% countable secret coverage', () => {
+  it('validates all 18 Optimal Route chapters and 270/270 100% countable secret coverage', () => {
     expect(OPTIMAL_ROUTE_CHAPTERS).toHaveLength(18);
     expect(ALL_ROUTE_STEPS.length).toBeGreaterThanOrEqual(100);
 

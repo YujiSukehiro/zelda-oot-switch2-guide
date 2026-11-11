@@ -67,8 +67,15 @@ assert(beanCost === exp.magicBeanTotalRupeeCost, `Expected Magic Bean total cost
 
 assert(quests.happyMaskQuest.length === exp.happyMaskTrades, `Expected ${exp.happyMaskTrades} Happy Mask trades, got ${quests.happyMaskQuest.length}`);
 assert(quests.biggoronSwordQuest.length === exp.biggoronTradeSteps, `Expected ${exp.biggoronTradeSteps} Biggoron steps, got ${quests.biggoronSwordQuest.length}`);
+assert(Array.isArray(upgrades.bossHeartContainers) && upgrades.bossHeartContainers.length === exp.bossHeartContainers, `Expected ${exp.bossHeartContainers} Boss Heart Containers, got ${upgrades.bossHeartContainers?.length}`);
+assert(Array.isArray(upgrades.storyTokens) && upgrades.storyTokens.length === 9, `Expected 9 Spiritual Stones & Sage Medallions, got ${upgrades.storyTokens?.length}`);
+assert(Array.isArray(upgrades.ganonTrials) && upgrades.ganonTrials.length === 6, `Expected 6 Ganon's Castle Barrier Trials, got ${upgrades.ganonTrials?.length}`);
+for (const stoneReq of ['stone-emerald', 'stone-ruby', 'stone-sapphire']) {
+  assert(reqIds.has(stoneReq), `Missing story requirement ID: ${stoneReq}`);
+}
 
-// 3. Validate references on all collectible records
+// 3. Validate references & clean prose on all collectible records
+const rawSlugLeakPattern = /\b(songs-and-quests\.json|upgrades-and-bottles\.json|heart-pieces\.json|gold-skulltulas\.json|(?:hp|gs|gf|skr)-\d{2,3}|eq-[a-z-]+|sw2-[a-z-]+)\b/i;
 const seenItemIds = new Set();
 const checkRecord = (item, label) => {
   if (item.id) {
@@ -91,6 +98,14 @@ const checkRecord = (item, label) => {
       }
     }
   }
+  for (const proseKey of ['howToGet', 'notes', 'reward', 'description', 'instructions']) {
+    if (typeof item[proseKey] === 'string') {
+      assert(
+        !rawSlugLeakPattern.test(item[proseKey]),
+        `${label} (${item.id || item.step}) leaks raw slug or .json filename in ${proseKey}: ${item[proseKey]}`
+      );
+    }
+  }
 };
 
 heartPieces.forEach((x) => checkRecord(x, 'HeartPiece'));
@@ -101,12 +116,20 @@ upgrades.greatFairies.forEach((x) => checkRecord(x, 'GreatFairy'));
 upgrades.skulltulaRewards.forEach((x) => checkRecord(x, 'SkulltulaReward'));
 upgrades.capacityUpgrades.forEach((x) => checkRecord(x, 'CapacityUpgrade'));
 upgrades.gearAndEquipment.forEach((x) => checkRecord(x, 'Equipment'));
+upgrades.bossHeartContainers.forEach((x) => checkRecord(x, 'BossHeartContainer'));
+upgrades.storyTokens.forEach((x) => checkRecord(x, 'StoryToken'));
+upgrades.ganonTrials.forEach((x) => checkRecord(x, 'GanonTrial'));
 quests.ocarinaSongs.forEach((x) => checkRecord({ ...x, id: `song-entry-${x.id}` }, 'OcarinaSong'));
 quests.magicBeans.forEach((x) => checkRecord(x, 'MagicBean'));
 quests.happyMaskQuest.forEach((x) => checkRecord({ ...x, id: `mask-step-${x.step}` }, 'HappyMask'));
 quests.biggoronSwordQuest.forEach((x) => checkRecord({ ...x, id: `biggoron-step-${x.step}` }, 'BiggoronStep'));
 quests.cowsAndKeyGrottos.forEach((x) => checkRecord(x, 'CowOrGrotto'));
 quests.switch2Exclusives.forEach((x) => checkRecord(x, 'Switch2Exclusive'));
+
+const ganonsCastleCount =
+  upgrades.gearAndEquipment.filter((x) => x.regionId === 'ganons-castle').length +
+  upgrades.ganonTrials.filter((x) => x.regionId === 'ganons-castle').length;
+assert(ganonsCastleCount >= 7, `Expected ganons-castle to have >= 7 checkable cards, got ${ganonsCastleCount}`);
 
 // 4. Verify per-region Heart Piece & Gold Skulltula tallies match regions.json 1-for-1
 let overworldGsCount = 0;

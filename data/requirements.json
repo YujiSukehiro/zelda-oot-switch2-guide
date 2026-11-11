@@ -48,6 +48,27 @@
     "switch2Notes": "NEW IN SWITCH 2 REMAKE: Unlike N64/3DS where Zora's Domain remained frozen forever, clearing the Water Temple fully thaws Zora's Domain and reopens the Lake Hylia <-> Zora's Domain <-> Lost Woods diving shortcuts!"
   },
   {
+    "id": "stone-emerald",
+    "name": "Kokiri's Emerald",
+    "category": "story",
+    "icon": "gem-green",
+    "howToGet": "Defeat Queen Gohma inside the Great Deku Tree as Child Link to break the forest curse and leave Kokiri Forest."
+  },
+  {
+    "id": "stone-ruby",
+    "name": "Goron's Ruby",
+    "category": "story",
+    "icon": "gem-red",
+    "howToGet": "Defeat King Dodongo inside Dodongo's Cavern as Child Link to earn Darunia's sworn brotherhood."
+  },
+  {
+    "id": "stone-sapphire",
+    "name": "Zora's Sapphire",
+    "category": "story",
+    "icon": "gem-blue",
+    "howToGet": "Defeat Barinade inside Lord Jabu-Jabu's Belly as Child Link and rescue Princess Ruto."
+  },
+  {
     "id": "kokiri-sword",
     "name": "Kokiri Sword",
     "category": "gear",

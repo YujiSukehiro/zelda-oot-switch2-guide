@@ -6,9 +6,9 @@
     "regionId": "kokiri-forest",
     "era": "child",
     "gateTier": "tier-1-utility",
-    "requiredIds": ["era-child", "kokiri-sword", "time-night"],
+    "requiredIds": ["era-child", "time-night"],
     "switch2Status": "updated-switch2",
-    "howToGet": "At night as Child Link, check behind the Know-It-All Brothers' house in SW Kokiri Forest (tucked slightly deeper against the treehouse wall in Switch 2). Jump-slash it to grab the token."
+    "howToGet": "At night as Child Link, check behind the Know-It-All Brothers' house in SW Kokiri Forest (tucked slightly deeper against the treehouse wall in Switch 2). Jump-slash it with your Kokiri Sword or a Deku Stick to grab the token."
   },
   {
     "id": "gs-002",

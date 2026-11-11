@@ -32,9 +32,10 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Crawl through the fenced training hole in SW Kokiri Forest, time your run past the rolling boulder, and open the chest for the Kokiri Sword.',
           'Farm 40 Rupees (hop across the river stepping stones, grab the Blue Rupee behind Mido’s house, and clear thrown rocks for Kokiri kids in Switch 2) to buy the Deku Shield at the Kokiri Shop.',
           'At night after obtaining the Kokiri Sword, slip behind the Know-It-All Brothers’ House (tucked slightly deeper against the back treehouse wall in Switch 2) and jump-slash Gold Skulltula #1.',
+          'After clearing Inside the Great Deku Tree for the Kokiri’s Emerald, exit across the western bridge toward Hyrule Field to receive the Fairy Ocarina from Saria.',
           'Once you hold an Empty Bottle with Bugs and Magic Beans from Zora’s River, visit the soft soil patch directly behind the Kokiri Shop to release Bottled Bugs for Gold Skulltula #2 and plant Magic Bean #2 (20 Rupees).',
         ],
-        secretIds: ['eq-kokiri-sword', 'gs-001', 'gs-002', 'bean-02'],
+        secretIds: ['eq-kokiri-sword', 'eq-deku-shield', 'gs-001', 'eq-ocarina', 'gs-002', 'bean-02'],
       },
       {
         id: 'kokiri-forest-phase-2',
@@ -233,7 +234,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
     ],
     proTips: [
-      'MAJOR SWITCH 2 RELOCATION: Do NOT waste bombs searching for the old N64 Lake Hylia fence Scrub or NW Diving Tektite grottos—both Stone of Agony Heart Pieces were replaced by the two cross-era Fairy’s Thoughts puzzles (hp-05 & hp-06)!',
+      'MAJOR SWITCH 2 RELOCATION: Do NOT waste bombs searching for the old N64 Lake Hylia fence Scrub or NW Diving Tektite grottos—both Stone of Agony Heart Pieces were replaced by the two cross-era Fairy’s Thoughts puzzles!',
       'Wait to sell the Bunny Hood until you have upgraded to the 500-Rupee Adult’s Wallet (10 Skulltulas)—the Running Man tops off your entire wallet capacity for free.',
       'Enable gyro aiming in Settings when hunting Big Poes on horseback to land consecutive two-arrow kills before they veer through walls.',
     ],
@@ -288,7 +289,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
     ],
     proTips: [
-      'SWITCH 2 TALLY NOTE: Lon Lon Ranch has 3 Gold Skulltulas in the Switch 2 Remake (all Child-era), down from 4 in N64—the 4th shifted to Hyrule Field’s new SE Peahat Wetland grotto (gs-010).',
+      'SWITCH 2 TALLY NOTE: Lon Lon Ranch has 3 Gold Skulltulas in the Switch 2 Remake (all Child-era), down from 4 in N64—the 4th shifted to Hyrule Field’s new SE Peahat Wetland grotto.',
       'Right after rescuing Epona, ride back into Lon Lon Ranch and beat Malon’s obstacle course in under 0:50 so she delivers a personal Cow to Link’s House in Kokiri Forest!',
     ],
   },
@@ -333,13 +334,15 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
       {
         id: 'market-phase-2',
-        title: 'Adult Link — Prelude of Light & 500-Point Big Poe Bottle',
+        title: 'Adult Link — Light Medallion, Prelude, Big Poe Bottle & Light Arrows',
         era: 'adult',
         steps: [
+          'Pull the Master Sword inside the Temple of Time to awaken in the Adult era and receive the Light Medallion from Sage Rauru.',
           'Return to the Temple of Time right after defeating Phantom Ganon in the Forest Temple—Sheik teaches you the Prelude of Light (X -> A -> X -> A -> Y -> X), unlocking Child <-> Adult Time Travel AND the Hall of Fallen Foes questline!',
           'Enter the ruined Guardhouse near the entrance bridge and sell 5 bottled Big Poes from Hyrule Field (500 points total—cut in half from N64’s 1,000!) to claim Empty Bottle #5.',
+          'Once you hold all 6 Sage Medallions, return to the Temple of Time to witness Princess Zelda’s reveal and receive the Light Arrows.',
         ],
-        secretIds: ['song-prelude', 'bottle-05'],
+        secretIds: ['medallion-light', 'song-prelude', 'bottle-05', 'eq-light-arrows'],
       },
       {
         id: 'market-phase-3',
@@ -388,7 +391,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         title: 'Child Link — Great Fairy #2 & Song of Storms Moat Grotto',
         era: 'child',
         steps: [
-          'After earning Bombs and the Magic Meter on Death Mountain, follow the right-hand cul-de-sac past Talon’s spot, bomb the boulder, crawl inside, play Zelda’s Lullaby, and offer 50 Rupees for the Charged Spin Attack (gf-02).',
+          'After earning Bombs and the Magic Meter on Death Mountain, follow the right-hand cul-de-sac past Talon’s spot, bomb the boulder, crawl inside, play Zelda’s Lullaby, and offer 50 Rupees for the Charged Spin Attack.',
           'Once you learn Song of Storms + own Bombs & Boomerang, play Song of Storms beside the lone tree at the outer moat corner to open a hidden grotto, bomb the fragile inner wall, and Boomerang Gold Skulltula #16.',
         ],
         secretIds: ['gf-02', 'gs-016'],
@@ -673,7 +676,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'On 3F with Bombs, detonate a Bomb inside the rock tunnel right as Hot Rodder Goron rolls through to win the Bigger Bomb Bag (30).',
           'On 4F (top floor NW door), bomb through the gray boulders in the maze room to the back-left corner and roll into the wooden crate for Gold Skulltula #30.',
         ],
-        secretIds: ['hp-17', 'cap-bombs-30', 'gs-030'],
+        secretIds: ['eq-goron-bracelet', 'hp-17', 'cap-bombs-30', 'gs-030'],
       },
       {
         id: 'goron-city-phase-2',
@@ -881,7 +884,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
     ],
     proTips: [
-      'Cast Farore’s Wind (gf-03, 100 Rupees) inside sprawling dungeons like the Water, Fire, or Shadow Temple to set an instant return warp point at key forks.',
+      'Cast Farore’s Wind (100 Rupees) inside sprawling dungeons like the Water, Fire, or Shadow Temple to set an instant return warp point at key forks.',
       'You do not even need the Zora Tunic to grab Heart Piece #28 on the lakebed—with 8+ hearts you have over a minute of breath to sink with Iron Boots, grab it, and unequip.',
     ],
   },
@@ -1020,7 +1023,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Climb through the upper hideout exits to the highest fortress roof overlooking the isolated wooden chest: summon Pierre with the Scarecrow’s Song + Hookshot across (or Longshot straight onto the chest / float with Hover Boots!) for Heart Piece #34.',
           'At night, climb to the middle exterior fortress tier and Hookshot Gold Skulltula #51 clinging high on the central cliff face.',
         ],
-        secretIds: ['hp-34', 'gs-051'],
+        secretIds: ['eq-gerudo-card', 'hp-34', 'gs-051'],
       },
       {
         id: 'gerudo-fortress-phase-2',
@@ -1077,7 +1080,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       },
     ],
     proTips: [
-      'On Switch 2’s world map collectible tally, this province is listed as Haunted Wasteland / Mirage Desert with 1 Adult Gold Skulltula and 0 Heart Pieces—grab gs-053 on your first crossing so the region turns 100% complete immediately!',
+      'On Switch 2’s world map collectible tally, this province is listed as Haunted Wasteland / Mirage Desert with 1 Adult Gold Skulltula and 0 Heart Pieces—grab Gold Skulltula #53 on your first crossing so the region turns 100% complete immediately!',
       'Tap the Lens of Truth on and off rhythmically while trailing the Poe Guide—toggling faster than 1 second barely drains your Magic Meter at all.',
     ],
   },
@@ -1175,7 +1178,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'B1 Basement Loop: Step on the floor button to ignite the torch, burn the east spiderweb with a Deku Stick, shoot the eye switch above the door with your Slingshot, dive onto the underwater switch on the west side, and ride the floating platform across.',
           'Pre-Boss Sequence: Defeat the Gohma Larvae in the dark torch room -> burn the ceiling web in the spike-roller room -> push the B1 shortcut block -> carry a lit Deku Stick across the shallow pool from the main brazier to burn the lower web -> deflect the three Deku Scrubs in exact **2 -> 3 -> 1** order (Middle, Right, Left!) to unseal Queen Gohma’s lair.',
         ],
-        secretIds: [],
+        secretIds: ['eq-slingshot', 'boss-hc-deku', 'stone-emerald'],
       },
       {
         id: 'deku-tree-phase-3',
@@ -1234,7 +1237,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           '1F West Wing -> 2F Bomb Bag: Plant a Bomb Flower squarely between the row of dormant Bomb Flowers at the base of the stone staircase to chain-detonate and lower the stairs -> climb to 2F -> shoot the eye switch above the fire platform -> defeat the second Lizalfos pair -> open the big chest for the Bomb Bag (20)!',
           'Giant Skull Bridge -> King Dodongo: Step on the 2F switch, cross the high suspension bridge, and drop one Bomb into EACH eye socket of the giant stone Dodongo skull below -> enter its open jaws on 1F -> navigate the east/north block corridor, pull the center block into the floor socket, and bomb the cracked floor tile in the boss antechamber to plunge into King Dodongo’s lava pit.',
         ],
-        secretIds: [],
+        secretIds: ['eq-bomb-bag', 'boss-hc-dodongo', 'stone-ruby'],
       },
       {
         id: 'dodongos-cavern-phase-3',
@@ -1292,7 +1295,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Severing the 3 Tentacles: Lock onto and stun/sever the Red Tentacle (west room), Yellow/Blue Tentacle (center-east room), and Green Tentacle (north room) with repeated Boomerang throws—each vanished tentacle clears its corresponding fleshy barrier elsewhere in the dungeon.',
           'Big Octo & Pre-Boss Hall: Toss Ruto onto the Zora’s Sapphire pedestal on B1 to trigger the **Big Octo** mini-boss: chase it clockwise, stun it from behind with the Boomerang so it spins around, and slash the glowing green orb on its back! Next, stun the red wobbly platforms with your Boomerang to cross 1F west, carry a wooden crate onto the blue switch, and climb the pre-boss room vines.',
         ],
-        secretIds: [],
+        secretIds: ['eq-boomerang', 'boss-hc-jabu', 'stone-sapphire'],
       },
       {
         id: 'jabu-jabus-belly-phase-3',
@@ -1351,7 +1354,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Fairy Bow & Boss Key: Traverse the twisted west corridor, leap across to grab **Key #4**, unlock the upper door, and defeat the 3-Stalfos arena to claim the **Fairy Bow**! Shoot the portrait ghosts in the east/west stairwells (**Joelle** & **Beth**, yielding **Key #5**), then shoot the golden eye switch outside the west twisted corridor to untwist the room and drop into the **Boss Key** chest!',
           'Final 2 Poes & B2 Rotation: Drop through the floor hole after the Boss Key, defeat the Green Bubble, climb into **Amy**’s room (reassemble her sliding block puzzle under 1:00 and shoot her), then drop back to the 1F central hall to face **Meg**: spin your camera around all 4 clones and shoot ONLY the clone that spins once as she appears! Ride the restored elevator to B2 and push the rotating gallery walls to hit the hidden switches opening Phantom Ganon’s door.',
         ],
-        secretIds: [],
+        secretIds: ['eq-bow', 'boss-hc-forest', 'medallion-forest'],
       },
       {
         id: 'forest-temple-phase-3',
@@ -1410,7 +1413,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           '4F -> 5F Megaton Hammer: Outrun the chasing wall of fire across the wire grates -> hit the crystal switch on 4F (or bomb the fake door) to defeat **Flare Dancer #1** (Hookshot its core out of its fire coat and slash!) -> climb to 5F, step on the floor switch, and sprint counterclockwise around the narrow crescent rim before the fire ring returns to claim the **Megaton Hammer**!',
           'Descent & Boss Key (#7–#8): Pound the 5F/4F floor pillars and rusted switches down the west wing (freeing Gorons #7 & #8 if grabbing all keys) -> back in the 1F entrance hall, smash the stone totem blocking the left door with the Megaton Hammer, defeat **Flare Dancer #2**, and pound the floor switch/totems through the B1 cells to free the final Goron guarding the **Boss Key** -> smash the 1F central boss-room pillar to reach Volvagia!',
         ],
-        secretIds: [],
+        secretIds: ['eq-megaton-hammer', 'boss-hc-fire', 'medallion-fire'],
       },
       {
         id: 'fire-temple-phase-3',
@@ -1432,8 +1435,8 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         'Keep your Megaton Hammer and Fairy Bow ready on the central lava island. Watch the 9 bubbling pits—sparks rise first from a decoy hole, then brighter magma erupts from Volvagia’s true hole: dodge his initial flame swipe, slam his head with the Megaton Hammer to stun him flat, and follow with a Master Sword jump-slash + crouch-stabs! Whenever Volvagia flies up to rain boulders across the platform, simply climb partway down the platform’s outer cliff edge—every falling rock sails harmlessly over your head.',
     },
     proTips: [
-      'Having the Switch 2 Echo Gem (20 Skulltulas) equipped inside the 3F Rolling Boulder Maze pulses directly in front of the uncracked bomb wall hiding gs-076.',
-      'Step outside into Death Mountain Crater right after beating Volvagia with 200 Rupees to unlock Double Magic (gf-04) behind the two red Hammer boulders!',
+      'Having the Switch 2 Echo Gem (20 Skulltulas) equipped inside the 3F Rolling Boulder Maze pulses directly in front of the uncracked bomb wall hiding Gold Skulltula #76.',
+      'Step outside into Death Mountain Crater right after beating Volvagia with 200 Rupees to unlock Double Magic behind the two red Hammer boulders!',
     ],
   },
 
@@ -1457,7 +1460,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         era: 'adult',
         steps: [
           'Arrive with the Hookshot (mandatory for all 3 Gold Skulltulas here!) and empty out 3–4 of your Bottles so you can scoop free Blue Fire for Ice Cavern’s Red Ice walls PLUS frozen King Zora outside.',
-          'SWITCH 2 HEADS-UP: Do NOT search for the old N64 Red Ice Piece of Heart—Switch 2 removed all Heart Pieces inside dungeons and moved that piece to the Death Mountain Crater Business Scrub (hp-21)!',
+          'SWITCH 2 HEADS-UP: Do NOT search for the old N64 Red Ice Piece of Heart—Switch 2 removed all Heart Pieces inside dungeons and moved that piece to the Death Mountain Crater Business Scrub!',
         ],
         secretIds: [],
       },
@@ -1470,7 +1473,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Sliding Ice Block Puzzle: Return to the central hub, melt the western Red Ice barrier with Blue Fire, and push the respawning ice block between stone stops (`East -> South -> West -> North` loops) to gather all 5 Silver Rupees (including the submerged Rupee!) and melt the exit Red Ice wall.',
           'White Wolfos Arena: Defeat the **White Wolfos** mini-boss in the final chamber -> open the chest for the **Iron Boots** -> watch Sheik’s scene to learn the **Serenade of Water** (L -> R -> A -> A -> Y), then drop down the exit shaft.',
         ],
-        secretIds: ['song-serenade'],
+        secretIds: ['eq-iron-boots', 'song-serenade'],
       },
       {
         id: 'ice-cavern-phase-3',
@@ -1529,7 +1532,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Cycle 2 — High (3F) -> Dark Link & Longshot (Key #5): Play Lullaby at the 3F West plaque to raise water to **3F**, Hookshot across the 3F West moving platforms, navigate the rising dragon-statue room, and step across the misty island in the illusion room until **Dark Link** spawns behind you (defeat him with Din’s Fire, Megaton Hammer, or un-targeted diagonal slashes!) -> open the **Longshot** chest! Play Song of Time on the blue block behind the chest, swim the B1 Whirlpool River, shoot the eye switch through the dragon’s jaws, and claim **Key #5**.',
           'Cycle 3 — Boss Key & Morpha: Cycle water back through **1F -> 2F**: push the 1F West/South underwater block all the way from behind (**Key #6**), then enter the **1F North** corridor (at 2F water), Longshot across the spikes, dodge the cascading boulders + whirlpools, bomb the side walls to push the block onto the submerged switch, and climb to the **Boss Key** chest! Raise water back to **3F** one final time and Longshot the dragon statue up the 3F North blade ramp into Morpha’s chamber.',
         ],
-        secretIds: [],
+        secretIds: ['eq-longshot', 'boss-hc-water', 'medallion-water'],
       },
       {
         id: 'water-temple-phase-3',
@@ -1574,7 +1577,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         title: 'Preparation & Required Loadout',
         era: 'child',
         steps: [
-          'Tackle Bottom of the Well the moment you unlock Time Travel after the Forest Temple—earning the Lens of Truth early unlocks the Market Treasure Chest Shop (hp-04), Haunted Wasteland, Shadow Temple, and Gerudo Training Ground!',
+          'Tackle Bottom of the Well the moment you unlock Time Travel after the Forest Temple—earning the Lens of Truth early unlocks the Market Treasure Chest Shop, Haunted Wasteland, Shadow Temple, and Gerudo Training Ground!',
           'Bring the Boomerang (mandatory for the 3 Gold Skulltulas here!), Deku Sticks, Bombs, and an Empty Bottle in case a Like-Like swallows your Deku Shield.',
         ],
         secretIds: [],
@@ -1647,7 +1650,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'B2 -> B3 Gauntlet (Keys #1–#3): Bomb the B2 Beamos -> float across the guillotine chasm to the Invisible Spinning Scythe room (5 Silver Rupees) -> bomb/open the Falling Spike Ceiling cell (**Key #1**) -> collect 5 Silver Rupees in the Invisible Spikes room (use Hover + Hookshot) to reach the Stalfos cage (**Key #2**) -> cross the B3 Giant Wind Fans (equip Iron Boots against side gusts, then Hover Boots to glide across into the right-hand bombed rubble door!) -> clear Gibdos (**Key #3** hidden inside the Single Flaming Skull Pot—toss a Bomb into the pot!).',
           'B4 Phantom Ship & Boss Key (Keys #4–#5): Pull the block under the ladder to board the **Phantom Ship**, play Zelda’s Lullaby on the deck Triforce, fend off two Stalfos, and leap off onto the port-side ledge before the ship plunges! Shoot the Bomb Flower cluster across the chasm with your Bow (or Fire Arrows) to topple the giant Bird Statue bridge; first clear the B4 west maze—Invisible Floormaster room (**Key #4**) and Burning Wooden Spike Walls room (cast Din’s Fire to burn the closing walls -> **Boss Key** + **Key #5**)—then Hover-glide across the invisible B4 platforms to Bongo Bongo.',
         ],
-        secretIds: [],
+        secretIds: ['eq-hover-boots', 'boss-hc-shadow', 'medallion-shadow'],
       },
       {
         id: 'shadow-temple-phase-3',
@@ -1708,7 +1711,12 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           'Adult Wing (3 Small Keys -> Mirror Shield): Return as Adult Link and push the heavy 1F right Silver Block -> dodge rolling boulders for 5 Silver Rupees (**Key #3**) -> rotate the cobra mirrors + lure Armos onto the sun button to enter the grand Colossus Statue Hall -> play Zelda’s Lullaby on the east hand and Hookshot the high chest (**Key #4**) -> climb 3F/4F east past Anubis + Beamos (**Key #5** via invisible Floormaster + sun door) -> defeat **Adult Iron Knuckle #1** and claim the **Mirror Shield** outside!',
           'Boss Key & Crumbling Face: Reflect sunlight onto the 4F sun switch for the **Boss Key** (Hookshot past the fire wall; watch the fake chest!), rotate the twin 4F mirrors to beam sunlight down onto the 3F platform, stand in the beam with your Mirror Shield to melt the giant statue’s face, Hookshot inside, defeat **Nabooru Iron Knuckle #2**, and enter Twinrova’s chamber.',
         ],
-        secretIds: [],
+        secretIds: [
+          'eq-silver-gauntlets',
+          'eq-mirror-shield',
+          'boss-hc-spirit',
+          'medallion-spirit',
+        ],
       },
       {
         id: 'spirit-temple-phase-3',
@@ -1773,7 +1781,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         era: 'adult',
         steps: [
           'Enter the West door off the entrance lobby and unlock the chain of consecutive left-hand doors wrapping into the central vault (with all 9 keys you cannot soft-lock; if entering early with only 7 keys, stay strictly on the ground-floor left door chain and ignore the ceiling room!).',
-          'Step into the central treasure chamber and open the ornate gold chest to claim the **Ice Arrows** (`eq-ice-arrows`)!',
+          'Step into the central treasure chamber and open the ornate gold chest to claim the **Ice Arrows**!',
         ],
         secretIds: ['eq-ice-arrows'],
       },
@@ -1786,7 +1794,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
     },
     proTips: [
       'Clearing the Iron Knuckles, White Wolfos, and Dinolfos inside Gerudo Training Ground logs key late-game entries toward your 84 statues in the Switch 2 Hall of Fallen Foes.',
-      'Zero Gold Skulltulas or Heart Pieces exist inside Gerudo Training Ground—once `eq-ice-arrows` is checked off, the mini-dungeon is 100% complete!',
+      'Zero Gold Skulltulas or Heart Pieces exist inside Gerudo Training Ground—once the Ice Arrows are checked off, the mini-dungeon is 100% complete!',
     ],
   },
 
@@ -1801,7 +1809,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
       'Final Dungeon — Required: All 6 Medallions + Light Arrows + 500 Rupees in Wallet (Do Shadow Trial FIRST!)',
     entrancesAndShortcuts: [
       'Rainbow Bridge Entrance: Cross the Rainbow Bridge from Outside Ganon’s Castle after receiving the Light Arrows in the Temple of Time.',
-      'Shadow Trial -> Double Defense Detour: Grab the Golden Gauntlets inside the Shadow Trial FIRST, then walk right back out the front entrance with 500 Rupees to claim Double Defense (`gf-06`) before clearing the remaining 5 barriers!',
+      'Shadow Trial -> Double Defense Detour: Grab the Golden Gauntlets inside the Shadow Trial FIRST, then walk right back out the front entrance with 500 Rupees to claim Double Defense before clearing the remaining 5 barriers!',
     ],
     phases: [
       {
@@ -1810,7 +1818,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         era: 'adult',
         steps: [
           'Stock 2–3 Bottled Fairies + 1–2 Blue Potions (or Château/Lon Lon Milk), max Arrows/Bombs, Biggoron’s Sword, Mirror Shield, Hover/Iron Boots, Lens of Truth, and 500 Rupees in your Adult’s/Giant’s Wallet.',
-          'Note that Inside Ganon’s Castle holds 0 Gold Skulltulas and 0 Heart Pieces—your sole permanent item upgrade inside is the **Golden Gauntlets** in the Shadow Trial.',
+          'Note that Inside Ganon’s Castle holds 0 Gold Skulltulas and 0 Heart Pieces—track the **Golden Gauntlets** plus all **6 Elemental Barrier Trials** here to complete the castle 100%.',
         ],
         secretIds: [],
       },
@@ -1823,7 +1831,15 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
           '2. Forest & Water Trials: In **Forest**, cast Din’s Fire (or Fire Arrows) on the unlit torches, then ride the wind fans with Hover Boots + Song of Time for 5 Silver Rupees -> Light Arrow. In **Water**, defeat the Freezards, scoop **Blue Fire** into a Bottle, melt the Red Ice, push one ice block into the floor hole and the second across onto the rusted switch alcove, smash with Megaton Hammer -> Light Arrow.',
           '3. Fire, Light & Spirit Trials: In **Fire**, wear Goron Tunic + Hover Boots, hurl the giant black obelisk with your **Golden Gauntlets** to bridge the lava, collect 5 Silver Rupees, and Longshot out -> Light Arrow. In **Light**, heave the Golden Gauntlets boulder, clear invisible Skulltulas/bats for keys, play Zelda’s Lullaby on the Triforce for a key, collect 5 Silver Rupees, and walk through the **fake wall** at the end (Lens of Truth!) -> Light Arrow. In **Spirit**, Hookshot around spike rollers for 5 Silver Rupees, toss a Bombchu over the iron grate to hit the switch, shoot a Fire Arrow through the ceiling cobweb skylight, and reflect sunlight onto the ONE real sun face with your Mirror Shield -> Light Arrow!',
         ],
-        secretIds: [],
+        secretIds: [
+          'eq-golden-gauntlets',
+          'trial-shadow',
+          'trial-forest',
+          'trial-water',
+          'trial-fire',
+          'trial-light',
+          'trial-spirit',
+        ],
       },
       {
         id: 'ganons-castle-phase-3',
@@ -1868,7 +1884,7 @@ export const AREA_GUIDES: AreaWalkthroughGuide[] = [
         era: 'both',
         steps: [
           'Defeat Phantom Ganon in the Forest Temple and visit the Temple of Time to learn the Prelude of Light from Sheik.',
-          'Place the Master Sword back into the Pedestal of Time to become Child Link, enter Kakariko Village to view Kaepora Gaebora’s special cutscene, and sleep in any green-glowing bed (Link’s House, Kakariko, or Lake Hylia) to enter the Hall of Fallen Foes (`sw2-hall-of-fallen-foes`).',
+          'Place the Master Sword back into the Pedestal of Time to become Child Link, enter Kakariko Village to view Kaepora Gaebora’s special cutscene, and sleep in any green-glowing bed (Link’s House, Kakariko, or Lake Hylia) to enter the Hall of Fallen Foes.',
         ],
         secretIds: ['sw2-hall-of-fallen-foes'],
       },

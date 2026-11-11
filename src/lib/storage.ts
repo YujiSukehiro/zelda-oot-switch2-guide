@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { REGION_BY_ID, REQUIREMENT_BY_ID, SECRET_BY_ID } from '../data';
+import { REGION_BY_ID, REQUIREMENT_BY_ID, ROUTE_STEP_BY_ID, SECRET_BY_ID } from '../data';
 import type {
   EraFilter,
   LastSessionSnapshot,
   MapLayerMode,
   PlayerProgressState,
+  StoryPresetApplyOptions,
   ThemeMode,
   UnlockDelta,
   UrlHashState,
@@ -26,9 +27,39 @@ const IDB_KEY = 'progress-v1';
 
 const VALID_ERAS = new Set<EraFilter>(['all', 'child', 'adult']);
 const VALID_THEMES = new Set<ThemeMode>(['dark', 'parchment']);
-const VALID_VIEWS = new Set<WorkspaceViewMode>(['map', 'route']);
+const VALID_VIEWS = new Set<WorkspaceViewMode>(['map', 'route', 'area']);
 const VALID_MAP_LAYERS = new Set<MapLayerMode>(['illustrated', 'schematic']);
 const VALID_SHEETS = new Set(['ocarina', 'quests', 'diff', 'search', 'backup']);
+
+/**
+ * Synchronizes the cross-listed 50-Skulltula Piece of Heart (`hp-10` <-> `skr-50`)
+ * so toggling or importing either one keeps both IDs identical.
+ */
+export function syncCrossListedSecrets(
+  completedSecretIds: Readonly<Record<string, boolean>>,
+  toggledId?: string,
+  toggledValue?: boolean,
+): Record<string, boolean> {
+  const synced: Record<string, boolean> = { ...completedSecretIds };
+
+  if (toggledId === 'hp-10' || toggledId === 'skr-50') {
+    const targetVal = toggledValue ?? Boolean(synced[toggledId]);
+    if (targetVal) {
+      synced['hp-10'] = true;
+      synced['skr-50'] = true;
+    } else {
+      delete synced['hp-10'];
+      delete synced['skr-50'];
+    }
+    return synced;
+  }
+
+  if (synced['hp-10'] || synced['skr-50']) {
+    synced['hp-10'] = true;
+    synced['skr-50'] = true;
+  }
+  return synced;
+}
 
 function sanitizeBooleanMap(value: unknown): Record<string, boolean> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -78,7 +109,9 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
       ? (candidate.state as Record<string, unknown>)
       : candidate;
 
-  const completedSecretIds = sanitizeBooleanMap(source.completedSecretIds);
+  const completedSecretIds = syncCrossListedSecrets(
+    sanitizeBooleanMap(source.completedSecretIds),
+  );
   const completedRouteStepIds = sanitizeBooleanMap(source.completedRouteStepIds);
 
   let ownedRequirementIds: Record<string, boolean>;
@@ -131,6 +164,10 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
     : undefined;
 
   const lastSession = sanitizeLastSession(source.lastSession);
+  const hasCompletedOnboarding =
+    typeof source.hasCompletedOnboarding === 'boolean'
+      ? source.hasCompletedOnboarding
+      : undefined;
 
   const next: PlayerProgressState = {
     version: 1,
@@ -157,6 +194,9 @@ export function sanitizeProgressState(raw: unknown): PlayerProgressState {
   }
   if (lastSession) {
     next.lastSession = lastSession;
+  }
+  if (hasCompletedOnboarding !== undefined) {
+    next.hasCompletedOnboarding = hasCompletedOnboarding;
   }
 
   return next;
@@ -420,6 +460,9 @@ export function parseUrlHash(hashInput?: string): UrlHashState {
   const rawSpotlight = params.get('spotlight');
   const spotlight = rawSpotlight === '1' || rawSpotlight === 'true';
 
+  const rawLens = params.get('lens');
+  const lens = rawLens && rawLens.length > 0 ? rawLens.slice(0, 32) : undefined;
+
   return {
     view,
     chapterId,
@@ -427,6 +470,7 @@ export function parseUrlHash(hashInput?: string): UrlHashState {
     era,
     sheet,
     spotlight,
+    ...(lens ? { lens } : {}),
   };
 }
 
@@ -450,6 +494,9 @@ export function buildUrlHash(hashState: Partial<UrlHashState>): string {
   }
   if (hashState.spotlight) {
     params.set('spotlight', '1');
+  }
+  if (hashState.lens && hashState.lens.length > 0) {
+    params.set('lens', hashState.lens.slice(0, 32));
   }
 
   const serialized = params.toString();
@@ -514,10 +561,16 @@ export function usePlayerProgress() {
     setState((prev) => {
       const toggled = toggleSecretCompleted(prev, secretId, completed);
       const isNowDone = Boolean(toggled.completedSecretIds[secretId]);
+      const syncedCompleted = syncCrossListedSecrets(
+        toggled.completedSecretIds,
+        secretId,
+        isNowDone,
+      );
       const secretMeta = SECRET_BY_ID[secretId];
       const next: PlayerProgressState = secretMeta
         ? {
             ...toggled,
+            completedSecretIds: syncedCompleted,
             lastSession: {
               updatedAt: new Date().toISOString(),
               lastActionLabel: `${isNowDone ? 'Completed' : 'Unchecked'}: ${secretMeta.title}`,
@@ -526,9 +579,12 @@ export function usePlayerProgress() {
               stepId: prev.bookmarkedRouteStepId ?? null,
             },
           }
-        : toggled;
+        : {
+            ...toggled,
+            completedSecretIds: syncedCompleted,
+          };
 
-      computedDelta = computeUnlockDelta(prev, next, secretId);
+      computedDelta = computeUnlockDelta(prev, next, secretMeta?.title ?? secretId);
       if (computedDelta.totalUnlocked > 0) {
         setLastUnlockDelta(computedDelta);
       }
@@ -538,7 +594,12 @@ export function usePlayerProgress() {
   }, []);
 
   const toggleRouteStep = useCallback(
-    (stepId: string, meta?: RouteStepSessionMeta, completed?: boolean) => {
+    (stepId: string, meta?: RouteStepSessionMeta, completed?: boolean): UnlockDelta => {
+      let computedDelta: UnlockDelta = {
+        newlyUnlocked: [],
+        byRegion: {},
+        totalUnlocked: 0,
+      };
       setState((prev) => {
         const existing = prev.completedRouteStepIds ?? {};
         const shouldComplete = completed ?? !Boolean(existing[stepId]);
@@ -549,20 +610,30 @@ export function usePlayerProgress() {
           delete nextSteps[stepId];
         }
 
-        const label = meta?.label ?? stepId;
-        return {
+        const stepDef = ROUTE_STEP_BY_ID[stepId];
+        const label = meta?.label ?? stepDef?.title ?? stepId;
+        const next: PlayerProgressState = {
           ...prev,
           completedRouteStepIds: nextSteps,
           activeRouteChapterId: meta?.chapterId ?? prev.activeRouteChapterId,
           lastSession: {
             updatedAt: new Date().toISOString(),
             lastActionLabel: `${shouldComplete ? 'Completed Step' : 'Reopened Step'}: ${label}`,
-            regionId: meta?.regionId ?? prev.lastSession?.regionId ?? null,
+            regionId: meta?.regionId ?? stepDef?.regionId ?? prev.lastSession?.regionId ?? null,
             chapterId: meta?.chapterId ?? prev.activeRouteChapterId ?? null,
             stepId,
           },
         };
+
+        if (shouldComplete && stepDef?.unlocksRequirementIds?.length) {
+          computedDelta = computeUnlockDelta(prev, next, label);
+          if (computedDelta.totalUnlocked > 0) {
+            setLastUnlockDelta(computedDelta);
+          }
+        }
+        return next;
       });
+      return computedDelta;
     },
     [],
   );
@@ -623,22 +694,29 @@ export function usePlayerProgress() {
     [],
   );
 
-  const selectPreset = useCallback((presetId: string): UnlockDelta => {
-    let computedDelta: UnlockDelta = {
-      newlyUnlocked: [],
-      byRegion: {},
-      totalUnlocked: 0,
-      triggerLabel: presetId,
-    };
-    setState((prev) => {
-      const next = applyStoryPreset(prev, presetId);
-      computedDelta = computeUnlockDelta(prev, next, presetId);
-      if (computedDelta.totalUnlocked > 0) {
-        setLastUnlockDelta(computedDelta);
-      }
-      return next;
-    });
-    return computedDelta;
+  const selectPreset = useCallback(
+    (presetId: string, options?: StoryPresetApplyOptions): UnlockDelta => {
+      let computedDelta: UnlockDelta = {
+        newlyUnlocked: [],
+        byRegion: {},
+        totalUnlocked: 0,
+        triggerLabel: presetId,
+      };
+      setState((prev) => {
+        const next = applyStoryPreset(prev, presetId, options);
+        computedDelta = computeUnlockDelta(prev, next, presetId);
+        if (computedDelta.totalUnlocked > 0) {
+          setLastUnlockDelta(computedDelta);
+        }
+        return next;
+      });
+      return computedDelta;
+    },
+    [],
+  );
+
+  const completeOnboarding = useCallback(() => {
+    setState((prev) => ({ ...prev, hasCompletedOnboarding: true }));
   }, []);
 
   const setEraFilter = useCallback((era: EraFilter) => {
@@ -691,6 +769,7 @@ export function usePlayerProgress() {
     setMapLayerMode,
     toggleRequirement,
     selectPreset,
+    completeOnboarding,
     setEraFilter,
     setSwitch2Spotlight,
     setLoadoutMode,
