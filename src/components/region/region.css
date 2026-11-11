@@ -1625,3 +1625,232 @@
   line-height: 1.5;
 }
 
+
+
+/* ==========================================================================
+   Phase 1 UI/UX Overhaul — FormattedGuideText, Compact Expandable SecretCard,
+   Environmental Condition Badges & Area Map CTA
+   ========================================================================== */
+
+.guide-inline-strong {
+  font-weight: 750;
+  color: var(--text-primary);
+}
+
+.guide-inline-code {
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--color-triforce);
+}
+
+.dossier-enter-area-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-block-size: 38px;
+  margin-block: 4px 8px;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-triforce-border);
+  background: var(--color-triforce-bg);
+  color: var(--color-triforce);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background var(--duration-fast), border-color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.dossier-enter-area-btn:hover {
+  background: var(--color-triforce);
+  color: var(--text-inverse);
+}
+
+.dossier-reachability-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 11px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-locked-crimson-border);
+  background: var(--color-locked-crimson-bg);
+  color: var(--color-locked-crimson-text);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.secret-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.secret-card-map-focus-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.secret-card-map-focus-btn:hover {
+  color: var(--color-triforce);
+  text-decoration: underline;
+}
+
+.secret-expand-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-block-size: 24px;
+  min-inline-size: 24px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.secret-expand-toggle-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.secret-expand-chevron {
+  transition: transform var(--duration-fast);
+}
+
+.secret-expand-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.secret-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.secret-card.is-collapsed {
+  padding-block: 8px;
+}
+
+.secret-card.is-map-selected {
+  border-color: var(--color-triforce);
+  box-shadow: 0 0 0 2px var(--color-triforce-bg);
+}
+
+.secret-location-hint.is-compact-preview {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.secret-badge.badge-env {
+  font-weight: 750;
+}
+
+.secret-badge.badge-env.env-night {
+  background: var(--color-locked-violet-bg);
+  border-color: var(--color-locked-violet-border);
+  color: var(--color-locked-violet-text);
+}
+
+.secret-badge.badge-env.env-day {
+  background: var(--color-amber-bg);
+  border-color: var(--color-amber-border);
+  color: var(--color-amber-text);
+}
+
+.secret-badge.badge-env.env-bugs {
+  background: var(--color-ready-bg);
+  border-color: var(--color-ready-border);
+  color: var(--color-ready-text);
+}
+
+.secret-badge.badge-env.env-blue-fire {
+  background: var(--color-sapphire-bg);
+  border-color: var(--color-sapphire-border);
+  color: var(--color-sapphire-text);
+}
+
+.secret-badge.badge-env.env-sticks {
+  background: var(--color-amber-bg);
+  border-color: var(--color-amber-border);
+  color: var(--color-amber-text);
+}
+
+.badge-cat.cat-dungeon-item,
+.badge-cat.cat-quest-token,
+.badge-cat.cat-ganon-trial {
+  background: var(--color-triforce-bg);
+  border-color: var(--color-triforce-border);
+  color: var(--color-triforce);
+}
+
+.badge-cat.cat-boss-heart {
+  background: var(--color-locked-crimson-bg);
+  border-color: var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+}
+
+.secret-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.secret-callout > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.secret-callout--switch2 {
+  background: var(--color-switch2-bg);
+  border: 1px solid var(--color-switch2-border);
+  color: var(--text-primary);
+}
+
+.secret-callout--switch2 .secret-callout__label {
+  color: var(--color-switch2-text);
+}
+
+.secret-callout--protip {
+  background: var(--color-triforce-bg);
+  border: 1px solid var(--color-triforce-border);
+  color: var(--text-primary);
+}
+
+.secret-callout--protip .secret-callout__label {
+  color: var(--color-triforce);
+}
+
+.secret-region-lock-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: var(--radius-xs);
+  background: var(--color-locked-crimson-bg);
+  border: 1px solid var(--color-locked-crimson-border);
+  color: var(--color-locked-crimson-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}

@@ -27,17 +27,16 @@ afterEach(() => {
 });
 
 describe('TopCommandBar', () => {
-  it('renders live global progress pill, era filters, companion triggers, and Cmd+K shortcut', () => {
+  it('renders live Heart Meter + quarter-heart indicator, de-duplicates Era/Spotlight filters, and triggers Inventory, Catch Up, Reference sheets, and Cmd+K', () => {
     const state = createDefaultProgressState();
     state.completedSecretIds['hp-01'] = true;
     state.completedSecretIds['gs-001'] = true;
     const progress = computeGlobalProgress(state);
 
     const onOpenSheet = vi.fn();
-    const onEraFilterChange = vi.fn();
-    const onSpotlightChange = vi.fn();
     const onToggleTheme = vi.fn();
-    const onToggleLoadoutDock = vi.fn();
+    const onOpenInventory = vi.fn();
+    const onOpenCatchUp = vi.fn();
 
     render(
       <TopCommandBar
@@ -45,24 +44,30 @@ describe('TopCommandBar', () => {
         globalProgress={progress}
         activeSheet={null}
         onOpenSheet={onOpenSheet}
-        onEraFilterChange={onEraFilterChange}
-        onSpotlightChange={onSpotlightChange}
         onToggleTheme={onToggleTheme}
-        onToggleLoadoutDock={onToggleLoadoutDock}
-        isLoadoutDockOpen={false}
+        onOpenInventory={onOpenInventory}
+        onOpenCatchUp={onOpenCatchUp}
       />,
     );
 
     const pill = screen.getByTestId('global-progress-pill');
     expect(pill).toHaveTextContent(`${progress.completedCount}/${progress.totalCount}`);
-    expect(pill).toHaveTextContent('1/36');
     expect(pill).toHaveTextContent('1/100');
 
-    fireEvent.click(screen.getByTestId('era-filter-adult'));
-    expect(onEraFilterChange).toHaveBeenCalledWith('adult');
+    // Live Heart Meter: 3 base Heart Containers + 1/4 Piece of Heart
+    const heartMeter = screen.getByTestId('heart-meter-pill');
+    expect(heartMeter).toHaveTextContent('♥♥♥');
+    expect(screen.getByTestId('heart-quarter-indicator')).toHaveTextContent('+1/4');
 
-    fireEvent.click(screen.getByTestId('spotlight-toggle-btn'));
-    expect(onSpotlightChange).toHaveBeenCalledWith(true);
+    // Duplicate Era & Switch 2 filter buttons are removed from TopCommandBar (kept in HyruleMapCanvas)
+    expect(screen.queryByTestId('era-filter-adult')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('spotlight-toggle-btn')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('open-inventory-btn'));
+    expect(onOpenInventory).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByTestId('open-catchup-btn'));
+    expect(onOpenCatchUp).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByTestId('open-ocarina-btn'));
     expect(onOpenSheet).toHaveBeenCalledWith('ocarina');
@@ -75,9 +80,6 @@ describe('TopCommandBar', () => {
 
     fireEvent.click(screen.getByTestId('open-backup-btn'));
     expect(onOpenSheet).toHaveBeenCalledWith('backup');
-
-    fireEvent.click(screen.getByTestId('toggle-loadout-btn'));
-    expect(onToggleLoadoutDock).toHaveBeenCalledWith(true);
 
     fireEvent.click(screen.getByTestId('theme-toggle-btn'));
     expect(onToggleTheme).toHaveBeenCalledWith('parchment');

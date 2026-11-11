@@ -7,7 +7,18 @@ import {
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
 } from 'react';
-import { Layers, LocateFixed, RotateCcw, Sparkles, Waves, ZoomIn, ZoomOut } from 'lucide-react';
+import {
+  EyeOff,
+  Layers,
+  LocateFixed,
+  Lock,
+  Map as MapIcon,
+  RotateCcw,
+  Sparkles,
+  Waves,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react';
 import {
   DUNGEON_AND_SPECIAL_REGIONS,
   OVERWORLD_REGIONS,
@@ -23,8 +34,17 @@ import type {
   RegionProgressSummary,
 } from '../../types/zelda';
 import { DungeonPin } from './DungeonPin';
+import {
+  ILLUSTRATED_COORDS,
+  ILLUSTRATED_LABEL_OVERRIDES,
+  resolveRegionMapCoords,
+} from './illustratedCoords';
 import { MapLegend } from './MapLegend';
-import { formatRegionKindLabel, RegionNode } from './RegionNode';
+import {
+  formatRegionKindLabel,
+  RegionNode,
+  type ExtendedMapRegionSummary,
+} from './RegionNode';
 import './map.css';
 
 export interface HyruleMapCanvasProps {
@@ -32,8 +52,11 @@ export interface HyruleMapCanvasProps {
   regionSummaries: Record<string, RegionProgressSummary>;
   selectedRegionId: string | null;
   onSelectRegion: (regionId: string) => void;
+  onEnterAreaMap?: (regionId: string) => void;
   onEraFilterChange?: (era: EraFilter) => void;
   onSpotlightChange?: (enabled: boolean) => void;
+  hideCompleted?: boolean;
+  onHideCompletedChange?: (hide: boolean) => void;
   mapLayerMode?: MapLayerMode;
   onMapLayerModeChange?: (mode: MapLayerMode) => void;
 }
@@ -74,31 +97,45 @@ function clampPanForZoom(pan: { x: number; y: number }, zoom: number): { x: numb
   };
 }
 
-function buildCurvedEdgePath(from: Region, to: Region, kind: EdgeKind, key: string): string {
-  const x1 = from.mapCoords.x;
-  const y1 = from.mapCoords.y;
-  const x2 = to.mapCoords.x;
-  const y2 = to.mapCoords.y;
+function buildCurvedEdgePath(
+  from: Region,
+  to: Region,
+  kind: EdgeKind,
+  key: string,
+  mapStyle: MapLayerMode,
+): string {
+  const fromPt = resolveRegionMapCoords(from, mapStyle);
+  const toPt = resolveRegionMapCoords(to, mapStyle);
+  const x1 = fromPt.x;
+  const y1 = fromPt.y;
+  const x2 = toPt.x;
+  const y2 = toPt.y;
 
   if (kind === 'tether') {
     return `M ${x1} ${y1} L ${x2} ${y2}`;
   }
 
-  if (key === 'lake-hylia<->zoras-domain') {
-    // Graceful southern underwater warp curve avoiding central Hyrule Field labels
-    return `M 855 340 Q 565 535 420 600`;
-  }
-
-  if (key === 'goron-city<->lost-woods') {
-    return `M 780 465 Q 835 305 730 145`;
-  }
-
-  if (key === 'lost-woods<->zoras-river') {
-    return `M 780 465 Q 775 415 735 375`;
-  }
-
-  if (key === 'lost-woods<->zoras-domain') {
-    return `M 780 465 Q 838 418 855 340`;
+  if (mapStyle === 'schematic') {
+    if (key === 'lake-hylia<->zoras-domain') {
+      // Graceful southern underwater warp curve avoiding central Hyrule Field labels
+      return `M 855 340 Q 565 535 420 600`;
+    }
+    if (key === 'goron-city<->lost-woods') {
+      return `M 780 465 Q 835 305 730 145`;
+    }
+    if (key === 'lost-woods<->zoras-river') {
+      return `M 780 465 Q 775 415 735 375`;
+    }
+    if (key === 'lost-woods<->zoras-domain') {
+      return `M 780 465 Q 838 418 855 340`;
+    }
+  } else {
+    if (key === 'lake-hylia<->zoras-domain') {
+      return `M ${x2} ${y2} Q 685 520 ${x1} ${y1}`;
+    }
+    if (key === 'goron-city<->lost-woods') {
+      return `M ${x2} ${y2} Q 838 308 ${x1} ${y1}`;
+    }
   }
 
   const mx = (x1 + x2) / 2;
@@ -113,7 +150,7 @@ function buildCurvedEdgePath(from: Region, to: Region, kind: EdgeKind, key: stri
   return `M ${x1} ${y1} Q ${(mx + nx).toFixed(1)} ${(my + ny).toFixed(1)} ${x2} ${y2}`;
 }
 
-function buildDeduplicatedEdges(): MapConnectionEdge[] {
+function buildDeduplicatedEdges(mapStyle: MapLayerMode): MapConnectionEdge[] {
   const seen = new Set<string>();
   const edges: MapConnectionEdge[] = [];
 
@@ -141,12 +178,15 @@ function buildDeduplicatedEdges(): MapConnectionEdge[] {
         kind = 'forest-warp';
       }
 
+      const first = reg.id < neighbor.id ? reg : neighbor;
+      const second = reg.id < neighbor.id ? neighbor : reg;
+
       edges.push({
         key,
-        from: reg,
-        to: neighbor,
+        from: first,
+        to: second,
         kind,
-        pathD: buildCurvedEdgePath(reg, neighbor, kind, key),
+        pathD: buildCurvedEdgePath(first, second, kind, key, mapStyle),
       });
     }
   }
@@ -154,7 +194,8 @@ function buildDeduplicatedEdges(): MapConnectionEdge[] {
   return edges;
 }
 
-const DEDUPLICATED_MAP_EDGES: readonly MapConnectionEdge[] = buildDeduplicatedEdges();
+const SCHEMATIC_MAP_EDGES: readonly MapConnectionEdge[] = buildDeduplicatedEdges('schematic');
+const ILLUSTRATED_MAP_EDGES: readonly MapConnectionEdge[] = buildDeduplicatedEdges('illustrated');
 
 interface DragSession {
   pointerId: number;
@@ -185,8 +226,11 @@ export function HyruleMapCanvas({
   regionSummaries,
   selectedRegionId,
   onSelectRegion,
+  onEnterAreaMap,
   onEraFilterChange,
   onSpotlightChange,
+  hideCompleted,
+  onHideCompletedChange,
   mapLayerMode,
   onMapLayerModeChange,
 }: HyruleMapCanvasProps) {
@@ -196,6 +240,7 @@ export function HyruleMapCanvas({
   const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
   const [isShortcutHovered, setIsShortcutHovered] = useState<boolean>(false);
   const [uncontrolledSpotlight, setUncontrolledSpotlight] = useState<boolean>(false);
+  const [uncontrolledHideCompleted, setUncontrolledHideCompleted] = useState<boolean>(false);
   const [uncontrolledLayerMode, setUncontrolledLayerMode] = useState<MapLayerMode>('illustrated');
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -208,6 +253,9 @@ export function HyruleMapCanvas({
   const effectiveSpotlight = onSpotlightChange
     ? Boolean(state.switch2SpotlightOnly)
     : Boolean(state.switch2SpotlightOnly) || uncontrolledSpotlight;
+
+  const effectiveHideCompleted =
+    hideCompleted !== undefined ? hideCompleted : uncontrolledHideCompleted;
 
   const effectiveLayerMode: MapLayerMode =
     mapLayerMode ?? state.mapLayerMode ?? uncontrolledLayerMode;
@@ -295,12 +343,13 @@ export function HyruleMapCanvas({
     }
     const region = REGION_BY_ID[id];
     if (!region) return;
+    const coords = resolveRegionMapCoords(region, effectiveLayerMode);
     const targetZoom = Math.max(zoom, 1.65);
     const nextZoom = Number(clamp(targetZoom, MIN_ZOOM, MAX_ZOOM).toFixed(2));
     const nextPan = clampPanForZoom(
       {
-        x: -nextZoom * (region.mapCoords.x - 500),
-        y: -nextZoom * (region.mapCoords.y - 350),
+        x: -nextZoom * (coords.x - 500),
+        y: -nextZoom * (coords.y - 350),
       },
       nextZoom,
     );
@@ -313,14 +362,15 @@ export function HyruleMapCanvas({
     if (!selectedRegionId || zoom <= 1.08) return;
     const region = REGION_BY_ID[selectedRegionId];
     if (!region) return;
-    const currentVx = 500 + pan.x + zoom * (region.mapCoords.x - 500);
-    const currentVy = 350 + pan.y + zoom * (region.mapCoords.y - 350);
+    const coords = resolveRegionMapCoords(region, effectiveLayerMode);
+    const currentVx = 500 + pan.x + zoom * (coords.x - 500);
+    const currentVy = 350 + pan.y + zoom * (coords.y - 350);
     if (currentVx < 120 || currentVx > 880 || currentVy < 100 || currentVy > 600) {
       setPan(
         clampPanForZoom(
           {
-            x: -zoom * (region.mapCoords.x - 500),
-            y: -zoom * (region.mapCoords.y - 350),
+            x: -zoom * (coords.x - 500),
+            y: -zoom * (coords.y - 350),
           },
           zoom,
         ),
@@ -552,6 +602,15 @@ export function HyruleMapCanvas({
     }
   };
 
+  const handleToggleHideCompleted = () => {
+    const next = !effectiveHideCompleted;
+    if (onHideCompletedChange) {
+      onHideCompletedChange(next);
+    } else {
+      setUncontrolledHideCompleted(next);
+    }
+  };
+
   const handleToggleLayerMode = () => {
     const nextMode: MapLayerMode =
       effectiveLayerMode === 'illustrated' ? 'schematic' : 'illustrated';
@@ -564,9 +623,18 @@ export function HyruleMapCanvas({
 
   const hoveredRegion = hoveredRegionId ? REGION_BY_ID[hoveredRegionId] ?? null : null;
   const hoveredSummary = hoveredRegion ? resolvedSummaries[hoveredRegion.id] : null;
+  const hoveredCoords = hoveredRegion
+    ? resolveRegionMapCoords(hoveredRegion, effectiveLayerMode)
+    : null;
   const flipTooltipToTop = Boolean(
-    hoveredRegion && hoveredRegion.mapCoords.x > 610 && hoveredRegion.mapCoords.y > 430,
+    hoveredCoords && hoveredCoords.x > 610 && hoveredCoords.y > 430,
   );
+  const selectedRegion = selectedRegionId ? REGION_BY_ID[selectedRegionId] ?? null : null;
+  const selectedSummary = selectedRegion ? resolvedSummaries[selectedRegion.id] : null;
+  const activeEdges =
+    effectiveLayerMode === 'illustrated' ? ILLUSTRATED_MAP_EDGES : SCHEMATIC_MAP_EDGES;
+  const zoraDiveBadgeTransform =
+    effectiveLayerMode === 'illustrated' ? 'translate(682 482)' : 'translate(602 502)';
 
   const isDefaultCamera = zoom === 1 && pan.x === 0 && pan.y === 0;
   const cameraTransform = isDefaultCamera
@@ -611,6 +679,19 @@ export function HyruleMapCanvas({
             <Sparkles size={13} aria-hidden="true" />
             <span className="map-hud-btn__label-long">Switch 2 Spotlight</span>
             <span className="map-hud-btn__label-short">SW2 Spotlight</span>
+          </button>
+
+          <button
+            type="button"
+            className="map-hud-btn map-hud-btn--standalone"
+            data-testid="map-hide-completed-toggle"
+            aria-pressed={effectiveHideCompleted}
+            aria-label="Hide 100% completed areas on map"
+            onClick={handleToggleHideCompleted}
+          >
+            <EyeOff size={13} aria-hidden="true" />
+            <span className="map-hud-btn__label-long">Hide Completed</span>
+            <span className="map-hud-btn__label-short">Hide Done</span>
           </button>
 
           <button
@@ -731,7 +812,7 @@ export function HyruleMapCanvas({
                   y="0"
                   width="1000"
                   height="700"
-                  preserveAspectRatio="xMidYMid slice"
+                  preserveAspectRatio="none"
                 />
                 {/* Subtle contrast scrim so crisp vector pins, labels & routes pop cleanly */}
                 <rect
@@ -977,8 +1058,11 @@ export function HyruleMapCanvas({
 
             {/* Deduplicated Connection Paths (`connectedRegions`) */}
             <g className="hyrule-edges-layer" data-testid="map-connections">
-              {DEDUPLICATED_MAP_EDGES.map((edge) => {
+              {activeEdges.map((edge) => {
                 if (edge.kind === 'road') {
+                  if (effectiveLayerMode === 'illustrated') {
+                    return null;
+                  }
                   return (
                     <g key={edge.key} data-edge={edge.key} data-edge-kind="road" aria-hidden="true">
                       <path className="map-edge-road-casing" d={edge.pathD} />
@@ -1017,7 +1101,7 @@ export function HyruleMapCanvas({
                         role="button"
                         tabIndex={0}
                         aria-label="Switch 2 Underwater Shortcut (Zora's Domain to Lake Hylia): Zora's Domain unfreezes after clearing the Water Temple"
-                        transform="translate(602 502)"
+                        transform={zoraDiveBadgeTransform}
                         onPointerEnter={() => setIsShortcutHovered(true)}
                         onPointerLeave={() => setIsShortcutHovered(false)}
                         onFocus={() => setIsShortcutHovered(true)}
@@ -1094,6 +1178,16 @@ export function HyruleMapCanvas({
                 const isDimmed = hasActiveFilter && summary.totalCount === 0;
                 const isSpotlightHighlighted =
                   effectiveSpotlight && summary.totalCount > 0 && summary.switch2ItemCount > 0;
+                const coords =
+                  effectiveLayerMode === 'illustrated'
+                    ? (ILLUSTRATED_COORDS[region.id] ?? region.mapCoords)
+                    : region.mapCoords;
+                const labelOverride =
+                  effectiveLayerMode === 'illustrated'
+                    ? ILLUSTRATED_LABEL_OVERRIDES[region.id]
+                    : undefined;
+                const isHiddenByCompleteFilter =
+                  effectiveHideCompleted && summary.isComplete && selectedRegionId !== region.id;
 
                 return (
                   <RegionNode
@@ -1103,6 +1197,9 @@ export function HyruleMapCanvas({
                     isSelected={selectedRegionId === region.id}
                     isDimmed={isDimmed}
                     isSpotlightHighlighted={isSpotlightHighlighted}
+                    coords={coords}
+                    labelOverride={labelOverride}
+                    isHiddenByCompleteFilter={isHiddenByCompleteFilter}
                     onSelect={handleNodeSelect}
                     onHoverChange={setHoveredRegionId}
                   />
@@ -1117,6 +1214,16 @@ export function HyruleMapCanvas({
                 const isDimmed = hasActiveFilter && summary.totalCount === 0;
                 const isSpotlightHighlighted =
                   effectiveSpotlight && summary.totalCount > 0 && summary.switch2ItemCount > 0;
+                const coords =
+                  effectiveLayerMode === 'illustrated'
+                    ? (ILLUSTRATED_COORDS[region.id] ?? region.mapCoords)
+                    : region.mapCoords;
+                const labelOverride =
+                  effectiveLayerMode === 'illustrated'
+                    ? ILLUSTRATED_LABEL_OVERRIDES[region.id]
+                    : undefined;
+                const isHiddenByCompleteFilter =
+                  effectiveHideCompleted && summary.isComplete && selectedRegionId !== region.id;
 
                 return (
                   <DungeonPin
@@ -1126,6 +1233,9 @@ export function HyruleMapCanvas({
                     isSelected={selectedRegionId === region.id}
                     isDimmed={isDimmed}
                     isSpotlightHighlighted={isSpotlightHighlighted}
+                    coords={coords}
+                    labelOverride={labelOverride}
+                    isHiddenByCompleteFilter={isHiddenByCompleteFilter}
                     onSelect={handleNodeSelect}
                     onHoverChange={setHoveredRegionId}
                   />
@@ -1149,6 +1259,38 @@ export function HyruleMapCanvas({
 
       {/* Collapsible Map Legend */}
       <MapLegend isZoraThawed={isZoraThawed} />
+
+      {/* Prominent Selected Area CTA Bar ("Enter Area / Floor Map →") */}
+      {selectedRegion && selectedSummary && (
+        <div
+          className="hyrule-map-selected-bar"
+          data-testid="map-selected-bar"
+          role="region"
+          aria-label={`Selected area: ${selectedRegion.name}`}
+        >
+          <div className="hyrule-map-selected-bar__info">
+            <span className="hyrule-map-selected-bar__name">{selectedRegion.name}</span>
+            <span className="hyrule-map-selected-bar__meta">
+              {selectedSummary.completedCount}/{selectedSummary.totalCount} done
+              {(selectedSummary as RegionProgressSummary & ExtendedMapRegionSummary).isReachable ===
+                false && !selectedSummary.isComplete
+                ? ' · Locked'
+                : selectedSummary.readyNowCount > 0
+                  ? ` · +${selectedSummary.readyNowCount} Ready`
+                  : ''}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="hyrule-map-enter-area-btn"
+            data-testid="map-enter-area-btn"
+            onClick={() => (onEnterAreaMap ?? onSelectRegion)(selectedRegion.id)}
+          >
+            <MapIcon size={14} aria-hidden="true" />
+            <span>Enter Area / Floor Map →</span>
+          </button>
+        </div>
+      )}
 
       {/* Floating Rich HUD Tooltip Card (Node Hover / Focus OR Switch 2 Zora Dive Shortcut) */}
       {hoveredRegion && hoveredSummary ? (
@@ -1182,10 +1324,19 @@ export function HyruleMapCanvas({
                   ? 'Child Only'
                   : 'Adult Only'}
             </span>
-            {hoveredSummary.readyNowCount > 0 && (
-              <span className="hyrule-map-tooltip__badge hyrule-map-tooltip__badge--ready">
-                +{hoveredSummary.readyNowCount} Ready
+            {(hoveredSummary as RegionProgressSummary & ExtendedMapRegionSummary).isReachable ===
+              false && !hoveredSummary.isComplete ? (
+              <span className="hyrule-map-tooltip__badge hyrule-map-tooltip__badge--locked">
+                <Lock size={10} aria-hidden="true" />
+                {(hoveredSummary as RegionProgressSummary & ExtendedMapRegionSummary)
+                  .reachabilityBlocker ?? 'Area Locked'}
               </span>
+            ) : (
+              hoveredSummary.readyNowCount > 0 && (
+                <span className="hyrule-map-tooltip__badge hyrule-map-tooltip__badge--ready">
+                  +{hoveredSummary.readyNowCount} Ready
+                </span>
+              )
             )}
             {hoveredSummary.switch2ItemCount > 0 && (
               <span className="hyrule-map-tooltip__badge hyrule-map-tooltip__badge--sw2">

@@ -10,7 +10,24 @@ import {
   toggleSecretCompleted,
 } from '../../lib/gating';
 import type { PlayerProgressState } from '../../types/zelda';
-import { RegionDrawer } from './index';
+import { FormattedGuideText, RegionDrawer, SecretCard } from './index';
+
+function createChildOverworldState(extraReqs: string[] = []): PlayerProgressState {
+  const base = createDefaultProgressState();
+  const ownedRequirementIds: Record<string, boolean> = {
+    ...base.ownedRequirementIds,
+    'kokiri-sword': true,
+    'deku-shield': true,
+    'stone-emerald': true,
+  };
+  for (const id of extraReqs) {
+    ownedRequirementIds[id] = true;
+  }
+  return {
+    ...base,
+    ownedRequirementIds,
+  };
+}
 
 function renderRegionDrawer(
   regionId: string | null,
@@ -98,7 +115,7 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
   });
 
   it('renders Hyrule Field with Switch 2 highlights, map counters, Ready Right Now, and Cross-Era Step 1 / Step 2 buckets for hp-05 and hp-06', () => {
-    renderRegionDrawer('hyrule-field');
+    renderRegionDrawer('hyrule-field', createChildOverworldState());
 
     const dossiers = screen.getAllByTestId('region-dossier');
     expect(dossiers).toHaveLength(1);
@@ -142,7 +159,9 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
 
   it('renders Kakariko Village with Early Trick Ready Now callout on hp-08 and Bottom of the Well sub-tab', () => {
     const onSelectRegion = vi.fn();
-    renderRegionDrawer('kakariko-village', undefined, { onSelectRegion });
+    renderRegionDrawer('kakariko-village', createChildOverworldState(['zeldas-letter']), {
+      onSelectRegion,
+    });
 
     const highlights = screen.getByTestId('switch2-highlights');
     expect(highlights).toHaveTextContent('Echo Gem');
@@ -263,7 +282,7 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
 
   it('switches cleanly between blocker, tier, and type grouping modes and checks off secrets via onToggleSecret', () => {
     const onToggleSecret = vi.fn();
-    let state = createDefaultProgressState();
+    let state = createChildOverworldState(['zeldas-letter']);
 
     const { rerender } = render(
       <RegionDrawer
@@ -381,7 +400,7 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
   });
 
   it('switches to the In-Depth Area Guide tab, renders boss strategies & walkthrough phases, checks off secrets inline, and jumps to the Optimal Route', () => {
-    const state = createDefaultProgressState();
+    const state = createChildOverworldState();
     const onToggleSecret = vi.fn();
     const onOpenOptimalRouteForRegion = vi.fn();
 
@@ -415,5 +434,85 @@ describe('RegionDrawer & Secret Categorization (src/components/region)', () => {
 
     fireEvent.click(within(guidePanel).getByTestId('dossier-jump-to-route-btn'));
     expect(onOpenOptimalRouteForRegion).toHaveBeenCalledWith('deku-tree');
+  });
+
+  it('renders FormattedGuideText without any raw ** asterisks and supports compact expandable SecretCard with environmental condition badges', () => {
+    const { container } = render(
+      <FormattedGuideText text="Equip **Goron Tunic** and play `Bolero of Fire` near the **Crater**." />,
+    );
+    expect(container.textContent).not.toContain('**');
+    expect(container.textContent).not.toContain('`');
+    expect(container.querySelectorAll('strong')).toHaveLength(2);
+    expect(container.querySelector('code')).toHaveTextContent('Bolero of Fire');
+
+    const state = createDefaultProgressState();
+    const onOpenAreaWorkspace = vi.fn();
+
+    const drawerView = render(
+      <RegionDrawer
+        regionId="deku-tree"
+        state={state}
+        effectiveRequirements={deriveEffectiveRequirements(state)}
+        regionSummaries={computeAllRegionSummaries(state)}
+        areaGuide={AREA_GUIDE_BY_REGION_ID['deku-tree']}
+        onClose={vi.fn()}
+        onSelectRegion={vi.fn()}
+        onToggleSecret={vi.fn()}
+        onOpenAreaWorkspace={onOpenAreaWorkspace}
+      />,
+    );
+
+    // Enter Area / Floor Map CTA in dossier header
+    fireEvent.click(screen.getByTestId('dossier-open-area-map-btn'));
+    expect(onOpenAreaWorkspace).toHaveBeenCalledWith('deku-tree');
+
+    // Switch to Area Guide and verify zero raw ** markers remain anywhere in rendered text
+    fireEvent.click(screen.getByTestId('dossier-tab-guide'));
+    expect(screen.getByTestId('dossier-guide-panel').textContent).not.toContain('**');
+    drawerView.unmount();
+
+    // Verify compact SecretCard starts collapsed, renders environmental chips, and expands on click
+    render(
+      <SecretCard
+        evaluated={{
+          secret: {
+            id: 'test-gs-night',
+            title: 'Night Soil Skulltula',
+            category: 'gold-skulltula',
+            skulltulaNumber: 42,
+            regionId: 'kokiri-forest',
+            era: 'child',
+            gateTier: 'tier-1-utility',
+            requiredIds: ['time-night', 'bottled-bug'],
+            altMethods: [],
+            locationHint: 'Soft soil patch beside Know-It-All Brothers',
+            howToGet: 'Drop **Bottled Bugs** into the soil at night.',
+            countsToward100Percent: true,
+            switch2Status: 'classic',
+            switch2Notes: 'Tokens now sparkle from farther away in **Switch 2**.',
+            proTip: 'Re-scoop one of the three bugs before it burrows!',
+          },
+          status: 'available-now',
+          missingPrimaryIds: [],
+          satisfiedAltMethods: [],
+          primaryBlockerGroupKey: '',
+          primaryBlockerLabel: '',
+          primaryBlockerCategory: 'other',
+        }}
+        effectiveRequirements={new Set(['time-night', 'bottled-bug'])}
+        compact
+        onToggleSecret={vi.fn()}
+        onSelectRequirementPill={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('env-chip-test-gs-night-night')).toHaveTextContent('Night Only');
+    expect(screen.getByTestId('env-chip-test-gs-night-bugs')).toHaveTextContent('Bottled Bugs');
+    expect(screen.queryByTestId('secret-details-test-gs-night')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('secret-expand-btn-test-gs-night'));
+    expect(screen.getByTestId('secret-details-test-gs-night')).toBeInTheDocument();
+    expect(screen.getByTestId('secret-switch2-note-test-gs-night')).toHaveTextContent('Switch 2');
+    expect(screen.getByTestId('secret-protip-test-gs-night')).toHaveTextContent('Re-scoop');
   });
 });
