@@ -562,7 +562,7 @@ for (const target of DEPLOY_TARGETS) {
 }
 
 test.describe('Visual QA Screenshot Suite (Desktop 1440×900 & Mobile 390×844)', () => {
-  test('captures all 5 crisp verification screenshots on strict /Zelda/ subpath', async ({
+  test('captures all 6 crisp verification screenshots on strict /Zelda/ subpath', async ({
     page,
   }, testInfo) => {
     const telemetry = attachZeroErrorTelemetry(page);
@@ -585,12 +585,26 @@ test.describe('Visual QA Screenshot Suite (Desktop 1440×900 & Mobile 390×844)'
       fullPage: false,
     });
 
-    // 2. Desktop 1440×900 — Split-Pane Kakariko Village Dossier (Ready Right Now + Categorized Locks + Sub-tabs)
+    // 2. Desktop 1440×900 — Split-Pane Kakariko Village Dossier (Header, Sub-tabs, Switch 2 Highlights & Ready Now)
     await ensureLoadoutOpen(page, false);
     await page.getByTestId('map-node-kakariko-village').click();
     await expect(page.getByTestId('region-dossier')).toBeVisible();
     await page.screenshot({
       path: path.join(outDir, 'desktop-region-dossier.png'),
+      fullPage: false,
+    });
+
+    // 2b. Desktop 1440×900 — Hyrule Field Dossier (Ready Right Now + Locked Cross-Era Step 1 / Step 2 & Requirement Pills)
+    await page.getByTestId('map-node-hyrule-field').click();
+    await expect(
+      page.getByTestId('region-dossier').getByRole('heading', { level: 2, name: 'Hyrule Field' }),
+    ).toBeVisible();
+    await expect(page.getByTestId('cross-era-steps-hp-05')).toBeVisible();
+    await page
+      .getByTestId('section-ready-now')
+      .evaluate((el) => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await page.screenshot({
+      path: path.join(outDir, 'desktop-region-dossier-locks.png'),
       fullPage: false,
     });
 
