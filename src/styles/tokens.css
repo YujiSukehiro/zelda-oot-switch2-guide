@@ -1,0 +1,342 @@
+/* ==========================================================================
+   Zelda: Ocarina of Time (Switch 2 Remake) — Design System Tokens
+   Default Theme: "Sheikah / Twilight" Dark  |  Alt Theme: "Hyrule Parchment"
+   ========================================================================== */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Core Surfaces */
+  --bg-canvas: #090e1a;
+  --bg-map-ocean: #07101f;
+  --bg-map-land: #111c2d;
+  --bg-surface: #101829;
+  --bg-surface-elevated: #162136;
+  --bg-surface-subtle: #1b2842;
+  --bg-surface-hover: #223252;
+  --bg-surface-active: #293c63;
+  --bg-backdrop: rgba(5, 9, 18, 0.76);
+
+  /* Borders & Dividers */
+  --border-subtle: rgba(148, 175, 219, 0.16);
+  --border-default: rgba(148, 175, 219, 0.26);
+  --border-strong: rgba(186, 209, 247, 0.4);
+
+  /* Text Hierarchy (WCAG AA+ contrast on dark slate) */
+  --text-primary: #f1f5fd;
+  --text-secondary: #b9c7df;
+  --text-muted: #8295b5;
+  --text-inverse: #090e1a;
+
+  /* Triforce Gold — 100% Completion & Primary Brand Accent */
+  --color-triforce: #f5c451;
+  --color-triforce-strong: #ffd666;
+  --color-triforce-bg: rgba(245, 196, 81, 0.14);
+  --color-triforce-border: rgba(245, 196, 81, 0.42);
+  --color-triforce-glow: rgba(245, 196, 81, 0.35);
+
+  /* Kokiri Emerald — Ready Right Now Badges */
+  --color-ready: #2dd48f;
+  --color-ready-strong: #10b981;
+  --color-ready-bg: rgba(45, 212, 143, 0.14);
+  --color-ready-border: rgba(45, 212, 143, 0.42);
+  --color-ready-text: #6ee7b7;
+
+  /* Amber — Early Alternate Tricks & Switch 2 Highlights */
+  --color-amber: #fbbf24;
+  --color-amber-bg: rgba(251, 191, 36, 0.14);
+  --color-amber-border: rgba(251, 191, 36, 0.42);
+  --color-amber-text: #fde68a;
+
+  --color-switch2: #ff8a4c;
+  --color-switch2-bg: rgba(255, 138, 76, 0.14);
+  --color-switch2-border: rgba(255, 138, 76, 0.44);
+  --color-switch2-text: #fdba8c;
+
+  /* Zora Sapphire — Water, Warp & Child Era Accents */
+  --color-sapphire: #38bdf8;
+  --color-sapphire-bg: rgba(56, 189, 248, 0.14);
+  --color-sapphire-border: rgba(56, 189, 248, 0.42);
+  --color-sapphire-text: #7dd3fc;
+
+  /* Locked Status — Crimson (Missing Gear) & Violet (Cross-Era / Song) */
+  --color-locked-crimson: #fb7185;
+  --color-locked-crimson-bg: rgba(251, 113, 133, 0.13);
+  --color-locked-crimson-border: rgba(251, 113, 133, 0.38);
+  --color-locked-crimson-text: #fda4af;
+
+  --color-locked-violet: #c084fc;
+  --color-locked-violet-bg: rgba(192, 132, 252, 0.14);
+  --color-locked-violet-border: rgba(192, 132, 252, 0.42);
+  --color-locked-violet-text: #d8b4fe;
+
+  /* Switch 2 Ocarina Note Button Palette */
+  --note-y: #34d399;
+  --note-x: #60a5fa;
+  --note-a: #f87171;
+  --note-r: #fbbf24;
+  --note-l: #a78bfa;
+
+  /* Hyrule Biome Colors (Regions & Topographic Contours) */
+  --biome-forest: #22c55e;
+  --biome-forest-soft: rgba(34, 197, 94, 0.18);
+  --biome-field: #84cc16;
+  --biome-field-soft: rgba(132, 204, 22, 0.18);
+  --biome-ranch: #eab308;
+  --biome-ranch-soft: rgba(234, 179, 8, 0.18);
+  --biome-town: #f59e0b;
+  --biome-town-soft: rgba(245, 158, 11, 0.18);
+  --biome-village: #f59e0b;
+  --biome-castle: #cbd5e1;
+  --biome-castle-soft: rgba(203, 213, 225, 0.18);
+  --biome-ruins: #94a3b8;
+  --biome-shadow: #a855f7;
+  --biome-shadow-soft: rgba(168, 85, 247, 0.18);
+  --biome-graveyard: #a855f7;
+  --biome-mountain: #f97316;
+  --biome-mountain-soft: rgba(249, 115, 22, 0.18);
+  --biome-volcano: #ef4444;
+  --biome-river: #06b6d4;
+  --biome-water: #0ea5e9;
+  --biome-water-soft: rgba(14, 165, 233, 0.18);
+  --biome-lake: #3b82f6;
+  --biome-canyon: #d97706;
+  --biome-desert: #eab308;
+  --biome-desert-soft: rgba(234, 179, 8, 0.18);
+  --biome-dream: #2dd4bf;
+  --biome-dream-soft: rgba(45, 212, 191, 0.18);
+  --biome-dungeon: #f43f5e;
+  --biome-special: #2dd4bf;
+
+  /* Elevation Shadows */
+  --shadow-xs: 0 1px 2px rgba(2, 6, 17, 0.45);
+  --shadow-sm: 0 4px 12px rgba(2, 6, 17, 0.5);
+  --shadow-md: 0 10px 28px rgba(2, 6, 17, 0.62);
+  --shadow-lg: 0 20px 48px rgba(2, 6, 17, 0.76);
+  --shadow-glow-gold: 0 0 18px rgba(245, 196, 81, 0.36);
+  --shadow-glow-emerald: 0 0 16px rgba(45, 212, 143, 0.34);
+
+  /* Focus Ring */
+  --focus-ring: 0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--color-triforce);
+}
+
+/* ==========================================================================
+   Light Theme: "Hyrule Parchment"
+   ========================================================================== */
+
+[data-theme='parchment'] {
+  color-scheme: light;
+
+  --bg-canvas: #f6f0e1;
+  --bg-map-ocean: #d8e8f2;
+  --bg-map-land: #ebe1c8;
+  --bg-surface: #fcf8ee;
+  --bg-surface-elevated: #ffffff;
+  --bg-surface-subtle: #efe7d3;
+  --bg-surface-hover: #e6dcc3;
+  --bg-surface-active: #dcd0b2;
+  --bg-backdrop: rgba(38, 30, 18, 0.48);
+
+  --border-subtle: rgba(94, 75, 43, 0.15);
+  --border-default: rgba(94, 75, 43, 0.26);
+  --border-strong: rgba(94, 75, 43, 0.44);
+
+  --text-primary: #1f1a12;
+  --text-secondary: #4c402d;
+  --text-muted: #76664c;
+  --text-inverse: #fcf8ee;
+
+  --color-triforce: #b77908;
+  --color-triforce-strong: #925e04;
+  --color-triforce-bg: rgba(183, 121, 8, 0.13);
+  --color-triforce-border: rgba(183, 121, 8, 0.42);
+  --color-triforce-glow: rgba(183, 121, 8, 0.24);
+
+  --color-ready: #0d8a59;
+  --color-ready-strong: #047857;
+  --color-ready-bg: rgba(13, 138, 89, 0.12);
+  --color-ready-border: rgba(13, 138, 89, 0.38);
+  --color-ready-text: #065f46;
+
+  --color-amber: #b45309;
+  --color-amber-bg: rgba(180, 83, 9, 0.12);
+  --color-amber-border: rgba(180, 83, 9, 0.36);
+  --color-amber-text: #92400e;
+
+  --color-switch2: #c2410c;
+  --color-switch2-bg: rgba(194, 65, 12, 0.11);
+  --color-switch2-border: rgba(194, 65, 12, 0.36);
+  --color-switch2-text: #9a3412;
+
+  --color-sapphire: #0369a1;
+  --color-sapphire-bg: rgba(3, 105, 161, 0.11);
+  --color-sapphire-border: rgba(3, 105, 161, 0.35);
+  --color-sapphire-text: #075985;
+
+  --color-locked-crimson: #be123c;
+  --color-locked-crimson-bg: rgba(190, 18, 60, 0.1);
+  --color-locked-crimson-border: rgba(190, 18, 60, 0.34);
+  --color-locked-crimson-text: #9f1239;
+
+  --color-locked-violet: #7e22ce;
+  --color-locked-violet-bg: rgba(126, 34, 206, 0.1);
+  --color-locked-violet-border: rgba(126, 34, 206, 0.34);
+  --color-locked-violet-text: #6b21a8;
+
+  --biome-forest: #15803d;
+  --biome-forest-soft: rgba(21, 128, 61, 0.15);
+  --biome-field: #4d7c0f;
+  --biome-field-soft: rgba(77, 124, 15, 0.15);
+  --biome-ranch: #a16207;
+  --biome-ranch-soft: rgba(161, 98, 7, 0.15);
+  --biome-town: #b45309;
+  --biome-town-soft: rgba(180, 83, 9, 0.15);
+  --biome-village: #b45309;
+  --biome-castle: #475569;
+  --biome-castle-soft: rgba(71, 85, 105, 0.15);
+  --biome-ruins: #64748b;
+  --biome-shadow: #6d28d9;
+  --biome-shadow-soft: rgba(109, 40, 217, 0.14);
+  --biome-graveyard: #6d28d9;
+  --biome-mountain: #c2410c;
+  --biome-mountain-soft: rgba(194, 65, 12, 0.15);
+  --biome-volcano: #b91c1c;
+  --biome-river: #0e7490;
+  --biome-water: #0284c7;
+  --biome-water-soft: rgba(2, 132, 199, 0.15);
+  --biome-lake: #1d4ed8;
+  --biome-canyon: #b45309;
+  --biome-desert: #a16207;
+  --biome-desert-soft: rgba(161, 98, 7, 0.15);
+  --biome-dream: #0f766e;
+  --biome-dream-soft: rgba(15, 118, 110, 0.15);
+  --biome-dungeon: #be123c;
+  --biome-special: #0f766e;
+
+  --shadow-xs: 0 1px 2px rgba(45, 34, 16, 0.08);
+  --shadow-sm: 0 4px 12px rgba(45, 34, 16, 0.11);
+  --shadow-md: 0 10px 26px rgba(45, 34, 16, 0.15);
+  --shadow-lg: 0 20px 44px rgba(45, 34, 16, 0.22);
+  --shadow-glow-gold: 0 0 14px rgba(183, 121, 8, 0.24);
+  --shadow-glow-emerald: 0 0 14px rgba(13, 138, 89, 0.22);
+}
+
+/* ==========================================================================
+   Shared Scale, Typography, Radius & Layout Tokens
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cinzel', 'Georgia', 'Times New Roman', serif;
+  --font-mono: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  --topbar-height: 60px;
+  --drawer-width-desktop: 460px;
+  --bp-mobile: 768px;
+  --bp-tablet: 1024px;
+  --bp-desktop: 1280px;
+
+  --z-map: 1;
+  --z-hud: 10;
+  --z-drawer: 20;
+  --z-dock: 25;
+  --z-popover: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 140ms;
+  --duration-normal: 220ms;
+}
+
+/* ==========================================================================
+   Base Reset & Accessible Defaults
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+dialog {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+}
+
+dialog::backdrop {
+  background: var(--bg-backdrop);
+  backdrop-filter: blur(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
